@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0B2230">
+<title>Hub Pro</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy: #0B2230;
+  --navy2: #0f2c3e;
+  --navy3: #163348;
+  --navy4: #1d3f57;
+  --gold: #B89A4F;
+  --gold2: #d4b872;
+  --gold-dim: rgba(184,154,79,0.12);
+  --gold-dim2: rgba(184,154,79,0.06);
+  --gold-border: rgba(184,154,79,0.28);
+  --offwhite: #E8E6E2;
+  --offwhite2: #b8b6b2;
+  --offwhite3: #787672;
+  --carbon: #111111;
+  --border: rgba(232,230,226,0.08);
+  --border2: rgba(184,154,79,0.22);
+  --radius: 12px;
+  --radius-sm: 8px;
+  --font: 'Montserrat', sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:var(--navy);color:var(--offwhite);font-family:var(--font);overflow:hidden}
+#app{height:100%;display:flex;flex-direction:column;overflow:hidden;max-width:480px;margin:0 auto;position:relative}
+
+.screen{display:none;flex-direction:column;height:100%;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.screen.active{display:flex}
+
+/* ── SPLASH ── */
+#splash{align-items:center;justify-content:center;background:var(--navy);gap:12px}
+.splash-logo-wrap{display:flex;flex-direction:column;align-items:center;gap:4px;margin-bottom:8px}
+.splash-hub{font-size:36px;font-weight:700;color:var(--gold);letter-spacing:2px}
+.splash-litoral{font-size:33px;font-weight:400;color:var(--offwhite);letter-spacing:13px;margin-top:-6px}
+.splash-sub{font-size:10px;font-weight:300;color:var(--offwhite2);letter-spacing:8px;text-transform:uppercase;margin-top:2px}
+.splash-divider{width:1px;height:48px;background:var(--border2);margin:16px 0}
+.splash-pro{font-size:13px;font-weight:600;color:var(--gold);letter-spacing:4px;text-transform:uppercase}
+.splash-bar{width:40px;height:1px;background:var(--border);margin-top:32px;overflow:hidden;position:relative}
+.splash-bar::after{content:'';position:absolute;left:-100%;top:0;width:100%;height:100%;background:var(--gold);animation:loadbar 1.6s ease forwards 0.4s}
+@keyframes loadbar{to{left:100%}}
+
+/* ── HEADER PADRÃO ── */
+.app-header{background:var(--navy);border-bottom:1px solid var(--border);padding:16px 20px;flex-shrink:0;display:flex;align-items:center;gap:12px}
+.back-btn{width:34px;height:34px;border-radius:50%;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--offwhite2);font-size:15px;flex-shrink:0}
+.header-title{font-size:15px;font-weight:600;color:var(--offwhite);flex:1}
+.header-action{font-size:13px;font-weight:600;color:var(--gold);cursor:pointer}
+
+/* ── FORMS ── */
+.form-body{padding:20px;display:flex;flex-direction:column;gap:14px}
+.photo-area{display:flex;flex-direction:column;align-items:center;padding:24px 0 20px}
+.photo-circle{width:84px;height:84px;border-radius:50%;background:var(--navy3);border:1.5px solid var(--border2);display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;overflow:hidden}
+.photo-circle img{width:100%;height:100%;object-fit:cover}
+.photo-ph{font-size:30px;color:var(--offwhite3)}
+.photo-badge{position:absolute;bottom:0;right:0;width:24px;height:24px;background:var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--navy);font-weight:700}
+.photo-label{margin-top:8px;font-size:11px;color:var(--offwhite3);letter-spacing:.03em}
+.field{display:flex;flex-direction:column;gap:5px}
+.field label{font-size:11px;font-weight:600;color:var(--offwhite3);letter-spacing:.06em;text-transform:uppercase}
+.field input,.field select{background:var(--navy3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;font-size:14px;color:var(--offwhite);font-family:var(--font);outline:none;transition:border-color .2s;-webkit-appearance:none;font-weight:400}
+.field input:focus,.field select:focus{border-color:var(--border2)}
+.field input::placeholder{color:var(--offwhite3)}
+.field select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23787672' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:36px}
+.field select option{background:var(--navy3);color:var(--offwhite)}
+.btn-primary{background:var(--gold);color:var(--navy);border:none;border-radius:var(--radius-sm);padding:14px;font-size:14px;font-weight:700;font-family:var(--font);cursor:pointer;letter-spacing:.04em;transition:opacity .15s;margin-top:4px}
+.btn-primary:active{opacity:.85}
+.btn-sec{background:transparent;color:var(--offwhite2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:13px;font-size:13px;font-weight:500;font-family:var(--font);cursor:pointer;margin-top:4px}
+.btn-sec:active{opacity:.75}
+
+/* ── ONBOARDING ── */
+#perfil .app-header{justify-content:space-between}
+.skip-btn{font-size:13px;color:var(--gold);cursor:pointer;font-weight:500}
+
+/* ── DISC ── */
+.disc-progress-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.disc-q-label{font-size:11px;color:var(--offwhite3);font-weight:600;letter-spacing:.06em}
+.disc-bar{height:2px;background:var(--border);border-radius:2px;overflow:hidden}
+.disc-bar-fill{height:100%;background:var(--gold);border-radius:2px;transition:width .4s ease}
+.disc-body{flex:1;padding:24px 20px 20px;display:flex;flex-direction:column}
+.disc-question{font-size:19px;font-weight:700;color:var(--offwhite);line-height:1.4;margin-bottom:6px;letter-spacing:-.3px}
+.disc-sub{font-size:12px;color:var(--offwhite3);margin-bottom:24px;line-height:1.5;font-weight:400}
+.disc-options{display:flex;flex-direction:column;gap:9px}
+.disc-opt{background:var(--navy3);border:1px solid var(--border);border-radius:var(--radius);padding:13px 14px;cursor:pointer;transition:all .15s;display:flex;align-items:flex-start;gap:10px}
+.disc-opt.selected{border-color:var(--gold-border);background:var(--gold-dim)}
+.opt-letter{width:26px;height:26px;border-radius:6px;background:var(--navy4);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--offwhite3);flex-shrink:0;transition:all .15s;letter-spacing:.04em}
+.disc-opt.selected .opt-letter{background:var(--gold);color:var(--navy)}
+.opt-text{font-size:13px;color:var(--offwhite);line-height:1.5;padding-top:4px;font-weight:400}
+.disc-next{margin-top:20px}
+
+/* ── RESULTADO DISC ── */
+.res-hero{padding:28px 20px 22px;background:var(--navy2);border-bottom:1px solid var(--border);text-align:center}
+.res-badge{display:inline-flex;align-items:center;gap:8px;background:var(--gold-dim);border:1px solid var(--border2);border-radius:20px;padding:5px 14px;margin-bottom:14px}
+.res-badge-letter{font-size:20px;font-weight:700;color:var(--gold)}
+.res-badge-name{font-size:12px;color:var(--gold2);font-weight:600;letter-spacing:.04em;text-transform:uppercase}
+.res-title{font-size:21px;font-weight:700;color:var(--offwhite);letter-spacing:-.3px;margin-bottom:6px}
+.res-desc{font-size:13px;color:var(--offwhite2);line-height:1.65;max-width:300px;margin:0 auto;font-weight:400}
+.res-body{padding:16px 20px 8px;display:flex;flex-direction:column;gap:12px}
+.res-card{background:var(--navy2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px}
+.res-card-title{font-size:10px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px}
+.res-item{display:flex;align-items:flex-start;gap:8px;font-size:13px;color:var(--offwhite);line-height:1.5;padding:4px 0}
+.res-dot{width:4px;height:4px;border-radius:50%;background:var(--gold);flex-shrink:0;margin-top:7px}
+.barra-row{display:flex;align-items:center;gap:10px;margin-bottom:7px}
+.barra-label{font-size:11px;font-weight:700;color:var(--offwhite3);width:14px;text-align:center;letter-spacing:.04em}
+.barra-track{flex:1;height:5px;background:var(--border);border-radius:3px;overflow:hidden}
+.barra-fill{height:100%;border-radius:3px;background:var(--gold);transition:width 1.1s ease}
+.barra-pct{font-size:10px;color:var(--offwhite3);width:28px;text-align:right;font-weight:600}
+.res-btn-row{display:flex;gap:10px;padding:12px 20px 28px}
+
+/* ── HOME ── */
+.home-header{padding:18px 20px 14px;background:var(--navy);border-bottom:1px solid var(--border);flex-shrink:0}
+.home-top{display:flex;align-items:center;justify-content:space-between}
+.home-user{display:flex;align-items:center;gap:11px}
+.home-avatar{width:40px;height:40px;border-radius:50%;background:var(--navy3);border:1.5px solid var(--border2);overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:var(--gold);flex-shrink:0}
+.home-avatar img{width:100%;height:100%;object-fit:cover}
+.home-name{font-size:14px;font-weight:700;color:var(--offwhite);letter-spacing:-.2px}
+.home-city{font-size:11px;color:var(--offwhite3);font-weight:400}
+.home-disc-badge{background:var(--gold-dim);border:1px solid var(--border2);border-radius:20px;padding:4px 11px;font-size:11px;font-weight:700;color:var(--gold);letter-spacing:.04em;cursor:pointer;text-transform:uppercase}
+.home-body{padding:18px 20px;display:flex;flex-direction:column;gap:16px;padding-bottom:32px}
+.section-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px}
+.section-hd-title{font-size:10px;font-weight:700;color:var(--offwhite3);text-transform:uppercase;letter-spacing:.08em}
+.section-hd-link{font-size:11px;color:var(--gold);cursor:pointer;font-weight:600}
+
+/* Meta semanal */
+.meta-card{background:var(--navy2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px}
+.meta-prompt{font-size:13px;color:var(--offwhite2);margin-bottom:10px;line-height:1.5;font-weight:400}
+.meta-input{background:var(--navy3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;font-size:13px;color:var(--offwhite);font-family:var(--font);width:100%;outline:none;resize:none;transition:border-color .2s;font-weight:400}
+.meta-input:focus{border-color:var(--border2)}
+.meta-input::placeholder{color:var(--offwhite3)}
+.meta-saved{font-size:13px;color:var(--offwhite);font-style:italic;line-height:1.55;padding:8px 0 4px;font-weight:400}
+.meta-label-saved{font-size:10px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px}
+.meta-check-wrap{display:flex;flex-direction:column;gap:8px;margin-top:10px;border-top:1px solid var(--border);padding-top:10px}
+.meta-check-label{font-size:11px;color:var(--offwhite3);font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+.meta-check-row{display:flex;gap:8px}
+.meta-check-btn{flex:1;padding:9px 6px;border-radius:var(--radius-sm);font-size:12px;font-weight:700;font-family:var(--font);cursor:pointer;border:1px solid var(--border);background:var(--navy3);color:var(--offwhite2);transition:all .15s;letter-spacing:.03em}
+.meta-check-btn.sim{border-color:rgba(74,222,128,.3);color:#4ade80;background:rgba(74,222,128,.08)}
+.meta-check-btn.nao{border-color:rgba(248,113,113,.3);color:#f87171;background:rgba(248,113,113,.08)}
+
+/* Pergunta do dia */
+.pdq-card{background:var(--gold-dim);border:1px solid var(--border2);border-radius:var(--radius);padding:16px}
+.pdq-label{font-size:10px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px}
+.pdq-text{font-size:15px;font-weight:600;color:var(--offwhite);line-height:1.5;margin-bottom:12px}
+.pdq-input{background:var(--navy3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;font-size:13px;color:var(--offwhite);font-family:var(--font);width:100%;outline:none;resize:none;font-weight:400;transition:border-color .2s}
+.pdq-input:focus{border-color:var(--border2)}
+.pdq-input::placeholder{color:var(--offwhite3)}
+.pdq-save{margin-top:8px;width:100%;padding:9px;background:var(--gold);color:var(--navy);border:none;border-radius:var(--radius-sm);font-size:12px;font-weight:700;font-family:var(--font);cursor:pointer;letter-spacing:.04em}
+.pdq-done{font-size:12px;color:var(--offwhite3);font-style:italic;padding-top:4px;font-weight:400}
+
+/* Streak */
+.streak-row{display:flex;gap:5px}
+.streak-day{flex:1;height:26px;border-radius:5px;background:var(--navy3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:var(--offwhite3);letter-spacing:.04em;text-transform:uppercase}
+.streak-day.done{background:var(--gold-dim);border-color:var(--border2);color:var(--gold)}
+.streak-day.today{background:var(--gold);border-color:var(--gold);color:var(--navy)}
+
+/* Plano card */
+.plan-card{background:var(--navy2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;cursor:pointer}
+.plan-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.plan-label{font-size:10px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.08em}
+.plan-pct{font-size:11px;color:var(--offwhite3);font-weight:700}
+.plan-title{font-size:14px;font-weight:700;color:var(--offwhite);margin-bottom:3px}
+.plan-sub{font-size:12px;color:var(--offwhite3);margin-bottom:10px;font-weight:400}
+.plan-bar{height:3px;background:var(--border);border-radius:2px;overflow:hidden}
+.plan-bar-fill{height:100%;background:var(--gold);border-radius:2px;transition:width .6s ease}
+
+/* Pilares grid */
+.pillar-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}
+.pillar-card{background:var(--navy2);border:1px solid var(--border);border-radius:var(--radius);padding:13px;cursor:pointer;transition:border-color .15s}
+.pillar-card:active{opacity:.8}
+.pillar-card.gold-border{border-color:var(--border2)}
+.pillar-icon{font-size:18px;margin-bottom:7px}
+.pillar-name{font-size:12px;font-weight:700;color:var(--offwhite);margin-bottom:2px;letter-spacing:-.1px}
+.pillar-sub{font-size:10px;color:var(--offwhite3);font-weight:400}
+
+/* ── PILAR DETALHE ── */
+.insight-card{background:var(--navy2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:9px}
+.insight-head{padding:13px 14px;display:flex;align-items:center;gap:9px;cursor:pointer}
+.insight-head:active{background:var(--navy3)}
+.insight-tag{font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;text-transform:uppercase;letter-spacing:.06em;flex-shrink:0}
+.tag-urgente{background:rgba(248,113,113,.15);color:#f87171}
+.tag-habito{background:var(--gold-dim);color:var(--gold)}
+.tag-atitude{background:rgba(74,222,128,.12);color:#4ade80}
+.tag-dados{background:rgba(139,92,246,.15);color:#a78bfa}
+.insight-text{font-size:13px;color:var(--offwhite);flex:1;line-height:1.4;font-weight:500}
+.insight-body{padding:12px 14px;font-size:12px;color:var(--offwhite2);line-height:1.7;border-top:1px solid var(--border);display:none;font-weight:400}
+.insight-body.open{display:block}
+.disc-tip-card{background:var(--gold-dim);border:1px solid var(--border2);border-radius:var(--radius);padding:13px 14px;margin-top:4px}
+.disc-tip-label{font-size:9px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.1em;margin-bottom:5px}
+.disc-tip-text{font-size:12px;color:var(--offwhite);line-height:1.65;font-weight:400}
+
+/* ── SCRIPTS DE OBJEÇÃO ── */
+.obj-card{background:var(--navy2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:9px}
+.obj-head{padding:13px 14px;cursor:pointer;display:flex;align-items:flex-start;gap:9px}
+.obj-head:active{background:var(--navy3)}
+.obj-quote{font-size:13px;font-weight:600;color:var(--offwhite);line-height:1.4;flex:1;font-style:italic}
+.obj-body{padding:0 14px 14px;border-top:1px solid var(--border);display:none}
+.obj-body.open{display:block}
+.obj-response{margin-top:10px}
+.obj-resp-label{font-size:9px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px}
+.obj-resp-disc{font-size:10px;font-weight:700;background:var(--gold-dim);color:var(--gold);border:1px solid var(--border2);border-radius:20px;padding:2px 8px;display:inline-block;margin-bottom:5px;letter-spacing:.04em}
+.obj-resp-text{font-size:12px;color:var(--offwhite2);line-height:1.65;font-weight:400}
+.obj-resp-divider{height:1px;background:var(--border);margin:10px 0}
+
+/* ── MERCADO SC ── */
+.mercado-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;margin-bottom:12px}
+.mercado-card{background:var(--navy2);border:1px solid var(--border);border-radius:var(--radius);padding:12px}
+.mercado-cidade{font-size:11px;font-weight:700;color:var(--offwhite);margin-bottom:2px}
+.mercado-preco{font-size:16px;font-weight:700;color:var(--gold)}
+.mercado-unit{font-size:10px;color:var(--offwhite3);margin-top:1px;font-weight:400}
+.mercado-info-card{background:var(--navy2);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:9px}
+.mercado-info-title{font-size:10px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
+.mercado-info-item{display:flex;align-items:flex-start;gap:7px;padding:5px 0;border-bottom:1px solid var(--border);font-size:12px;color:var(--offwhite);line-height:1.5;font-weight:400}
+.mercado-info-item:last-child{border-bottom:none}
+.mi-dot{width:4px;height:4px;border-radius:50%;background:var(--gold);flex-shrink:0;margin-top:6px}
+
+/* ── SIMULADOR ── */
+.sim-scenario{background:var(--navy2);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px}
+.sim-context{font-size:12px;color:var(--offwhite3);margin-bottom:8px;line-height:1.5;font-weight:400}
+.sim-cliente{background:var(--navy3);border-radius:var(--radius-sm);padding:12px;margin-bottom:14px;border-left:2px solid var(--border2)}
+.sim-cliente-label{font-size:9px;font-weight:700;color:var(--offwhite3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+.sim-cliente-fala{font-size:13px;color:var(--offwhite);font-style:italic;line-height:1.5;font-weight:500}
+.sim-options{display:flex;flex-direction:column;gap:8px}
+.sim-opt{background:var(--navy3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:11px 13px;cursor:pointer;font-size:12px;color:var(--offwhite);line-height:1.5;font-weight:400;transition:border-color .15s}
+.sim-opt:active{opacity:.8}
+.sim-opt.correct{border-color:rgba(74,222,128,.4);background:rgba(74,222,128,.06)}
+.sim-opt.wrong{border-color:rgba(248,113,113,.4);background:rgba(248,113,113,.06)}
+.sim-result{margin-top:12px;padding:12px;background:var(--navy3);border-radius:var(--radius-sm);font-size:12px;color:var(--offwhite);line-height:1.65;display:none;font-weight:400}
+.sim-result.show{display:block}
+.sim-result-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px}
+.sim-next{margin-top:10px;width:100%;padding:10px;background:var(--gold);color:var(--navy);border:none;border-radius:var(--radius-sm);font-size:12px;font-weight:700;font-family:var(--font);cursor:pointer;letter-spacing:.04em;display:none}
+.sim-next.show{display:block}
+
+/* ── CELEBRAÇÃO ── */
+#celebracao{align-items:center;justify-content:center;background:var(--navy);text-align:center;padding:40px 32px}
+.cel-icon{font-size:52px;margin-bottom:16px}
+.cel-title{font-size:24px;font-weight:700;color:var(--offwhite);margin-bottom:8px;letter-spacing:-.4px}
+.cel-sub{font-size:14px;color:var(--offwhite2);line-height:1.65;margin-bottom:28px;font-weight:400}
+.cel-gold{color:var(--gold)}
+
+/* ── BOTTOM NAV ── */
+#bottom-nav{display:none;background:var(--navy);border-top:1px solid var(--border);padding:6px 0 calc(6px + env(safe-area-inset-bottom));flex-shrink:0}
+#bottom-nav.visible{display:flex}
+.nav-items{display:flex;width:100%}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 4px;cursor:pointer}
+.nav-icon{font-size:19px}
+.nav-label{font-size:9px;color:var(--offwhite3);font-weight:600;letter-spacing:.04em;text-transform:uppercase}
+.nav-item.active .nav-label{color:var(--gold)}
+
+/* ── REGISTROS ── */
+.registro-item{background:var(--navy2);border:1px solid var(--border);border-radius:var(--radius);padding:13px 14px;margin-bottom:8px}
+.reg-data{font-size:10px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+.reg-text{font-size:13px;color:var(--offwhite);line-height:1.55;font-weight:400}
+.reg-empty{text-align:center;padding:40px 20px;color:var(--offwhite3);font-size:13px;line-height:1.65;font-weight:400}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- SPLASH -->
+<div id="splash" class="screen active">
+  <div class="splash-logo-wrap">
+    <div class="splash-hub">HUB</div>
+    <div class="splash-litoral">LITORAL</div>
+    <div class="splash-sub">Negócios Imobiliários</div>
+  </div>
+  <div class="splash-divider"></div>
+  <div class="splash-pro">PRO</div>
+  <div class="splash-bar"></div>
+</div>
+
+<!-- ONBOARDING PERFIL -->
+<div id="perfil" class="screen">
+  <div class="app-header">
+    <div class="header-title">Seu perfil</div>
+    <div class="skip-btn" onclick="skipOnboarding()">Pular</div>
+  </div>
+  <div style="overflow-y:auto;flex:1">
+    <div class="photo-area">
+      <div class="photo-circle" onclick="document.getElementById('photo-input').click()">
+        <img id="photo-preview" src="" style="display:none">
+        <span class="photo-ph" id="photo-icon">👤</span>
+        <div class="photo-badge">+</div>
+      </div>
+      <div class="photo-label">Adicionar foto</div>
+      <input type="file" id="photo-input" accept="image/*" style="display:none" onchange="handlePhoto(this,'photo-preview','photo-icon')">
+    </div>
+    <div class="form-body" style="padding-top:0">
+      <div class="field"><label>Nome completo</label><input type="text" id="inp-nome" placeholder="Seu nome" autocomplete="name"></div>
+      <div class="field"><label>Cidade</label><input type="text" id="inp-cidade" placeholder="Ex: Penha, SC"></div>
+      <div class="field"><label>Tempo como corretor</label>
+        <select id="inp-tempo"><option value="">Selecionar</option><option>Menos de 1 ano</option><option>1 a 3 anos</option><option>3 a 5 anos</option><option>5 a 10 anos</option><option>Mais de 10 anos</option></select></div>
+      <div class="field"><label>Especialidade</label>
+        <select id="inp-esp"><option value="">Selecionar</option><option>Residencial</option><option>Comercial</option><option>Temporada / Litoral</option><option>Lançamentos</option><option>Gestão de equipe</option></select></div>
+      <div class="field"><label>Meta mensal de vendas</label>
+        <select id="inp-meta"><option value="">Selecionar</option><option>1 venda/mês</option><option>2 a 3 vendas/mês</option><option>4 a 6 vendas/mês</option><option>Mais de 6 vendas/mês</option></select></div>
+      <button class="btn-primary" onclick="savePerfil()">Continuar para diagnóstico DISC →</button>
+    </div>
+  </div>
+</div>
+
+<!-- DISC QUIZ -->
+<div id="disc" class="screen">
+  <div class="app-header">
+    <div class="back-btn" onclick="discBack()">←</div>
+    <div style="flex:1;padding:0 8px">
+      <div class="disc-progress-row">
+        <span class="disc-q-label" id="disc-counter">1 / 12</span>
+        <span class="disc-q-label" id="disc-pct">8%</span>
+      </div>
+      <div class="disc-bar"><div class="disc-bar-fill" id="disc-bar-fill" style="width:8%"></div></div>
+    </div>
+  </div>
+  <div class="disc-body">
+    <div class="disc-question" id="disc-q"></div>
+    <div class="disc-sub" id="disc-sub"></div>
+    <div class="disc-options" id="disc-opts"></div>
+    <div class="disc-next" id="disc-next-wrap" style="display:none">
+      <button class="btn-primary" style="width:100%" onclick="discNext()">Próxima →</button>
+    </div>
+  </div>
+</div>
+
+<!-- RESULTADO DISC -->
+<div id="resultado" class="screen">
+  <div class="app-header">
+    <div class="back-btn" onclick="showScreen('home')">←</div>
+    <div class="header-title">Seu perfil DISC</div>
+    <div class="header-action" onclick="refazerDisc()">Refazer</div>
+  </div>
+  <div style="overflow-y:auto;flex:1">
+    <div class="res-hero">
+      <div class="res-badge"><span class="res-badge-letter" id="res-letter">D</span><span class="res-badge-name" id="res-profile-name">Dominante</span></div>
+      <div class="res-title" id="res-title"></div>
+      <div class="res-desc" id="res-desc"></div>
+    </div>
+    <div class="res-body">
+      <div class="res-card"><div class="res-card-title">Distribuição do seu perfil</div><div id="res-barras"></div></div>
+      <div class="res-card"><div class="res-card-title">Pontos fortes em vendas</div><div id="res-strengths"></div></div>
+      <div class="res-card"><div class="res-card-title">Pontos de atenção</div><div id="res-watch"></div></div>
+      <div class="res-card"><div class="res-card-title">Como você aprende melhor</div><div id="res-how"></div></div>
+    </div>
+    <div class="res-btn-row">
+      <button class="btn-primary" style="flex:1" onclick="goHome()">Ir para o Hub Pro →</button>
+    </div>
+  </div>
+</div>
+
+<!-- CELEBRAÇÃO -->
+<div id="celebracao" class="screen">
+  <div class="cel-icon" id="cel-icon">🏆</div>
+  <div class="cel-title" id="cel-title">Semana 1 concluída</div>
+  <div class="cel-sub" id="cel-sub">Você completou a primeira semana do programa. A maioria das pessoas não chega até aqui — você chegou.</div>
+  <button class="btn-primary" style="width:100%;max-width:280px" onclick="showScreen('home')">Continuar →</button>
+</div>
+
+<!-- HOME -->
+<div id="home" class="screen">
+  <div class="home-header">
+    <div class="home-top">
+      <div class="home-user">
+        <div class="home-avatar" id="home-avatar"></div>
+        <div><div class="home-name" id="home-name">Corretor</div><div class="home-city" id="home-city"></div></div>
+      </div>
+      <div class="home-disc-badge" id="home-disc-badge" onclick="showScreen('resultado')" style="display:none"></div>
+    </div>
+  </div>
+  <div class="home-body">
+    <!-- META SEMANAL -->
+    <div id="meta-section"></div>
+    <!-- PERGUNTA DO DIA -->
+    <div>
+      <div class="section-hd"><span class="section-hd-title">Pergunta do dia</span><span class="section-hd-link" onclick="showRegistros()">Ver registros</span></div>
+      <div id="pdq-section"></div>
+    </div>
+    <!-- STREAK -->
+    <div>
+      <div class="section-hd"><span class="section-hd-title">Sequência da semana</span><span class="section-hd-link" onclick="showPlano30()">Plano 30 dias</span></div>
+      <div class="streak-row" id="streak-row"></div>
+    </div>
+    <!-- PLANO 30 DIAS -->
+    <div class="plan-card" onclick="showPlano30()">
+      <div class="plan-top"><span class="plan-label">Plano 30 dias</span><span class="plan-pct" id="plan-pct">0%</span></div>
+      <div class="plan-title">Desenvolvimento de mentalidade</div>
+      <div class="plan-sub" id="plan-next-task">Toque para começar o dia 1</div>
+      <div class="plan-bar"><div class="plan-bar-fill" id="plan-bar" style="width:0%"></div></div>
+    </div>
+    <!-- PILARES -->
+    <div>
+      <div class="section-hd"><span class="section-hd-title">6 Pilares de performance</span></div>
+      <div class="pillar-grid">
+        <div class="pillar-card" onclick="openPilar('mindset')"><div class="pillar-icon">🧠</div><div class="pillar-name">Mentalidade</div><div class="pillar-sub">Fundação</div></div>
+        <div class="pillar-card" onclick="openPilar('processo')"><div class="pillar-icon">⚙️</div><div class="pillar-name">Processo</div><div class="pillar-sub">Do lead ao fechamento</div></div>
+        <div class="pillar-card" onclick="openPilar('equipe')"><div class="pillar-icon">👥</div><div class="pillar-name">Equipe</div><div class="pillar-sub">Gestão e liderança</div></div>
+        <div class="pillar-card" onclick="openPilar('cliente')"><div class="pillar-icon">🤝</div><div class="pillar-name">Cliente</div><div class="pillar-sub">Relacionamento</div></div>
+        <div class="pillar-card" onclick="openPilar('dados')"><div class="pillar-icon">📊</div><div class="pillar-name">Métricas</div><div class="pillar-sub">O que se mede, cresce</div></div>
+        <div class="pillar-card" onclick="openPilar('mercado')"><div class="pillar-icon">🏙️</div><div class="pillar-name">Mercado</div><div class="pillar-sub">Autoridade local</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PILAR / PLANO / SIMULADOR / OBJECTIONS / MERCADO SC / REGISTROS -->
+<div id="detail" class="screen">
+  <div class="app-header">
+    <div class="back-btn" onclick="detailBack()">←</div>
+    <div class="header-title" id="detail-title"></div>
+  </div>
+  <div style="overflow-y:auto;flex:1;padding:16px 20px 32px" id="detail-body"></div>
+</div>
+
+<!-- EDIT PERFIL -->
+<div id="edit-perfil" class="screen">
+  <div class="app-header">
+    <div class="back-btn" onclick="showHome()">←</div>
+    <div class="header-title">Editar perfil</div>
+    <div class="header-action" onclick="saveEditPerfil()">Salvar</div>
+  </div>
+  <div style="overflow-y:auto;flex:1">
+    <div class="photo-area">
+      <div class="photo-circle" onclick="document.getElementById('photo-input2').click()">
+        <img id="photo-preview2" src="" style="display:none">
+        <span class="photo-ph" id="photo-icon2">👤</span>
+        <div class="photo-badge">+</div>
+      </div>
+      <div class="photo-label">Alterar foto</div>
+      <input type="file" id="photo-input2" accept="image/*" style="display:none" onchange="handlePhoto(this,'photo-preview2','photo-icon2')">
+    </div>
+    <div class="form-body" style="padding-top:0">
+      <div class="field"><label>Nome completo</label><input type="text" id="edit-nome"></div>
+      <div class="field"><label>Cidade</label><input type="text" id="edit-cidade"></div>
+      <div class="field"><label>Tempo como corretor</label>
+        <select id="edit-tempo"><option>Menos de 1 ano</option><option>1 a 3 anos</option><option>3 a 5 anos</option><option>5 a 10 anos</option><option>Mais de 10 anos</option></select></div>
+      <div class="field"><label>Especialidade</label>
+        <select id="edit-esp"><option>Residencial</option><option>Comercial</option><option>Temporada / Litoral</option><option>Lançamentos</option><option>Gestão de equipe</option></select></div>
+      <div class="field"><label>Meta mensal</label>
+        <select id="edit-meta"><option>1 venda/mês</option><option>2 a 3 vendas/mês</option><option>4 a 6 vendas/mês</option><option>Mais de 6 vendas/mês</option></select></div>
+      <button class="btn-primary" onclick="saveEditPerfil()">Salvar alterações</button>
+      <button class="btn-sec" onclick="refazerDisc()">Refazer diagnóstico DISC</button>
+    </div>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<div id="bottom-nav">
+  <div class="nav-items">
+    <div class="nav-item active" id="nav-home" onclick="navTo('home')"><span class="nav-icon">🏠</span><span class="nav-label">Início</span></div>
+    <div class="nav-item" id="nav-obj" onclick="navTo('objections')"><span class="nav-icon">💬</span><span class="nav-label">Objeções</span></div>
+    <div class="nav-item" id="nav-sim" onclick="navTo('simulador')"><span class="nav-icon">🎯</span><span class="nav-label">Simular</span></div>
+    <div class="nav-item" id="nav-sc" onclick="navTo('mercadosc')"><span class="nav-icon">🏖️</span><span class="nav-label">Mercado SC</span></div>
+    <div class="nav-item" id="nav-perfil" onclick="navTo('edit-perfil')"><span class="nav-icon">👤</span><span class="nav-label">Perfil</span></div>
+  </div>
+</div>
+
+</div>
+<script>
+// ─── STATE ─────────────────────────────────────
+let S={nome:'',cidade:'',tempo:'',esp:'',meta:'',photo:'',disc:null,discScores:{D:0,I:0,S:0,C:0},plan:{checks:{}},pdq:{},meta_semanal:{},registros:[],onboarded:false};
+function load(){try{const s=localStorage.getItem('hubpro2');if(s)S={...S,...JSON.parse(s)};}catch(e){}}
+function save(){try{localStorage.setItem('hubpro2',JSON.stringify(S));}catch(e){}}
+
+// ─── SCREENS ───────────────────────────────────
+let detailFrom='home';
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  try{document.getElementById(id).scrollTop=0;}catch(e){}
+  const withNav=['home','detail','edit-perfil'];
+  document.getElementById('bottom-nav').classList.toggle('visible',withNav.includes(id));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  if(id==='home')document.getElementById('nav-home').classList.add('active');
+  if(id==='edit-perfil')document.getElementById('nav-perfil').classList.add('active');
+}
+function detailBack(){showScreen(detailFrom==='home'?'home':detailFrom);}
+function showHome(){updateHomeHeader();buildStreak();updatePlanCard();buildMetaSection();buildPDQ();showScreen('home');}
+function navTo(id){
+  if(id==='objections'){openObjeccoes();return;}
+  if(id==='simulador'){openSimulador();return;}
+  if(id==='mercadosc'){openMercadoSC();return;}
+  showScreen(id);
+  if(id==='edit-perfil'){loadEditForm();}
+}
+function showHome(){updateHomeHeader();buildStreak();updatePlanCard();buildMetaSection();buildPDQ();showScreen('home');document.getElementById('nav-home').classList.add('active');}
+
+// ─── PHOTO ─────────────────────────────────────
+function handlePhoto(input,previewId,iconId){
+  const file=input.files[0];if(!file)return;
+  const r=new FileReader();
+  r.onload=e=>{
+    S.photo=e.target.result;save();
+    const img=document.getElementById(previewId);
+    img.src=e.target.result;img.style.display='block';
+    document.getElementById(iconId).style.display='none';
+    updateHomeAvatar();
+  };r.readAsDataURL(file);
+}
+function updateHomeAvatar(){
+  const av=document.getElementById('home-avatar');
+  if(S.photo){av.innerHTML=`<img src="${S.photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;}
+  else{av.textContent=(S.nome||'C').charAt(0).toUpperCase();}
+}
+
+// ─── PERFIL ────────────────────────────────────
+function savePerfil(){
+  S.nome=document.getElementById('inp-nome').value.trim()||'Corretor';
+  S.cidade=document.getElementById('inp-cidade').value.trim();
+  S.tempo=document.getElementById('inp-tempo').value;
+  S.esp=document.getElementById('inp-esp').value;
+  S.meta=document.getElementById('inp-meta').value;
+  S.onboarded=true;save();startDisc();
+}
+function skipOnboarding(){S.nome=document.getElementById('inp-nome').value.trim()||'Corretor';S.onboarded=true;save();if(S.disc)showHome();else startDisc();}
+function loadEditForm(){
+  document.getElementById('edit-nome').value=S.nome;
+  document.getElementById('edit-cidade').value=S.cidade;
+  document.getElementById('edit-tempo').value=S.tempo;
+  document.getElementById('edit-esp').value=S.esp;
+  document.getElementById('edit-meta').value=S.meta;
+  if(S.photo){const img=document.getElementById('photo-preview2');img.src=S.photo;img.style.display='block';document.getElementById('photo-icon2').style.display='none';}
+}
+function saveEditPerfil(){
+  S.nome=document.getElementById('edit-nome').value.trim()||S.nome;
+  S.cidade=document.getElementById('edit-cidade').value.trim();
+  S.tempo=document.getElementById('edit-tempo').value;
+  S.esp=document.getElementById('edit-esp').value;
+  S.meta=document.getElementById('edit-meta').value;
+  save();showHome();
+}
+
+// ─── DISC DATA ──────────────────────────────────
+const DQ=[
+  {q:"Quando aparece um desafio difícil, sua reação natural é:",sub:"Escolha a que mais se parece com você",opts:[{t:"Ir direto à ação — resolver agora, analisar depois",d:"D"},{t:"Chamar alguém para resolver junto, energizado pelo problema",d:"I"},{t:"Pensar com calma antes de agir, evitar erros",d:"S"},{t:"Levantar todos os dados antes de qualquer movimento",d:"C"}]},
+  {q:"Como você prefere receber um feedback?",sub:"Seja honesto — não há resposta certa",opts:[{t:"Direto, sem rodeios — diz logo o que foi",d:"D"},{t:"Em conversa aberta, com entusiasmo pelo que posso melhorar",d:"I"},{t:"Com calma, explicando bem o contexto",d:"S"},{t:"Por escrito, com dados e exemplos concretos",d:"C"}]},
+  {q:"Durante uma negociação difícil, você tende a:",sub:"Pense na sua última negociação real",opts:[{t:"Pressionar pelo fechamento — resultado importa",d:"D"},{t:"Criar rapport, usar entusiasmo para convencer",d:"I"},{t:"Ouvir muito, garantir que o cliente se sente seguro",d:"S"},{t:"Apresentar argumentos lógicos e provas concretas",d:"C"}]},
+  {q:"O que mais te motiva no trabalho de corretor?",sub:"A resposta que vier primeiro é a mais verdadeira",opts:[{t:"Bater metas, vencer a concorrência, ser o melhor",d:"D"},{t:"O relacionamento com as pessoas, a energia das conversas",d:"I"},{t:"Ajudar de verdade, ver o cliente satisfeito",d:"S"},{t:"Dominar o mercado, saber mais que qualquer concorrente",d:"C"}]},
+  {q:"Com muitas tarefas ao mesmo tempo, você:",sub:"Sua tendência natural, não o ideal",opts:[{t:"Prioriza o que dá resultado mais rápido e parte",d:"D"},{t:"Conversa com alguém para organizar as ideias",d:"I"},{t:"Segue uma lista, com calma, sem pular etapas",d:"S"},{t:"Organiza tudo por prioridade e prazo antes de começar",d:"C"}]},
+  {q:"Como você lida com clientes que demoram para decidir?",sub:"Como você realmente reage",opts:[{t:"Fica impaciente e tenta forçar a decisão",d:"D"},{t:"Continua se relacionando, manda mensagens animadas",d:"I"},{t:"Respeita o ritmo, faz follow-up gentil e consistente",d:"S"},{t:"Envia mais informações e dados para ajudar na decisão",d:"C"}]},
+  {q:"Numa reunião de equipe, seu papel natural é:",sub:"O que acontece espontaneamente",opts:[{t:"Quem define o rumo e toma as decisões",d:"D"},{t:"Quem anima o grupo e gera energia",d:"I"},{t:"Quem garante que todos sejam ouvidos",d:"S"},{t:"Quem questiona e garante que a lógica faça sentido",d:"C"}]},
+  {q:"Quando um plano não funciona, você:",sub:"Sua primeira reação",opts:[{t:"Muda de rota na hora — sem apego ao plano anterior",d:"D"},{t:"Conversa com a equipe para levantar o moral",d:"I"},{t:"Avalia com cuidado antes de mudar qualquer coisa",d:"S"},{t:"Analisa o que deu errado para não repetir",d:"C"}]},
+  {q:"Qual frase mais combina com você?",sub:"A que ressoa mais profundamente",opts:[{t:"Feito é melhor que perfeito",d:"D"},{t:"Quem tem amigos, tem tudo",d:"I"},{t:"Devagar e sempre — consistência ganha",d:"S"},{t:"Deus está nos detalhes",d:"C"}]},
+  {q:"O que mais incomoda em um colega de trabalho?",sub:"O que realmente te irrita",opts:[{t:"Lentidão, indecisão, falta de foco em resultado",d:"D"},{t:"Falta de entusiasmo, frieza, pouca interação",d:"I"},{t:"Pressão excessiva, mudanças constantes sem aviso",d:"S"},{t:"Falta de rigor, erros por descuido, imprecisão",d:"C"}]},
+  {q:"Como você prefere aprender algo novo?",sub:"Seu estilo natural de aprendizado",opts:[{t:"Jogando direto — aprendo fazendo, na prática",d:"D"},{t:"Com alguém explicando, troca de experiências",d:"I"},{t:"Com calma, passo a passo, sem pressão de tempo",d:"S"},{t:"Lendo, estudando em profundidade antes de praticar",d:"C"}]},
+  {q:"Qual é o seu maior medo profissional?",sub:"A resposta mais honesta",opts:[{t:"Perder o controle, não ser o melhor, ficar para trás",d:"D"},{t:"Ser rejeitado, perder conexão com as pessoas",d:"I"},{t:"Conflito, instabilidade, mudanças bruscas",d:"S"},{t:"Cometer erros, tomar uma decisão errada, falhar",d:"C"}]}
+];
+const DP={
+  D:{name:'Dominante',title:'O Corretor de Resultados',desc:'Você é movido por resultados, age com velocidade e não aceita desculpas. Sua energia é combustível natural — mas o controle das emoções é o que separa bons fechadores de grandes negociadores.',strengths:['Fecha com determinação — não tem medo de pedir o sim','Foco total em resultado, sem enrolar','Age rápido quando a oportunidade aparece','Lidera pelo exemplo e inspira ação na equipe'],watch:['Impaciência com clientes mais lentos pode custar negócios','Tende a falar mais do que ouvir nas negociações','Pode pressionar além do ponto ideal, gerando resistência'],how:['Aprende fazendo — exemplos práticos e simulações reais','Conteúdo direto, sem enrolação ou teoria excessiva','Gosta de desafios, metas e competição como motor']},
+  I:{name:'Influente',title:'O Corretor das Conexões',desc:'Você vende relacionamento antes de vender imóvel. Sua energia contagia e cria confiança rapidamente — o que é ouro no mercado imobiliário. O foco é transformar essa energia em processo consistente.',strengths:['Cria rapport em minutos — cliente vira amigo','Entusiasmo genuíno que passa credibilidade','Rede de indicações natural — as pessoas te indicam','Excelente no primeiro contato e na visita ao imóvel'],watch:['Follow-up pode ser inconsistente sem um sistema','Tende a prometer mais do que é possível entregar','Dificuldade com burocracia e partes analíticas do processo'],how:['Aprende em conversa — grupos, duplas, troca de experiências','Histórias e casos reais têm mais impacto que teoria','Precisa de sistema para compensar onde a energia não basta']},
+  S:{name:'Estável',title:'O Corretor da Confiança',desc:'Você é o corretor que o cliente nunca esquece. Consistente, confiável, presente — essas qualidades constroem a carteira mais sólida do mercado. Sua missão é ampliar confiança em velocidade também.',strengths:['Clientes confiam cegamente — excelente retenção','Follow-up consistente e gentil que cria fidelidade','Ouve genuinamente — descobre necessidades que outros perdem','Carteira de indicações que cresce por anos'],watch:['Pode demorar demais para pedir o fechamento','Evita conflito mesmo quando precisa posicionar preço','Mudanças de processo causam desconforto inicial'],how:['Aprende com estabilidade — passo a passo, sem pressão','Exemplos concretos de como outros fizeram funcionam bem','Prefere dominar um método antes de aprender outro']},
+  C:{name:'Consciencioso',title:'O Corretor Especialista',desc:'Você é o corretor mais preparado da sala. Sabe o que ninguém sabe sobre o mercado, sobre o imóvel, sobre o processo. Seu desafio é usar esse conhecimento para fechar, não apenas para impressionar.',strengths:['Conhecimento profundo que gera autoridade instantânea','Raramente comete erros — processo rigoroso e confiável','Argumentos sólidos que desarmam objeções com lógica','Excelente em segmentos técnicos como alto padrão e comercial'],watch:['Análise em excesso pode atrasar decisões e fechamentos','Dificuldade em avançar sem ter todos os dados','Pode parecer frio ou distante para clientes relacionais'],how:['Aprende em profundidade — quer entender o porquê','Referências e dados de pesquisa têm peso','Melhora muito com análise pós-venda dos próprios casos']}
+};
+
+// ─── DISC ───────────────────────────────────────
+let discQ=0,discAns=[];
+function startDisc(){discQ=0;discAns=[];S.discScores={D:0,I:0,S:0,C:0};renderDQ();showScreen('disc');}
+function renderDQ(){
+  const q=DQ[discQ];
+  const pct=Math.round((discQ+1)/DQ.length*100);
+  document.getElementById('disc-counter').textContent=(discQ+1)+' / '+DQ.length;
+  document.getElementById('disc-pct').textContent=pct+'%';
+  document.getElementById('disc-bar-fill').style.width=pct+'%';
+  document.getElementById('disc-q').textContent=q.q;
+  document.getElementById('disc-sub').textContent=q.sub;
+  const opts=document.getElementById('disc-opts');
+  opts.innerHTML='';
+  ['A','B','C','D'].forEach((l,i)=>{
+    const d=document.createElement('div');d.className='disc-opt';
+    d.innerHTML=`<div class="opt-letter">${l}</div><div class="opt-text">${q.opts[i].t}</div>`;
+    d.onclick=()=>selectDO(i,q.opts[i].d,d);
+    opts.appendChild(d);
+  });
+  document.getElementById('disc-next-wrap').style.display='none';
+  discAns[discQ]=null;
+}
+function selectDO(i,disc,el){
+  document.querySelectorAll('.disc-opt').forEach(o=>o.classList.remove('selected'));
+  el.classList.add('selected');discAns[discQ]=disc;
+  document.getElementById('disc-next-wrap').style.display='block';
+}
+function discNext(){
+  if(!discAns[discQ])return;
+  S.discScores[discAns[discQ]]=(S.discScores[discAns[discQ]]||0)+1;
+  if(discQ<DQ.length-1){discQ++;renderDQ();}else showDiscResult();
+}
+function discBack(){if(discQ>0){discQ--;renderDQ();}else showScreen('perfil');}
+function refazerDisc(){startDisc();}
+function showDiscResult(){
+  const sc=S.discScores;
+  const top=Object.entries(sc).sort((a,b)=>b[1]-a[1])[0][0];
+  S.disc=top;save();
+  const p=DP[top];
+  document.getElementById('res-letter').textContent=top;
+  document.getElementById('res-profile-name').textContent=p.name;
+  document.getElementById('res-title').textContent=p.title;
+  document.getElementById('res-desc').textContent=p.desc;
+  const total=Object.values(sc).reduce((a,b)=>a+b,0)||1;
+  document.getElementById('res-barras').innerHTML=['D','I','S','C'].map(k=>{
+    const pct=Math.round(sc[k]/total*100);
+    return `<div class="barra-row"><span class="barra-label">${k}</span><div class="barra-track"><div class="barra-fill" style="width:0%" data-p="${pct}"></div></div><span class="barra-pct">${pct}%</span></div>`;
+  }).join('');
+  document.getElementById('res-strengths').innerHTML=p.strengths.map(s=>`<div class="res-item"><span class="res-dot"></span><span>${s}</span></div>`).join('');
+  document.getElementById('res-watch').innerHTML=p.watch.map(s=>`<div class="res-item"><span class="res-dot" style="background:#f87171"></span><span>${s}</span></div>`).join('');
+  document.getElementById('res-how').innerHTML=p.how.map(s=>`<div class="res-item"><span class="res-dot" style="background:#4ade80"></span><span>${s}</span></div>`).join('');
+  showScreen('resultado');
+  setTimeout(()=>document.querySelectorAll('.barra-fill').forEach(b=>b.style.width=b.dataset.p+'%'),300);
+}
+
+// ─── HOME ───────────────────────────────────────
+function goHome(){updateHomeHeader();buildStreak();updatePlanCard();buildMetaSection();buildPDQ();showScreen('home');}
+function updateHomeHeader(){
+  const n=S.nome||'Corretor';
+  document.getElementById('home-name').textContent=n;
+  document.getElementById('home-city').textContent=S.cidade||(S.esp||'');
+  updateHomeAvatar();
+  const b=document.getElementById('home-disc-badge');
+  if(S.disc){b.style.display='flex';b.textContent=S.disc+' · '+DP[S.disc].name;}
+}
+function buildStreak(){
+  const row=document.getElementById('streak-row');
+  const days=['SEG','TER','QUA','QUI','SEX','SAB','DOM'];
+  const today=new Date().getDay();
+  const adj=today===0?6:today-1;
+  const done=Object.keys(S.plan.checks||{}).length;
+  row.innerHTML=days.map((d,i)=>{
+    const cl=i<adj&&done>0?'done':i===adj?'today':'';
+    return `<div class="streak-day ${cl}">${d}</div>`;
+  }).join('');
+}
+function updatePlanCard(){
+  const total=28,done=Object.keys(S.plan.checks||{}).length;
+  const pct=Math.min(100,Math.round(done/total*100));
+  document.getElementById('plan-pct').textContent=pct+'%';
+  document.getElementById('plan-bar').style.width=pct+'%';
+  const wk=Math.min(3,Math.floor(done/7));
+  const wkNames=['Consciência','Reprogramação','Ação disciplinada','Consolidação'];
+  document.getElementById('plan-next-task').textContent=pct===0?'Toque para começar o dia 1':'Semana '+(wk+1)+' — '+wkNames[wk];
+}
+
+// ─── META SEMANAL ───────────────────────────────
+function buildMetaSection(){
+  const sec=document.getElementById('meta-section');
+  const now=new Date();
+  const dow=now.getDay(); // 0=dom,1=seg...5=sex,6=sab
+  const weekKey='w'+getWeekKey();
+  const meta=S.meta_semanal[weekKey];
+  let html='<div class="section-hd"><span class="section-hd-title">Meta da semana</span></div>';
+  if(!meta||!meta.text){
+    html+=`<div class="meta-card"><div class="meta-prompt">Qual é a sua principal meta para essa semana?</div>
+    <textarea class="meta-input" id="meta-input-txt" rows="2" placeholder="Ex: Agendar 4 visitas e fechar 1 negócio..."></textarea>
+    <button class="btn-primary" style="margin-top:8px" onclick="saveMeta()">Registrar meta →</button></div>`;
+  } else if(dow>=5||dow===0){
+    const check=meta.check;
+    html+=`<div class="meta-card">
+    <div class="meta-label-saved">Sua meta desta semana</div>
+    <div class="meta-saved">"${meta.text}"</div>
+    ${!check?`<div class="meta-check-wrap"><div class="meta-check-label">Você chegou lá?</div>
+    <div class="meta-check-row">
+      <button class="meta-check-btn sim" onclick="checkMeta(true)">Sim, cheguei ✓</button>
+      <button class="meta-check-btn nao" onclick="checkMeta(false)">Não dessa vez</button>
+    </div></div>`:`<div style="font-size:11px;color:var(--offwhite3);margin-top:8px;font-weight:400">${check==='sim'?'✓ Você registrou que chegou na sua meta.':'Registrado. Na semana que vem vai.'}</div>`}
+    </div>`;
+  } else {
+    html+=`<div class="meta-card"><div class="meta-label-saved">Meta desta semana</div><div class="meta-saved">"${meta.text}"</div></div>`;
+  }
+  sec.innerHTML=html;
+}
+function getWeekKey(){
+  const d=new Date();
+  const jan1=new Date(d.getFullYear(),0,1);
+  return d.getFullYear()+'_'+Math.ceil(((d-jan1)/86400000+jan1.getDay()+1)/7);
+}
+function saveMeta(){
+  const txt=document.getElementById('meta-input-txt').value.trim();
+  if(!txt)return;
+  const k='w'+getWeekKey();
+  S.meta_semanal[k]={text:txt,check:null};
+  save();buildMetaSection();
+}
+function checkMeta(sim){
+  const k='w'+getWeekKey();
+  if(S.meta_semanal[k])S.meta_semanal[k].check=sim?'sim':'nao';
+  save();buildMetaSection();
+}
+
+// ─── PERGUNTA DO DIA ────────────────────────────
+const PDQ=[
+  "Qual crença sobre vendas você carrega que pode estar te limitando?",
+  "Qual foi a última venda que você perdeu? O que você faria diferente hoje?",
+  "Se você tivesse que dobrar seus resultados em 90 dias, o que mudaria primeiro?",
+  "Qual é o seu maior medo na hora de pedir o fechamento?",
+  "O que um corretor que vende o dobro de você faz de diferente no dia a dia?",
+  "Qual hábito, se você mantivesse por 30 dias, mudaria seus resultados?",
+  "Quando foi a última vez que você ligou para um ex-cliente só para saber como ele estava?",
+  "Você está prospectatando ou esperando? Seja honesto.",
+  "Qual objeção ainda te desestabiliza emocionalmente? Por quê?",
+  "O que você diria para o corretor que você era há 1 ano?",
+  "Qual parte do seu processo de vendas você evita inconscientemente?",
+  "Como você descreveria seu diferencial em uma frase que o cliente nunca esqueceria?",
+  "Você tem um sistema de follow-up ou tem uma intenção de follow-up?",
+  "Qual cliente você deveria ligar hoje que está adiando?",
+  "O que te impede de ser o corretor que você sabe que pode ser?",
+  "Qual é a diferença entre o corretor que você é e o corretor que quer ser?",
+  "Se seus resultados refletem seus hábitos, quais hábitos precisam mudar?",
+  "Você está aprendendo com seus erros ou repetindo os mesmos?",
+  "Qual mercado você conhece profundamente o suficiente para ser referência?",
+  "O que você poderia fazer essa semana que teria o maior impacto no seu resultado?",
+  "Como você quer ser lembrado pelos seus clientes daqui a 5 anos?",
+  "Qual conversa difícil você está evitando que precisa acontecer?",
+  "O que o seu cliente mais precisa que você ainda não está entregando?",
+  "Você vende com base no que o cliente quer ou no que você tem para oferecer?",
+  "Qual aprendizado do último mês você ainda não colocou em prática?",
+  "O que está drenando sua energia que não deveria estar na sua agenda?",
+  "Se você fosse contratar um corretor, contrataria você? Por quê?",
+  "Qual é sua estratégia de desenvolvimento para os próximos 6 meses?",
+  "O que você faria diferente se soubesse que não poderia falhar?",
+  "O que você está disposto a sacrificar para chegar no próximo nível?"
+];
+function buildPDQ(){
+  const sec=document.getElementById('pdq-section');
+  const dayOfYear=Math.floor((new Date()-new Date(new Date().getFullYear(),0,0))/86400000);
+  const idx=dayOfYear%PDQ.length;
+  const dateKey=new Date().toISOString().slice(0,10);
+  const saved=S.pdq[dateKey];
+  let html=`<div class="pdq-card"><div class="pdq-label">Reflexão de hoje</div><div class="pdq-text">${PDQ[idx]}</div>`;
+  if(saved){html+=`<div class="pdq-done">✓ Respondida hoje — "${saved.slice(0,60)}${saved.length>60?'...':''}"</div>`;}
+  else{html+=`<textarea class="pdq-input" id="pdq-txt" rows="2" placeholder="Escreva sua reflexão..."></textarea><button class="pdq-save" onclick="savePDQ('${dateKey}',${idx})">Salvar reflexão</button>`;}
+  html+='</div>';sec.innerHTML=html;
+}
+function savePDQ(dateKey,idx){
+  const txt=document.getElementById('pdq-txt').value.trim();if(!txt)return;
+  S.pdq[dateKey]=txt;
+  S.registros.unshift({data:dateKey,tipo:'Reflexão do dia',texto:PDQ[idx]+'\n\n'+txt});
+  save();buildPDQ();
+  // check celebração
+  checkCelebracao();
+}
+
+// ─── CELEBRAÇÃO ─────────────────────────────────
+function checkCelebracao(){
+  const done=Object.keys(S.plan.checks||{}).length;
+  const cels=[{at:7,icon:'🥇',t:'Semana 1 concluída',s:'A consciência está ativada. Você completou a semana mais difícil — a primeira. Continue.'},{at:14,icon:'🔥',t:'Semana 2 concluída',s:'Padrões novos estão se formando. A maioria das pessoas não chega até aqui.'},{at:21,icon:'⚡',t:'Semana 3 concluída',s:'Você está em modo de ação disciplinada. Isso é real — não é motivação passageira.'},{at:28,icon:'🏆',t:'30 dias completos!',s:'Você fez o que menos de 5% dos corretores já fizeram. Este programa mudou algo em você.'}];
+  const cel=cels.find(c=>done===c.at&&!S['cel_'+c.at]);
+  if(cel){S['cel_'+cel.at]=true;save();document.getElementById('cel-icon').textContent=cel.icon;document.getElementById('cel-title').textContent=cel.t;document.getElementById('cel-sub').textContent=cel.s;showScreen('celebracao');}
+}
+
+// ─── REGISTROS ──────────────────────────────────
+function showRegistros(){
+  detailFrom='home';
+  document.getElementById('detail-title').textContent='Meus registros';
+  const body=document.getElementById('detail-body');
+  if(!S.registros||S.registros.length===0){
+    body.innerHTML=`<div class="reg-empty">Seus registros aparecerão aqui.<br>Responda a pergunta do dia e complete tarefas do plano para começar.</div>`;
+  } else {
+    body.innerHTML=S.registros.map(r=>`<div class="registro-item"><div class="reg-data">${r.tipo} · ${r.data}</div><div class="reg-text">${r.texto}</div></div>`).join('');
+  }
+  showScreen('detail');document.getElementById('nav-home').classList.add('active');
+}
+
+// ─── PILARES ────────────────────────────────────
+const PD={
+  mindset:{title:'🧠 Mentalidade',items:[
+    {tag:'urgente',tl:'Urgente',t:'Elimine a mentalidade de espera',d:'O corretor mediano espera o cliente aparecer. O de alta performance vai buscá-lo ativamente todos os dias. Bloqueie 90 minutos diários para prospecção ativa — esse tempo é sagrado.'},
+    {tag:'habito',tl:'Hábito',t:'Venda soluções, não imóveis',d:'O cliente não quer um apartamento, quer segurança, status, qualidade de vida. Mude o enquadramento. Antes de falar do imóvel, entenda profundamente o problema que ele quer resolver.'},
+    {tag:'atitude',tl:'Atitude',t:'O "não" faz parte do sistema',d:'80% das vendas requerem 5 follow-ups — a maioria desiste no 2º. Defina sua cota de "não" da semana. Se você precisa de 2 vendas e a conversão é 10%, precisa de 20 respostas — incluindo 18 nãos.'},
+    {tag:'habito',tl:'Ritual',t:'10 minutos matinais mudam tudo',d:'3 minutos de silêncio. 3 minutos lendo sua meta de identidade. 4 minutos visualizando uma venda concluída. Faça por 7 dias consecutivos e meça a diferença na sua energia.'}
+  ]},
+  processo:{title:'⚙️ Processo',items:[
+    {tag:'urgente',tl:'Crítico',t:'Documente seu funil completo',d:'Da prospecção ao pós-venda, cada etapa deve ter critério claro de entrada, saída e tempo médio esperado. O que não está documentado não existe como processo — existe como esperança.'},
+    {tag:'habito',tl:'Script',t:'Crie scripts situacionais',d:'Scripts para: primeiro contato, visita, contorno de objeções e fechamento. Scripts não enrijecem — libertam você para ouvir o cliente em vez de pensar no que dizer.'},
+    {tag:'urgente',tl:'Follow-up',t:'Calendário de follow-up implacável',d:'Dia 1 / Dia 3 / Dia 7 / Dia 14 / Dia 30 — com roteiro diferente em cada contato, sempre entregando valor. Quem chega ao 5º contato fecha muito mais.'},
+    {tag:'atitude',tl:'CRM',t:'Use um CRM — sem exceção',d:'Não importa se é Salesforce ou uma planilha. Memória não é processo. O que está no sistema existe. O que está na cabeça, não.'}
+  ]},
+  equipe:{title:'👥 Equipe',items:[
+    {tag:'habito',tl:'Recrutamento',t:'Contrate atitude, treine habilidade',d:'Talento natural explica 34% da variação de performance (Gallup) — mas não é suficiente sem gestão. Identifique potencial, depois treine com consistência.'},
+    {tag:'urgente',tl:'1:1',t:'Feedback semanal individual',d:'Individual, privado, 20 minutos. Reconheça em público, corrija em privado. Um feedback honesto e frequente vale mais que dez avaliações anuais.'},
+    {tag:'atitude',tl:'Metas',t:'Individual + equipe simultaneamente',d:'A meta individual cria responsabilidade. A coletiva cria colaboração. Precisa das duas — uma só gera competição destrutiva ou acomodação coletiva.'},
+    {tag:'habito',tl:'Retenção',t:'Turnover é o maior custo oculto',d:'Substituir um corretor custa 6 a 9 meses do salário em produtividade perdida. Invista em desenvolvimento antes de substituir.'}
+  ]},
+  cliente:{title:'🤝 Cliente',items:[
+    {tag:'urgente',tl:'Confiança',t:'Velocidade de venda = velocidade de confiança',d:'Invista nos primeiros 5 minutos. Ouça mais do que fala. A maior falha de corretores medianos é apresentar antes de entender. Faça perguntas abertas e genuínas.'},
+    {tag:'habito',tl:'Pós-venda',t:'80% dos negócios virão de indicação',d:'Se você tiver um processo de pós-venda ativo. Ligue 30, 90 e 180 dias após o negócio. Pergunte, não venda. Esse hábito constrói a carteira mais rentável do mercado.'},
+    {tag:'atitude',tl:'Urgência',t:'Crie urgência real, não fabricada',d:'O cliente detecta urgência falsa e perde confiança. Use dados reais: absorção do estoque, taxa de juro, últimas unidades com documentação comprovável.'},
+    {tag:'habito',tl:'Personas',t:'Mapeie os perfis de compradores',d:'Investidor, família em transição, primeiro imóvel, upgrade — cada um tem objeções e motivações completamente diferentes. Tratar todos igual é deixar dinheiro na mesa.'}
+  ]},
+  dados:{title:'📊 Métricas',items:[
+    {tag:'urgente',tl:'Funil',t:'Meça sua taxa em cada etapa',d:'Contato → visita → proposta → fechamento. Taxa de conversão visita→fechamento no setor: entre 2% e 8%. Saber onde você está é o ponto de partida para melhorar.'},
+    {tag:'habito',tl:'KPIs',t:'Os 5 números essenciais',d:'Novos leads/semana, visitas realizadas, propostas enviadas, tempo médio de ciclo, ticket médio fechado. Controle esses 5 toda semana — o resto é detalhe.'},
+    {tag:'atitude',tl:'Revisão',t:'Pipeline semanal, resultado mensal',d:'A reunião de pipeline é sobre o que vem aí. A de resultado é sobre o que já aconteceu. Não confunda os dois momentos.'},
+    {tag:'habito',tl:'Benchmark',t:'Compare-se com o mercado',d:'Taxa de conversão, tempo médio de ciclo, ticket médio — compare com dados do setor. Use CRECIs e associações como referência.'}
+  ]},
+  mercado:{title:'🏙️ Mercado',items:[
+    {tag:'urgente',tl:'Nicho',t:'Especialize-se antes de expandir',d:'O corretor que vende "tudo" compete com todos. O especialista no bairro X é procurado — não precisa prospectar da mesma forma. Nicho cria autoridade passiva.'},
+    {tag:'habito',tl:'Conteúdo',t:'Um vídeo por semana sobre seu mercado',d:'Infraestrutura, valorização, tendência do bairro. Posiciona você como referência antes da venda começar. O cliente chega já convencido que você é o especialista.'},
+    {tag:'atitude',tl:'Rede',t:'Rede além do mercado imobiliário',d:'Advogados de família, gerentes de banco, contadores e arquitetos são fontes sistemáticas de indicação. Uma reunião de café por semana constrói a rede mais sólida.'},
+    {tag:'habito',tl:'Dados',t:'Conheça seu mercado melhor que qualquer app',d:'Absorção do estoque, tempo médio de venda, variação de preço por rua — esses dados geram credibilidade instantânea. O cliente que testa seu conhecimento e vê que você domina, fecha.'}
+  ]}
+};
+const DISC_TIPS={
+  D:{mindset:'Como D, seu risco é agir sem reflexão. O ritual matinal de 10 min é especialmente poderoso para você — desacelera o suficiente para ser estratégico.',processo:'Perfil D tende a pular etapas. O funil documentado não é burocracia — é o que garante que sua velocidade natural vire resultado consistente.',equipe:'Como D, você lidera pelo resultado. O silêncio que parece eficiência pode ser desengajamento. Os 1:1 semanais são sua ferramenta mais importante.',cliente:'Perfil D fala mais e ouve menos. A regra 70/30 (ouça 70% do tempo) não é natural para você — mas é o maior alavancador do seu resultado.',dados:'D adora resultado mas muitas vezes só olha o número final. Monitore as etapas intermediárias — é onde o ouro está escondido.',mercado:'Perfil D tem energia para dominar um nicho rapidamente. Escolha um, vá fundo, seja o melhor. Breadth vem depois de depth.'},
+  I:{mindset:'Como I, você já tem energia — o trabalho é direcionar. O plano de 30 dias vai parecer repetitivo. Faça assim mesmo. Consistência é o que você mais precisa.',processo:'Perfil I adora o contato, odeia a burocracia. O CRM não é para você se lembrar — é para o sistema trabalhar quando sua energia estiver em outro lugar.',equipe:'Como I, você cria conexão naturalmente. Use isso nos 1:1s: a conversa honesta que você sabe ter é a ferramenta mais poderosa de retenção.',cliente:'Seu superpoder é a conexão. O desafio é converter o relacionamento em fechamento — adicione clareza sobre o próximo passo em cada conversa.',dados:'I tende a confiar no feeling. Os números são sua âncora quando o feeling diz que está tudo bem mas o pipeline diz outra coisa.',mercado:'Você tem a rede natural. Monetize sistematicamente — cada café com advogado ou gerente é uma semente de indicação. Documente e seja consistente.'},
+  S:{mindset:'Como S, você é naturalmente consistente — seu maior ativo. O desafio é acelerar a tomada de decisão. O plano foi feito para o seu estilo: passo a passo.',processo:'Perfil S segue processos melhor que qualquer outro. Seu risco é ser tão consistente no follow-up gentil que não pede o fechamento. Adicione clareza no pedido.',equipe:'Como S, você cria o ambiente mais seguro para a equipe — um ativo raro. Corretores se desenvolvem melhor quando se sentem seguros.',cliente:'Seu maior talento: o cliente confia em você. O pós-venda é onde você vai brilhar mais que qualquer outro perfil. Estruture e proteja esse processo.',dados:'S tende a evitar a conversa sobre números difíceis. Mas os dados são aliados — eles mostram onde o processo precisa de ajuste, sem drama.',mercado:'Consistência e confiabilidade constroem autoridade ao longo do tempo. Seu estilo funciona como referência local — você que aparece toda semana com algo útil.'},
+  C:{mindset:'Como C, você analisa antes de agir. O risco é a análise virar desculpa. O plano vai te incomodar com a imprecisão de algumas tarefas. Faça assim mesmo.',processo:'Ninguém documenta funil melhor que um C. Atenção: documentação sem execução é hobby. Use o rigor para executar, não só para planejar.',equipe:'Como C, você tem padrões altos. Comunique o que você espera com clareza — sua equipe não lê mentes. O feedback escrito e detalhado que você dá é ouro.',cliente:'Seu conhecimento gera credibilidade instantânea. Adapte para clientes relacionais: a lógica perfeita nem sempre fecha.',dados:'Você ama dados — use como diferencial. O corretor que apresenta análise de valorização por rua em vez de opinião se posiciona em outra categoria.',mercado:'Você tem tudo para ser referência de conhecimento. Conteúdo técnico, análise de mercado, relatórios — esse é o seu território.'}
+};
+function openPilar(key){
+  detailFrom='home';
+  const data=PD[key];
+  document.getElementById('detail-title').textContent=data.title;
+  const body=document.getElementById('detail-body');
+  body.innerHTML='';
+  data.items.forEach((item,i)=>{
+    const id='ins-'+key+'-'+i;
+    const d=document.createElement('div');d.className='insight-card';
+    d.innerHTML=`<div class="insight-head" onclick="toggleIns('${id}',this)"><span class="insight-tag tag-${item.tag}">${item.tl}</span><span class="insight-text">${item.t}</span><span style="color:var(--offwhite3);font-size:12px;margin-left:4px">▾</span></div><div class="insight-body" id="${id}">${item.d}</div>`;
+    body.appendChild(d);
+  });
+  if(S.disc&&DISC_TIPS[S.disc]&&DISC_TIPS[S.disc][key]){
+    const d=document.createElement('div');d.className='disc-tip-card';
+    d.innerHTML=`<div class="disc-tip-label">Para o seu perfil ${S.disc} — ${DP[S.disc].name}</div><div class="disc-tip-text">${DISC_TIPS[S.disc][key]}</div>`;
+    body.appendChild(d);
+  }
+  showScreen('detail');document.getElementById('nav-home').classList.add('active');
+}
+function toggleIns(id,head){
+  const b=document.getElementById(id);
+  b.classList.toggle('open');
+  head.querySelector('span:last-child').textContent=b.classList.contains('open')?'▴':'▾';
+}
+
+// ─── PLANO 30 DIAS ───────────────────────────────
+const PLANO=[
+  {title:'Semana 1 — Consciência',days:[
+    {label:'Dia 1 — Diagnóstico honesto',tasks:[{tag:'habito',tl:'Manhã',t:'Liste 5 crenças que você tem sobre vendas ou clientes — sem filtro.'},{tag:'urgente',tl:'Ação',t:'Grave-se 2 min respondendo: por que alguns corretores vendem muito mais do que eu?'},{tag:'habito',tl:'Noite',t:'Qual das 5 crenças mais te paralisa? Só identificar — sem mudar nada ainda.'}]},
+    {label:'Dia 2 — Inventário da vitória',tasks:[{tag:'habito',tl:'Manhã',t:'Liste suas 3 maiores vendas. O que você fez diferente naquelas ocasiões?'},{tag:'urgente',tl:'Ação',t:'Replique uma das condições daquelas vendas hoje.'},{tag:'habito',tl:'Noite',t:'Qual padrão você identificou nas suas melhores vendas? Guarde isso.'}]},
+    {label:'Dias 3–4 — Piloto automático',tasks:[{tag:'habito',tl:'Manhã',t:'Antes de abrir o WhatsApp, defina: qual o resultado mais importante de hoje?'},{tag:'urgente',tl:'Ação',t:'Complete em voz alta: "Eu sou um corretor que..." em 5 versões. Observe quais soam falsas.'},{tag:'habito',tl:'Ação',t:'Escolha UMA frase falsa e aja como se fosse verdade por 4 horas.'}]},
+    {label:'Dias 5–7 — Medo e revisão',tasks:[{tag:'urgente',tl:'Ação',t:'Faça o contato que você evita. A ligação que está adiando — hoje.'},{tag:'habito',tl:'Revisão',t:'Releia todos os registros da semana. Qual padrão aparece?'},{tag:'habito',tl:'Noite',t:'Escreva: o que a versão sua daqui 30 dias pensará diferente?'}]}
+  ]},
+  {title:'Semana 2 — Reprogramação',days:[
+    {label:'Dias 8–9 — Ritual e linguagem',tasks:[{tag:'habito',tl:'Manhã',t:'Crie ritual de 10 min: 3 silêncio, 3 meta de identidade, 4 visualização de venda.'},{tag:'urgente',tl:'Ação',t:'Identifique 3 frases de escassez que você diz. Crie a versão abundante de cada.'},{tag:'habito',tl:'Noite',t:'Execute o ritual por 7 dias consecutivos. Documente a sensação de cada dia.'}]},
+    {label:'Dias 10–11 — Banco de referências',tasks:[{tag:'habito',tl:'Ação',t:'Crie um arquivo "Evidências de que sou bom vendedor" — 5 situações reais.'},{tag:'urgente',tl:'Ação',t:'Identifique seus 2 picos de energia no dia. Reserve-os para prospecção ativa.'},{tag:'habito',tl:'Noite',t:'Adicione ao arquivo toda vez que algo der certo — mesmo os pequenos.'}]},
+    {label:'Dias 12–14 — Objeções internas',tasks:[{tag:'urgente',tl:'Ação',t:'Liste as 5 objeções que mais te desestabilizam emocionalmente.'},{tag:'habito',tl:'Ação',t:'Para cada uma, escreva a crença interna ideal — não o script, a crença.'},{tag:'habito',tl:'Revisão',t:'O ritual matinal está acontecendo? Se não, qual pensamento aparece quando tenta?'}]}
+  ]},
+  {title:'Semana 3 — Ação disciplinada',days:[
+    {label:'Dias 15–16 — Prospecção e foco',tasks:[{tag:'urgente',tl:'Ação',t:'Antes de prospectar: qual valor vou entregar nesse contato? Não "quero fechar".'},{tag:'urgente',tl:'Ação',t:'Bloqueie 90 min contínuos para prospecção pura. Sem WhatsApp, sem interrupções.'},{tag:'habito',tl:'Noite',t:'Você conseguiu os 90 minutos? Qual foi a primeira interrupção real?'}]},
+    {label:'Dias 17–19 — Visita e pipeline',tasks:[{tag:'habito',tl:'Antes',t:'Prepare cada visita em 3 dimensões: técnica, emocional e intencional.'},{tag:'urgente',tl:'Visita',t:'Durante a visita, ouça 70% do tempo. Pergunte e cale.'},{tag:'habito',tl:'Análise',t:'Revise seu pipeline. Onde está o gargalo? É habilidade ou mentalidade?'}]},
+    {label:'Dias 20–21 — Teste de pressão',tasks:[{tag:'urgente',tl:'Ação',t:'Simule uma negociação difícil com colega ou no espelho. Objeção de preço, cônjuge ausente.'},{tag:'habito',tl:'Noite',t:'Onde você travou? Onde a emoção subiu? Onde recuou sem precisar?'}]}
+  ]},
+  {title:'Semana 4 — Consolidação',days:[
+    {label:'Dias 22–25 — Revisão e nível seguinte',tasks:[{tag:'habito',tl:'Revisão',t:'Releia todos os registros das 3 semanas. Qual foi a maior virada de mentalidade?'},{tag:'urgente',tl:'Ação',t:'Defina UMA meta de comportamento para os próximos 90 dias — não de vendas.'},{tag:'habito',tl:'Ação',t:'Encontre um par de desenvolvimento para check-in semanal sobre mentalidade.'}]},
+    {label:'Dias 26–30 — Fechamento do ciclo',tasks:[{tag:'habito',tl:'Ação',t:'Identifique uma fonte regular de desenvolvimento: podcast, livro, mentoria.'},{tag:'urgente',tl:'Dia 30',t:'Releia o que escreveu no dia 7. Você chegou lá?'},{tag:'habito',tl:'Dia 30',t:'Escreva sua Declaração de Mentalidade: 3 crenças consolidadas + 1 em processo.'}]}
+  ]}
+];
+function showPlano30(){
+  detailFrom='home';
+  document.getElementById('detail-title').textContent='Plano 30 dias';
+  const body=document.getElementById('detail-body');body.innerHTML='';
+  PLANO.forEach((wk,wi)=>{
+    const wDiv=document.createElement('div');
+    wDiv.innerHTML=`<div style="font-size:10px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.08em;margin:${wi>0?'20px':0} 0 10px">${wk.title}</div>`;
+    wk.days.forEach((day,di)=>{
+      const card=document.createElement('div');card.className='insight-card';card.style.marginBottom='9px';
+      const bid='pb-'+wi+'-'+di;
+      card.innerHTML=`<div class="insight-head" onclick="toggleIns('${bid}',this)"><span class="insight-tag tag-habito">Dia</span><span class="insight-text">${day.label}</span><span style="color:var(--offwhite3);font-size:12px;margin-left:4px">▾</span></div>
+      <div class="insight-body" id="${bid}">
+        ${day.tasks.map((task,ti)=>{
+          const key=wi+'-'+di+'-'+ti;
+          const done=S.plan.checks[key];
+          return `<div style="display:flex;align-items:flex-start;gap:8px;padding:8px 0;border-bottom:1px solid var(--border);${ti===day.tasks.length-1?'border-bottom:none':''}">
+            <input type="checkbox" style="margin-top:2px;accent-color:var(--gold);flex-shrink:0;width:15px;height:15px;cursor:pointer" ${done?'checked':''} onchange="toggleTask('${key}',this)">
+            <span class="insight-tag tag-${task.tag}" style="flex-shrink:0">${task.tl}</span>
+            <span style="font-size:12px;color:var(--offwhite);line-height:1.55;font-weight:400;${done?'opacity:.4;text-decoration:line-through':''}">${task.t}</span>
+          </div>`;
+        }).join('')}
+      </div>`;
+      wDiv.appendChild(card);
+    });
+    body.appendChild(wDiv);
+  });
+  showScreen('detail');document.getElementById('nav-home').classList.add('active');
+}
+function toggleTask(key,cb){
+  if(cb.checked)S.plan.checks[key]=true;else delete S.plan.checks[key];
+  save();updatePlanCard();buildStreak();checkCelebracao();
+}
+
+// ─── SCRIPTS DE OBJEÇÃO ─────────────────────────
+const OBJECTIONS=[
+  {q:'"Está caro"',resps:[{d:'D',r:'Entendo. Vamos olhar o retorno — imóvel no litoral de SC valorizou 18% ao ano nos últimos 3 anos. O que parece caro hoje é o menor preço que esse imóvel vai ter.'},{d:'I',r:'Eu entendo a sensação, já ouvi muito isso. Mas posso te mostrar o que meus clientes que "acharam caro" me disseram 2 anos depois? A história é sempre a mesma.'},{d:'S',r:'Faz sentido questionar. Posso te mostrar uma comparação com imóveis similares para você avaliar com calma? Quero que você se sinta confortável com a decisão.'},{d:'C',r:'Ótima pergunta. Baseado no preço médio do m² aqui e na valorização histórica da região, vou te mostrar por que esse preço é justo — de forma objetiva.'}]},
+  {q:'"Vou esperar os juros caírem"',resps:[{d:'D',r:'Enquanto você espera, o preço sobe e o estoque some. Quando os juros caírem, você vai estar competindo com todo mundo na mesma posição. Quem age agora ganha duas vezes.'},{d:'I',r:'Eu ouço muito isso — e entendo completamente. Mas deixa eu te contar o que aconteceu com clientes que esperaram em 2022... não foi bem como eles planejaram.'},{d:'S',r:'Compreendo a lógica. O que posso mostrar é que, nesse imóvel específico, o custo total de espera costuma superar o ganho com juros menores. Posso calcular junto com você?'},{d:'C',r:'Vamos analisar os dados: a queda histórica de juros demora em média 18 meses. Nesse período, a valorização do imóvel cobre a diferença com margem. Posso mostrar a planilha?'}]},
+  {q:'"Preciso consultar meu marido/esposa"',resps:[{d:'D',r:'Claro, decisão importante. Quando podemos fazer uma visita com os dois juntos? Prefiro falar com quem decide do que com recados.'},{d:'I',r:'Claro! Na verdade, adoro quando o casal vem junto — a energia da visita muda completamente. Quando vocês dois podem vir ver pessoalmente?'},{d:'S',r:'Com certeza, é uma decisão de família. O que posso fazer para deixar todas as informações organizadas para vocês dois revisarem juntos com calma?'},{d:'C',r:'Faz todo sentido. Posso preparar um resumo completo — com dados técnicos, financiamento e comparativo — para vocês analisarem juntos. Qual o melhor formato para receber?'}]},
+  {q:'"Vou pensar"',resps:[{d:'D',r:'Entendo. O que falta para você decidir hoje? Se eu resolver isso agora, a gente fecha?'},{d:'I',r:'Claro! Só me diz: tem alguma dúvida que ficou? Porque muitas vezes "vou pensar" é "não entendi algo bem". Posso esclarecer na hora.'},{d:'S',r:'Claro, sem pressão. Mas me ajuda a entender: o que você precisa pensar exatamente? Quero ter certeza que você tem tudo que precisa para se sentir seguro.'},{d:'C',r:'Claro. O que está em aberto para você? Se for questão técnica, financeira ou documental, posso resolver agora. Se for pessoal, respeito completamente.'}]},
+  {q:'"Não é o momento certo"',resps:[{d:'D',r:'Qual seria o momento certo para você? Vamos definir isso agora — assim eu te contato exatamente quando fizer sentido.'},{d:'I',r:'Entendo. Mas me conta — o que precisaria mudar para o momento ficar certo? Às vezes a solução está mais perto do que parece.'},{d:'S',r:'Faz sentido querer o momento ideal. Me conta o que está pesando — talvez eu consiga te ajudar a entender se esse momento é mais certo do que parece.'},{d:'C',r:'Entendo. Qual critério define o "momento certo" para você — financeiro, familiar, profissional? Com essa informação, consigo te ajudar a avaliar melhor.'}]},
+  {q:'"Já tenho outro corretor me atendendo"',resps:[{d:'D',r:'Respeito isso. Só me diz: ele te mostrou o portfólio completo da região? Porque tenho imóveis exclusivos que poucos corretores têm acesso.'},{d:'I',r:'Que ótimo, competição é saudável! Me conta — o que você mais gostou no que ele te mostrou? Posso ter opções complementares que agregam.'},{d:'S',r:'Respeito sua lealdade. Só quero te fazer uma pergunta: você está satisfeito com o nível de atendimento que está recebendo? Se sim, sem problema algum.'},{d:'C',r:'Entendo. Posso te fazer uma pergunta técnica? Ele já te apresentou dados comparativos de valorização por rua na região? Se não, posso complementar.'}]}
+];
+function openObjeccoes(){
+  detailFrom='home';
+  document.getElementById('detail-title').textContent='Scripts de objeção';
+  const body=document.getElementById('detail-body');
+  const disc=S.disc;
+  let html=disc?`<div style="background:var(--gold-dim);border:1px solid var(--border2);border-radius:var(--radius);padding:11px 13px;margin-bottom:14px;font-size:12px;color:var(--offwhite);line-height:1.5;font-weight:400"><span style="font-size:9px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:3px">Personalizadas para o perfil ${disc}</span>As respostas abaixo são adaptadas ao seu estilo ${DP[disc].name} — como você naturalmente comunica melhor.</div>`:'';
+  OBJECTIONS.forEach((obj,i)=>{
+    const bid='obj-'+i;
+    let respsHtml='';
+    if(disc){
+      const r=obj.resps.find(r=>r.d===disc)||obj.resps[0];
+      respsHtml=`<div class="obj-response"><div class="obj-resp-label">Como responder</div><div class="obj-resp-disc">${r.d} — ${DP[r.d].name}</div><div class="obj-resp-text">${r.r}</div></div>
+      <div class="obj-resp-divider"></div>
+      <div style="font-size:10px;font-weight:700;color:var(--offwhite3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Outros estilos</div>
+      ${obj.resps.filter(r=>r.d!==disc).map(r=>`<div class="obj-response" style="margin-bottom:8px"><div class="obj-resp-disc">${r.d} — ${DP[r.d].name}</div><div class="obj-resp-text">${r.r}</div></div>`).join('')}`;
+    } else {
+      respsHtml=obj.resps.map(r=>`<div class="obj-response" style="margin-bottom:10px"><div class="obj-resp-disc">${r.d} — ${DP[r.d].name}</div><div class="obj-resp-text">${r.r}</div></div>`).join('');
+    }
+    html+=`<div class="obj-card"><div class="obj-head" onclick="toggleObj('${bid}',this)"><span style="color:var(--offwhite3);font-size:14px;flex-shrink:0">💬</span><div class="obj-quote">${obj.q}</div><span style="color:var(--offwhite3);font-size:12px;margin-left:4px">▾</span></div><div class="obj-body" id="${bid}">${respsHtml}</div></div>`;
+  });
+  body.innerHTML=html;
+  showScreen('detail');document.getElementById('nav-obj').classList.add('active');
+}
+function toggleObj(id,head){
+  const b=document.getElementById(id);b.classList.toggle('open');
+  head.querySelector('span:last-child').textContent=b.classList.contains('open')?'▴':'▾';
+}
+
+// ─── MERCADO SC ──────────────────────────────────
+function openMercadoSC(){
+  detailFrom='home';
+  document.getElementById('detail-title').textContent='Mercado SC';
+  const body=document.getElementById('detail-body');
+  body.innerHTML=`
+  <div style="font-size:10px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">Preço médio m² — 2026</div>
+  <div class="mercado-grid">
+    <div class="mercado-card"><div class="mercado-cidade">Balneário Camboriú</div><div class="mercado-preco">R$ 12.400</div><div class="mercado-unit">por m² · premium nacional</div></div>
+    <div class="mercado-card"><div class="mercado-cidade">Itajaí</div><div class="mercado-preco">R$ 7.100</div><div class="mercado-unit">por m² · porto + corporativo</div></div>
+    <div class="mercado-card"><div class="mercado-cidade">Penha</div><div class="mercado-preco">R$ 6.800</div><div class="mercado-unit">por m² · crescimento Beto Carrero</div></div>
+    <div class="mercado-card"><div class="mercado-cidade">Navegantes</div><div class="mercado-preco">R$ 5.900</div><div class="mercado-unit">por m² · industrial + residencial</div></div>
+    <div class="mercado-card"><div class="mercado-cidade">Barra Velha</div><div class="mercado-preco">R$ 5.200</div><div class="mercado-unit">por m² · crescimento acelerado</div></div>
+    <div class="mercado-card"><div class="mercado-cidade">Camboriú</div><div class="mercado-preco">R$ 4.200</div><div class="mercado-unit">por m² · jovem família</div></div>
+  </div>
+  <div class="mercado-info-card"><div class="mercado-info-title">Dados macro — 2026</div>
+    <div class="mercado-info-item"><div class="mi-dot"></div>Selic 10,75% · FGTS 8,5% a.a.</div>
+    <div class="mercado-info-item"><div class="mi-dot"></div>Crescimento regional Q1/2026: +4,2%</div>
+    <div class="mercado-info-item"><div class="mi-dot"></div>Melhor janela de fechamento: setembro–novembro (pré-temporada)</div>
+    <div class="mercado-info-item"><div class="mi-dot"></div>Perfil do comprador: casal 35–55 anos, SP/RS/PR, segunda residência ou short stay</div>
+  </div>
+  <div class="mercado-info-card"><div class="mercado-info-title">Top objeções da região — 2026</div>
+    <div class="mercado-info-item"><div class="mi-dot"></div>"Vou esperar os juros caírem" — use dados de valorização histórica da região como resposta</div>
+    <div class="mercado-info-item"><div class="mi-dot"></div>"Preciso consultar meu cônjuge" — agende visita com os dois juntos, nunca por recado</div>
+    <div class="mercado-info-item"><div class="mi-dot"></div>"Está caro" — compare com preço em SP e RJ + projeção de retorno por aluguel temporada</div>
+  </div>
+  <div class="mercado-info-card"><div class="mercado-info-title">Argumento de valorização — Penha e Barra Velha</div>
+    <div class="mercado-info-item"><div class="mi-dot"></div>Expansão do Beto Carrero: fluxo de turistas cresceu 22% desde 2023</div>
+    <div class="mercado-info-item"><div class="mi-dot"></div>Duplicação da BR-101 Norte em andamento — reduz tempo de SP para 7h</div>
+    <div class="mercado-info-item"><div class="mi-dot"></div>Short stay consolidado: taxa de ocupação média de 78% na temporada alta</div>
+    <div class="mercado-info-item"><div class="mi-dot"></div>Preço ainda 55% abaixo de Balneário — janela de valorização aberta</div>
+  </div>`;
+  showScreen('detail');document.getElementById('nav-sc').classList.add('active');
+}
+
+// ─── SIMULADOR ───────────────────────────────────
+const SIMS=[
+  {context:'Cliente visitou um apartamento de R$ 680 mil em Penha. Gostou, mas hesita.',cliente:'"Olha, eu gostei bastante. Mas é muito dinheiro. Preciso pensar melhor..."',opts:[
+    {t:'Perfeito! Entendo. Qual informação falta para você se sentir seguro?',correct:true,feedback:'Excelente. Você reconheceu o sinal de interesse e fez uma pergunta aberta que convida o cliente a revelar a objeção real. Isso abre espaço para resolver, não para pressionar.'},
+    {t:'Posso te dar um desconto de R$ 20 mil se fecharmos hoje.',correct:false,feedback:'Oferecer desconto imediatamente desvaloriza o produto e sinaliza que o preço era negociável desde o início. Isso cria desconfiança e enfraquece sua posição.'},
+    {t:'Tudo bem, quando você quiser é só me chamar.',correct:false,feedback:'Resposta passiva demais. Sem uma pergunta ou próximo passo definido, a probabilidade de retorno do cliente cai drasticamente. O silêncio não é estratégia.'}
+  ]},
+  {context:'Lead novo pelo Instagram. Perguntou preço pelo Direct antes de qualquer contato.',cliente:'"Oi, vi o apartamento no story. Qual o valor?"',opts:[
+    {t:'R$ 540 mil! Posso te mandar mais detalhes?',correct:false,feedback:'Nunca responda preço sem antes entender o perfil do cliente. Sem contexto, o número parece caro para qualquer pessoa. Você perdeu a chance de criar valor primeiro.'},
+    {t:'"Ótimo! Para te passar o melhor valor, me conta — é para morar ou investir? E qual cidade você prefere?" ',correct:true,feedback:'Perfeito. Você redirecionou a conversa para entender o perfil antes de citar preço. Isso te permite apresentar a oferta certa e justificar o valor com contexto.'},
+    {t:'"Tenho várias opções! Melhor a gente se falar por telefone."',correct:false,feedback:'Pedir ligação antes de criar qualquer rapport em um primeiro contato costuma afastar. O cliente ainda não confia o suficiente para investir tempo em uma ligação.'}
+  ]},
+  {context:'Casal na visita. Ela amou. Ele está quieto e analítico. Você precisa incluir os dois.',cliente:'Ela: "Eu adorei! Você não achou incrível?" Ele: "É bonito. Mas precisamos pensar nos números."',opts:[
+    {t:'Com razão! Vou te mostrar a planilha de financiamento e retorno por aluguel temporada.',correct:true,feedback:'Brilhante. Você leu o perfil C do marido e entregou exatamente o que ele precisa para decidir: dados. Ao mesmo tempo, validou o entusiasmo dela. Os dois se sentiram ouvidos.'},
+    {t:'"Vocês fazem um casal incrível. Com certeza vão adorar morar aqui!"',correct:false,feedback:'Resposta genérica que ignora a pergunta concreta do marido. Ele sinalizou que precisa de dados — ignorar isso cria resistência silenciosa que vai aparecer depois.'},
+    {t:'"Concordo com ela, é realmente especial. O que você gostaria de saber?"',correct:false,feedback:'Parcialmente certo — a pergunta aberta é boa. Mas concordar apenas com ela e ignorar a preocupação dele cria um desequilíbrio. Ambos precisam se sentir ouvidos.'}
+  ]},
+  {context:'Follow-up. Cliente visitou há 12 dias, sumiu. Você está ligando.',cliente:'"Ah, sim... estou pensando ainda. Tem muita coisa pra resolver."',opts:[
+    {t:'"Entendo completamente. O que está pesando mais? É questão financeira, familiar ou de timing?"',correct:true,feedback:'Perfeita. Você não pressionou e não capitulou — fez uma pergunta de diagnóstico que revela a objeção real. A resposta dele vai te dizer exatamente o que precisas resolver.'},
+    {t:'"Só queria avisar que tenho outro interessado no mesmo imóvel."',correct:false,feedback:'Criar urgência falsa é uma das piores estratégias de follow-up. O cliente detecta, perde a confiança e você perde o negócio — além da reputação.'},
+    {t:'"Sem problema, qualquer coisa pode me chamar!"',correct:false,feedback:'Totalmente passivo. Depois de 12 dias em silêncio, confirmar que está tudo bem sem aprofundar é praticamente encerrar a negociação. Sempre termine com um próximo passo claro.'}
+  ]},
+  {context:'Negociação final. Proposta enviada ontem. Cliente contrapropõe com 8% de desconto.',cliente:'"Gostei muito, mas para fechar hoje preciso de 8% de desconto."',opts:[
+    {t:'"Não consigo 8%, mas posso verificar com a incorporadora até 3%. Isso te ajuda a decidir?"',correct:true,feedback:'Excelente negociação. Você não cedeu sem contrapartida, propôs um número menor com uma âncora de reciprocidade ("isso te ajuda a decidir"). Manteve o controle da conversa.'},
+    {t:'"Vou ver o que consigo e te retorno amanhã."',correct:false,feedback:'Nunca saia de uma negociação sem um compromisso. "Amanhã" é uma saída que perde o momento. Se você precisa verificar, diga quando você volta — hoje, daqui a 2 horas.'},
+    {t:'"Pode ser, vou conseguir os 8% para você."',correct:false,feedback:'Ceder 8% sem resistência sinaliza que havia gordura e que você poderia ter dado mais. Além disso, mina sua credibilidade nas próximas negociações com esse ou outros clientes.'}
+  ]}
+];
+let simIdx=0,simDone=false;
+function openSimulador(){
+  detailFrom='home';simIdx=0;simDone=false;
+  document.getElementById('detail-title').textContent='Simulador de negociação';
+  renderSim();showScreen('detail');document.getElementById('nav-sim').classList.add('active');
+}
+function renderSim(){
+  const s=SIMS[simIdx];
+  const body=document.getElementById('detail-body');
+  body.innerHTML=`<div style="font-size:10px;font-weight:700;color:var(--offwhite3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px">Cenário ${simIdx+1} de ${SIMS.length}</div>
+  <div class="sim-scenario">
+    <div class="sim-context">${s.context}</div>
+    <div class="sim-cliente"><div class="sim-cliente-label">Cliente diz:</div><div class="sim-cliente-fala">${s.cliente}</div></div>
+    <div style="font-size:10px;font-weight:700;color:var(--offwhite3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Como você responde?</div>
+    <div class="sim-options">
+      ${s.opts.map((o,i)=>`<div class="sim-opt" id="sopt-${i}" onclick="selectSim(${i})">${o.t}</div>`).join('')}
+    </div>
+    <div class="sim-result" id="sim-result"></div>
+    <button class="sim-next" id="sim-next" onclick="nextSim()">${simIdx<SIMS.length-1?'Próximo cenário →':'Ver resultado final →'}</button>
+  </div>`;
+}
+function selectSim(i){
+  if(simDone)return;simDone=true;
+  const s=SIMS[simIdx];const o=s.opts[i];
+  document.querySelectorAll('.sim-opt').forEach((el,j)=>{
+    if(j===i)el.classList.add(o.correct?'correct':'wrong');
+  });
+  s.opts.forEach((o2,j)=>{if(o2.correct&&j!==i)document.getElementById('sopt-'+j).classList.add('correct');});
+  const res=document.getElementById('sim-result');
+  res.style.display='block';
+  res.innerHTML=`<div class="sim-result-title" style="color:${o.correct?'#4ade80':'#f87171'}">${o.correct?'✓ Resposta ideal':'✗ Pode melhorar'}</div>${o.feedback}`;
+  document.getElementById('sim-next').style.display='block';
+}
+let simScores=[];
+function nextSim(){
+  if(simIdx<SIMS.length-1){simIdx++;simDone=false;renderSim();}
+  else{
+    document.getElementById('detail-body').innerHTML=`<div style="text-align:center;padding:40px 0">
+    <div style="font-size:48px;margin-bottom:16px">🎯</div>
+    <div style="font-size:18px;font-weight:700;color:var(--offwhite);margin-bottom:8px">Simulação concluída</div>
+    <div style="font-size:13px;color:var(--offwhite2);line-height:1.65;margin-bottom:24px">Você praticou os 5 cenários mais comuns do mercado imobiliário do litoral SC.<br>Repita sempre que quiser — cada rodada consolida os padrões.</div>
+    <button class="btn-primary" style="width:100%" onclick="openSimulador()">Repetir simulação →</button></div>`;
+  }
+}
+
+// ─── BOOT ────────────────────────────────────────
+window.addEventListener('load',()=>{
+  load();
+  setTimeout(()=>{
+    if(S.onboarded&&S.disc){goHome();}
+    else if(S.onboarded){startDisc();}
+    else{showScreen('perfil');}
+  },1800);
+});
+</script>
+</body>
+</html>
