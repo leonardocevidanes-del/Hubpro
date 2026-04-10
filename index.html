@@ -739,7 +739,7 @@ html,body{height:100%;overflow:hidden;background:var(--navy);font-family:var(--f
 <!-- Firebase SDK -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut, deleteUser } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup, signInWithRedirect, getRedirectResult, GoogleAuthProvider, onAuthStateChanged, signOut, deleteUser } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getFirestore, doc, setDoc, getDoc, updateDoc, deleteDoc, collection, query, orderBy, getDocs, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -800,11 +800,25 @@ window.showSection = function(sec){
   if(sec==='home') renderHome();
 }
 
+// ── HANDLE GOOGLE REDIRECT RESULT ──
+getRedirectResult(auth).then(async (result) => {
+  if(result && result.user){
+    const user = result.user;
+    const snap = await getDoc(doc(db,'users',user.uid));
+    if(!snap.exists()){
+      await setDoc(doc(db,'users',user.uid),{ perfil:{ nome: user.displayName||'', email: user.email||'' }, createdAt: new Date().toISOString() });
+    }
+  }
+}).catch(()=>{});
+
 // ── AUTH STATE ──
 onAuthStateChanged(auth, async (user) => {
+  hideLoading();
   if (user) {
     currentUser = user;
+    showLoading('Carregando seus dados...');
     await carregarDadosUsuario();
+    hideLoading();
     const lgpd = userData.lgpdConsent;
     if (!lgpd) { showScreen('lgpd'); return; }
     const perfil = userData.perfil;
@@ -909,18 +923,12 @@ window.criarConta = async function(){
   }
 }
 window.loginGoogle = async function(){
-  showLoading('Conectando com Google...');
+  showLoading('Redirecionando para o Google...');
   try {
-    const result = await signInWithPopup(auth, googleProvider);
-    const user = result.user;
-    const snap = await getDoc(doc(db,'users',user.uid));
-    if(!snap.exists()){
-      await setDoc(doc(db,'users',user.uid),{ perfil:{ nome: user.displayName||'', email: user.email||'' }, createdAt: new Date().toISOString() });
-      userData = { perfil:{ nome: user.displayName||'', email: user.email||'' } };
-    }
+    await signInWithRedirect(auth, googleProvider);
   } catch(e){
     hideLoading();
-    if(e.code!=='auth/popup-closed-by-user') showToast('Erro ao conectar com Google.');
+    showToast('Erro ao conectar com Google.');
   }
 }
 
@@ -1814,11 +1822,4 @@ window.excluirConta = async function(){
 window.addEventListener('load', ()=>{
   // splash timeout
   setTimeout(()=>{
-    if(document.getElementById('screen-splash').classList.contains('active')){
-      // auth state will handle routing
-    }
-  }, 1500);
-});
-</script>
-</body>
-</html>
+    if(document.getElementById('scre
