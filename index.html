@@ -1818,8 +1818,16 @@ window.excluirConta = async function(){
   }
 }
 
-// ── INIT ──
+// ── INIT — mostrar auth imediatamente, Firebase redireciona se já logado ──
 window.addEventListener('load', ()=>{
-  // splash timeout
+  // Mostra tela de login imediatamente — se usuário já estiver logado,
+  // onAuthStateChanged vai redirecionar em seguida
   setTimeout(()=>{
-    if(document.getElementById('scre
+    if(document.getElementById('screen-splash').classList.contains('active')){
+      showScreen('auth');
+    }
+  }, 1200);
+});
+</script>
+</body>
+</html>
