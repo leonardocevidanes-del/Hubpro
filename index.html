@@ -40,9 +40,10 @@ html,body{height:100%;overflow:hidden;background:var(--navy);font-family:var(--f
 .fl input{background:var(--navy3);border:1px solid rgba(184,154,79,.25);border-radius:8px;padding:13px 14px;font-size:.9rem;font-family:var(--font);color:var(--white);outline:none;width:100%;transition:.2s}
 .fl input:focus{border-color:var(--gold)}
 .fl input::placeholder{color:var(--dim)}
-.rem-row{display:flex;align-items:center;gap:10px;cursor:pointer}
-.rem-row input[type=checkbox]{width:18px;height:18px;accent-color:var(--gold);cursor:pointer}
-.rem-row label{font-size:.8rem;color:var(--dim);cursor:pointer}
+.rem-row{display:flex;align-items:center;background:var(--navy3);border:1px solid rgba(184,154,79,.2);border-radius:8px;cursor:pointer;overflow:hidden}
+.rem-row-touch{min-width:48px;display:flex;align-items:center;justify-content:center;padding:14px 12px;flex-shrink:0}
+.rem-row-touch input[type=checkbox]{width:20px;height:20px;accent-color:var(--gold);pointer-events:none}
+.rem-row label{font-size:.8rem;color:var(--dim);cursor:pointer;padding:14px 14px 14px 0;flex:1}
 .btn-p{background:var(--gold);color:var(--navy);border:none;border-radius:8px;padding:14px;font-size:.88rem;font-weight:700;font-family:var(--font);letter-spacing:1px;cursor:pointer;transition:.2s;text-transform:uppercase;width:100%}
 .btn-p:hover{background:var(--gold2)}
 .btn-p:disabled{opacity:.5;cursor:not-allowed}
@@ -353,11 +354,12 @@ textarea.ta:focus{border-color:var(--gold)}
     <div class="fl"><label>E-mail</label><input type="email" id="l-email" placeholder="seu@email.com" autocomplete="email"></div>
     <div class="fl"><label>Senha</label><input type="password" id="l-senha" placeholder="••••••••" autocomplete="current-password"></div>
     <div class="rem-row" onclick="document.getElementById('rem-cb').click()">
-      <input type="checkbox" id="rem-cb">
-      <label for="rem-cb">Lembrar meu login neste dispositivo</label>
+      <div class="rem-row-touch"><input type="checkbox" id="rem-cb" onclick="event.stopPropagation()"></div>
+      <label for="rem-cb" onclick="event.stopPropagation();document.getElementById('rem-cb').click()">Lembrar meu login neste dispositivo</label>
     </div>
     <div id="l-err" class="aerr"></div>
     <button class="btn-p" onclick="fazerLogin()">Entrar</button>
+    <div style="text-align:center"><button onclick="esqueceuSenha()" style="background:transparent;border:none;color:var(--gold);font-size:.78rem;font-family:var(--font);cursor:pointer;text-decoration:underline;padding:4px">Esqueci minha senha</button></div>
   </div>
   <div id="form-cad" class="aform mc" style="padding-top:20px">
     <div class="fl"><label>Nome completo</label><input type="text" id="c-nome" placeholder="Seu nome completo" autocomplete="name" autocapitalize="words"></div>
@@ -376,12 +378,17 @@ textarea.ta:focus{border-color:var(--gold)}
   </div>
   <div class="ob mc">
     <div class="photo-up">
-      <div class="photo-circle" onclick="document.getElementById('onb-foto').click()">
+      <div class="photo-circle" id="onb-circle">
         <img id="onb-fp" src="" style="display:none">
         <span id="onb-fph">📷</span>
       </div>
-      <div class="photo-hint">Toque para adicionar foto (opcional)</div>
-      <input type="file" id="onb-foto" accept="image/*" capture="user" style="display:none" onchange="prevFoto(this)">
+      <div style="display:flex;gap:8px;margin-top:4px">
+        <button onclick="document.getElementById('onb-galeria').click()" style="background:var(--navy3);border:1px solid rgba(184,154,79,.3);border-radius:6px;padding:7px 14px;font-size:.72rem;font-weight:600;color:var(--gold);cursor:pointer;font-family:var(--font)">🖼️ Galeria</button>
+        <button onclick="document.getElementById('onb-camera').click()" style="background:var(--navy3);border:1px solid rgba(184,154,79,.3);border-radius:6px;padding:7px 14px;font-size:.72rem;font-weight:600;color:var(--gold);cursor:pointer;font-family:var(--font)">📸 Câmera</button>
+      </div>
+      <div class="photo-hint">Foto opcional</div>
+      <input type="file" id="onb-galeria" accept="image/*" style="display:none" onchange="prevFoto(this)">
+      <input type="file" id="onb-camera" accept="image/*" capture="user" style="display:none" onchange="prevFoto(this)">
     </div>
     <div class="fl"><label>Nome completo</label><input type="text" id="onb-nome" placeholder="Como você quer ser chamado" autocomplete="name" autocapitalize="words"></div>
     <div class="fl"><label>Cidade onde atua</label><input type="text" id="onb-cidade" placeholder="Ex: Balneário Camboriú" autocomplete="address-level2" autocapitalize="words" list="cidades-list">
@@ -411,14 +418,14 @@ textarea.ta:focus{border-color:var(--gold)}
     <div class="fl"><label>Especialidade</label>
       <select id="onb-esp" style="background:var(--navy3);border:1px solid rgba(184,154,79,.25);border-radius:8px;padding:13px 14px;font-size:.9rem;font-family:var(--font);color:var(--white);outline:none;width:100%">
         <option value="">Selecione sua especialidade</option>
-        <option>Imóveis de praia e veraneio</option>
-        <option>Alto padrão e luxo</option>
-        <option>Lançamentos e plantas</option>
-        <option>Imóveis residenciais</option>
-        <option>Imóveis comerciais</option>
-        <option>Investimento e renda</option>
-        <option>Imóveis rurais</option>
+        <option>Locação</option>
+        <option>Alto Padrão</option>
+        <option>Luxo</option>
+        <option>Médio Padrão</option>
+        <option>Terrenos e Lotes</option>
         <option>Minha Casa Minha Vida</option>
+        <option>Imóveis Rurais</option>
+        <option>Imóveis Comerciais</option>
       </select>
     </div>
     <button class="btn-p" onclick="salvarOnb()">Começar →</button>
@@ -696,7 +703,21 @@ window.fazerLogin=async function(){
     err.textContent=msgs[e.code]||'Erro ao entrar.';err.classList.add('on');
   }
 }
-window.criarConta=async function(){
+window.esqueceuSenha=async function(){
+  const email=$('l-email').value.trim();
+  const err=$('l-err');err.classList.remove('on');
+  if(!email){err.textContent='Digite seu e-mail acima para recuperar a senha.';err.classList.add('on');return;}
+  showLoad('Enviando e-mail...');
+  try{
+    const {sendPasswordResetEmail}=await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js");
+    await sendPasswordResetEmail(auth,email);
+    hideLoad();toast('E-mail de recuperação enviado! Verifique sua caixa de entrada. ✅',4000);
+  }catch(e){
+    hideLoad();
+    const msgs={'auth/user-not-found':'E-mail não encontrado.','auth/invalid-email':'E-mail inválido.'};
+    err.textContent=msgs[e.code]||'Erro ao enviar. Tente novamente.';err.classList.add('on');
+  }
+}
   const nome=$('c-nome').value.trim(),email=$('c-email').value.trim(),senha=$('c-senha').value;
   const err=$('c-err');err.classList.remove('on');
   if(!nome||!email||!senha){err.textContent='Preencha todos os campos.';err.classList.add('on');return;}
@@ -1061,15 +1082,20 @@ function renderPerf(){
   const p=UD.perfil||{},disc=UD.disc;
   $('perf-content').innerHTML=`<div class="perf-screen">
     <div class="perf-top">
-      <div class="perf-av" onclick="document.getElementById('pf-foto-inp').click()">${p.foto?`<img src="${p.foto}" alt="foto">`:`<span>${(p.nome||'U').charAt(0).toUpperCase()}</span>`}</div>
-      <input type="file" id="pf-foto-inp" accept="image/*" capture="user" style="display:none" onchange="atualizarFoto(this)">
+      <div class="perf-av" id="perf-av-el">${p.foto?`<img src="${p.foto}" alt="foto">`:`<span>${(p.nome||'U').charAt(0).toUpperCase()}</span>`}</div>
+      <input type="file" id="pf-galeria" accept="image/*" style="display:none" onchange="atualizarFoto(this)">
+      <input type="file" id="pf-camera" accept="image/*" capture="user" style="display:none" onchange="atualizarFoto(this)">
+      <div style="display:flex;gap:8px;justify-content:center;margin-bottom:8px">
+        <button onclick="document.getElementById('pf-galeria').click()" style="background:var(--navy3);border:1px solid rgba(184,154,79,.3);border-radius:6px;padding:6px 12px;font-size:.7rem;font-weight:600;color:var(--gold);cursor:pointer;font-family:var(--font)">🖼️ Galeria</button>
+        <button onclick="document.getElementById('pf-camera').click()" style="background:var(--navy3);border:1px solid rgba(184,154,79,.3);border-radius:6px;padding:6px 12px;font-size:.7rem;font-weight:600;color:var(--gold);cursor:pointer;font-family:var(--font)">📸 Câmera</button>
+      </div>
       <div class="perf-nome">${p.nome||'Corretor'}</div>
       ${disc?`<div class="perf-disc">DISC ${disc.perfil} — ${disc.nome}</div>`:`<div style="font-size:.72rem;color:var(--dim);margin-top:4px">Faça o Quiz DISC</div>`}
     </div>
     <div class="perf-sec"><h3>Informações</h3>
       <div class="pf"><label>Nome</label><input type="text" id="pf-nome" value="${p.nome||''}" autocapitalize="words"></div>
       <div class="pf"><label>Cidade</label><input type="text" id="pf-cidade" value="${p.cidade||''}" autocapitalize="words" list="cidades-pf"><datalist id="cidades-pf"><option value="Balneário Camboriú"><option value="Balneário Piçarras"><option value="Itajaí"><option value="Camboriú"><option value="Navegantes"><option value="Penha"><option value="Barra Velha"><option value="Florianópolis"></datalist></div>
-      <div class="pf"><label>Especialidade</label><select id="pf-esp" style="background:var(--navy);border:1px solid rgba(184,154,79,.18);border-radius:6px;padding:10px 12px;font-size:.83rem;font-family:var(--font);color:var(--white);outline:none;width:100%"><option value="">Selecione</option><option ${p.especialidade==='Imóveis de praia e veraneio'?'selected':''}>Imóveis de praia e veraneio</option><option ${p.especialidade==='Alto padrão e luxo'?'selected':''}>Alto padrão e luxo</option><option ${p.especialidade==='Lançamentos e plantas'?'selected':''}>Lançamentos e plantas</option><option ${p.especialidade==='Imóveis residenciais'?'selected':''}>Imóveis residenciais</option><option ${p.especialidade==='Imóveis comerciais'?'selected':''}>Imóveis comerciais</option><option ${p.especialidade==='Investimento e renda'?'selected':''}>Investimento e renda</option><option ${p.especialidade==='Minha Casa Minha Vida'?'selected':''}>Minha Casa Minha Vida</option></select></div>
+      <div class="pf"><label>Especialidade</label><select id="pf-esp" style="background:var(--navy);border:1px solid rgba(184,154,79,.18);border-radius:6px;padding:10px 12px;font-size:.83rem;font-family:var(--font);color:var(--white);outline:none;width:100%"><option value="">Selecione</option><option ${p.especialidade==='Locação'?'selected':''}>Locação</option><option ${p.especialidade==='Alto Padrão'?'selected':''}>Alto Padrão</option><option ${p.especialidade==='Luxo'?'selected':''}>Luxo</option><option ${p.especialidade==='Médio Padrão'?'selected':''}>Médio Padrão</option><option ${p.especialidade==='Terrenos e Lotes'?'selected':''}>Terrenos e Lotes</option><option ${p.especialidade==='Minha Casa Minha Vida'?'selected':''}>Minha Casa Minha Vida</option><option ${p.especialidade==='Imóveis Rurais'?'selected':''}>Imóveis Rurais</option><option ${p.especialidade==='Imóveis Comerciais'?'selected':''}>Imóveis Comerciais</option></select></div>
       <div class="pf"><label>Tempo como corretor</label><select id="pf-tempo" style="background:var(--navy);border:1px solid rgba(184,154,79,.18);border-radius:6px;padding:10px 12px;font-size:.83rem;font-family:var(--font);color:var(--white);outline:none;width:100%"><option value="">Selecione</option><option ${p.tempo==='Menos de 1 ano'?'selected':''}>Menos de 1 ano</option><option ${p.tempo==='1 a 3 anos'?'selected':''}>1 a 3 anos</option><option ${p.tempo==='3 a 5 anos'?'selected':''}>3 a 5 anos</option><option ${p.tempo==='5 a 10 anos'?'selected':''}>5 a 10 anos</option><option ${p.tempo==='Mais de 10 anos'?'selected':''}>Mais de 10 anos</option></select></div>
       <button class="btn-p" style="margin-top:6px" onclick="salvarPerf()">Salvar alterações</button>
     </div>
