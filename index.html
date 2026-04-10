@@ -833,19 +833,38 @@ onAuthStateChanged(auth, async (user) => {
 });
 
 async function carregarDadosUsuario(){
+  // Carrega do localStorage primeiro (instantâneo)
+  const key = 'hubpro_' + currentUser.uid;
   try {
-    const snap = await getDoc(doc(db,'users',currentUser.uid));
-    if(snap.exists()) userData = snap.data();
+    const local = localStorage.getItem(key);
+    if(local) userData = JSON.parse(local);
     else userData = {};
   } catch(e){ userData = {}; }
+  // Tenta sincronizar com Firestore em background (sem bloquear)
+  try {
+    const snap = await Promise.race([
+      getDoc(doc(db,'users',currentUser.uid)),
+      new Promise((_,reject) => setTimeout(()=>reject(new Error('timeout')), 3000))
+    ]);
+    if(snap.exists()){
+      const remoto = snap.data();
+      // Merge: dados remotos prevalecem, mas mantém dados locais se remoto estiver vazio
+      userData = { ...userData, ...remoto };
+      localStorage.setItem(key, JSON.stringify(userData));
+    }
+  } catch(e){ /* usa localStorage se Firestore falhar */ }
 }
 
 async function salvarDado(campo, valor){
   if(!currentUser) return;
+  userData[campo] = valor;
+  // Salva no localStorage imediatamente
+  const key = 'hubpro_' + currentUser.uid;
+  try { localStorage.setItem(key, JSON.stringify(userData)); } catch(e){}
+  // Tenta salvar no Firestore em background
   try {
-    await setDoc(doc(db,'users',currentUser.uid), {[campo]: valor}, {merge:true});
-    userData[campo] = valor;
-  } catch(e){ showToast('Erro ao salvar. Verifique sua conexão.'); }
+    setDoc(doc(db,'users',currentUser.uid), {[campo]: valor}, {merge:true}).catch(()=>{});
+  } catch(e){}
 }
 
 // ── SPLASH ──
