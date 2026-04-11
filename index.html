@@ -514,20 +514,25 @@ textarea.ta:focus{border-color:var(--gold)}
       <div class="hsec-title">📰 NOTÍCIAS DA REGIÃO</div>
       <div id="news-container">
         <div id="news-items">
-          <div class="news-card" onclick="window.open('https://www.nsctotal.com.br/noticias/litoral','_blank')">
-            <div class="nc-label"><span class="nc-dot"></span>LITORAL SC</div>
-            <div class="nc-title">NSC Total — Notícias do litoral catarinense</div>
-            <div class="nc-source">nsctotal.com.br · Toque para abrir</div>
+          <div class="news-card" onclick="window.open('https://ndmais.com.br/economia/e-possivel-comprar-apartamento-pe-na-areia-em-sc/','_blank')">
+            <div class="nc-label"><span class="nc-dot"></span>08/04/2026 · ND MAIS</div>
+            <div class="nc-title">Barra Velha e Balneário Barra do Sul com valorização acima de 25% ao ano no radar dos investidores em 2026</div>
+            <div class="nc-source">ndmais.com.br · Mercado Imobiliário SC</div>
           </div>
-          <div class="news-card" style="margin-top:8px" onclick="window.open('https://www.anoticia.com.br','_blank')">
-            <div class="nc-label"><span class="nc-dot"></span>REGIONAL</div>
-            <div class="nc-title">A Notícia — Cobertura da região norte de SC</div>
-            <div class="nc-source">anoticia.com.br · Toque para abrir</div>
+          <div class="news-card" style="margin-top:8px" onclick="window.open('https://www.notisul.com.br/mercado-imobiliario-laguna-investimentos-sc/','_blank')">
+            <div class="nc-label"><span class="nc-dot"></span>09/04/2026 · NOTISUL</div>
+            <div class="nc-title">Litoral SC deixa de ser destino sazonal e atrai moradores fixos e investidores o ano todo</div>
+            <div class="nc-source">notisul.com.br · Mercado Imobiliário</div>
           </div>
-          <div class="news-card" style="margin-top:8px" onclick="window.open('https://www.segs.com.br/financas','_blank')">
-            <div class="nc-label"><span class="nc-dot"></span>ECONOMIA</div>
-            <div class="nc-title">Selic 14,75% — Copom pode cortar novamente em 28/abr. Impacto no crédito imobiliário</div>
-            <div class="nc-source">segs.com.br · Economia · Toque para abrir</div>
+          <div class="news-card" style="margin-top:8px" onclick="window.open('https://exame.com/mercado-imobiliario/mercado-imobiliario-bate-recorde-movimenta-r-264-bi-e-sc-lidera-no-sul/','_blank')">
+            <div class="nc-label"><span class="nc-dot"></span>19/03/2026 · EXAME</div>
+            <div class="nc-title">SC lidera o Sul: mercado imobiliário avança 14,4% no VGV e 8,5% em unidades em 2025</div>
+            <div class="nc-source">exame.com · Mercado Imobiliário Brasil</div>
+          </div>
+          <div class="news-card" style="margin-top:8px" onclick="window.open('https://terrabrasilnoticias.com/2026/04/nova-torre-residencial-em-santa-catarina-vai-se-tornar-a-mais-alta-do-mundo-ja-ultrapassa-r-22-bilhoes-em-vendas-e-inclui-apartamentos-mansoes-suspensas-e-coberturas-de-alto-padrao','_blank')">
+            <div class="nc-label"><span class="nc-dot"></span>07/04/2026 · TERRA BRASIL</div>
+            <div class="nc-title">Senna Tower em BC ultrapassa R$ 2,2 bi em vendas — será o prédio residencial mais alto do mundo</div>
+            <div class="nc-source">terrabrasilnoticias.com · Balneário Camboriú</div>
           </div>
         </div>
       </div>
@@ -1032,6 +1037,12 @@ function renderPlano(){
 }
 window.togSem=function(h){h.nextElementSibling.classList.toggle('open');}
 window.togTrf=function(id,sem){
+  // Guarda quais semanas estavam abertas antes de re-renderizar
+  const abertasAntes=[];
+  document.querySelectorAll('.sem-body.open').forEach(b=>{
+    const card=b.closest('.sem-crd');
+    if(card){const idx=[...card.parentNode.children].indexOf(card);abertasAntes.push(idx);}
+  });
   const pd={...(UD.plano||{})};pd[id]=!pd[id];
   pd[`streak_${new Date().toDateString()}`]=true;
   save('plano',pd);
@@ -1042,6 +1053,9 @@ window.togTrf=function(id,sem){
     $('celeb').classList.add('on');
   }
   renderPlano();
+  // Restaura abas abertas
+  const cards=document.querySelectorAll('.sem-crd');
+  abertasAntes.forEach(idx=>{if(cards[idx])cards[idx].querySelector('.sem-body').classList.add('open');});
 }
 
 // PERGUNTAS
@@ -1082,12 +1096,44 @@ function renderMeta(){
     <div style="display:flex;gap:10px;margin-top:4px"><button class="btn-sim" onclick="checkinMeta('sim')" style="padding:13px;font-size:.83rem">✅ Sim, alcancei!</button><button class="btn-nao" onclick="checkinMeta('parcial')" style="padding:13px;font-size:.83rem;background:rgba(184,154,79,.1);border-color:var(--gold);color:var(--gold)">📝 Parcialmente</button></div>
     <button class="btn-s" style="margin-top:10px" onclick="checkinMeta('nao')">❌ Não alcancei dessa vez</button>`;
   }else if(metaViva){
-    h+=`<div style="background:var(--navy3);border:1px solid rgba(184,154,79,.25);border-radius:10px;padding:14px"><div style="font-size:.6rem;font-weight:700;color:var(--gold);letter-spacing:2px;text-transform:uppercase;margin-bottom:7px">META DESTA SEMANA</div><div style="font-size:.85rem;color:var(--white);line-height:1.5">${metaAtual.texto}</div>${metaAtual.checkin?`<div style="margin-top:8px;font-size:.78rem;color:${metaAtual.checkin==='sim'?'var(--green)':metaAtual.checkin==='parcial'?'var(--gold)':'var(--red)'}">${metaAtual.checkin==='sim'?'✅ Meta alcançada!':metaAtual.checkin==='parcial'?'📝 Parcialmente alcançada':'❌ Não alcançada — aprenda e siga em frente'}</div>`:''}</div>`;
+    h+=`<div style="background:var(--navy3);border:1px solid rgba(184,154,79,.25);border-radius:10px;padding:14px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px">
+        <div style="font-size:.6rem;font-weight:700;color:var(--gold);letter-spacing:2px;text-transform:uppercase">META DESTA SEMANA</div>
+        <button onclick="editarMeta()" style="background:rgba(184,154,79,.15);border:1px solid rgba(184,154,79,.4);border-radius:5px;padding:4px 10px;font-size:.65rem;font-weight:600;color:var(--gold);font-family:var(--font);cursor:pointer">✏️ Editar</button>
+      </div>
+      <div id="meta-texto-display" style="font-size:.85rem;color:var(--white);line-height:1.5">${metaAtual.texto}</div>
+      <div id="meta-edit-wrap" style="display:none;margin-top:10px">
+        <textarea class="ta" id="meta-edit-inp" style="min-height:70px">${metaAtual.texto}</textarea>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <button class="btn-p" style="flex:1;padding:10px;font-size:.8rem" onclick="salvarEdicaoMeta()">Salvar</button>
+          <button class="btn-s" style="flex:1;padding:10px;font-size:.8rem" onclick="cancelarEdicaoMeta()">Cancelar</button>
+        </div>
+      </div>
+      ${metaAtual.checkin?`<div style="margin-top:8px;font-size:.78rem;color:${metaAtual.checkin==='sim'?'var(--green)':metaAtual.checkin==='parcial'?'var(--gold)':'var(--red)'}">${metaAtual.checkin==='sim'?'✅ Meta alcançada!':metaAtual.checkin==='parcial'?'📝 Parcialmente alcançada':'❌ Não alcançada — aprenda e siga em frente'}</div>`:''}
+    </div>`;
   }
   if(metas.length>1){
     h+=`<div class="meta-hist"><h3>Histórico</h3>${[...metas].reverse().slice(0,5).map(m=>`<div class="mhi"><div class="mhi-d">${new Date(m.data).toLocaleDateString('pt-BR',{day:'2-digit',month:'short'})}</div><div class="mhi-t">${m.texto}</div>${m.checkin?`<div class="mhi-c" style="color:${m.checkin==='sim'?'var(--green)':m.checkin==='parcial'?'var(--gold)':'var(--red)'}">${m.checkin==='sim'?'✅ Alcançada':m.checkin==='parcial'?'📝 Parcial':'❌ Não alcançada'}</div>`:''}</div>`).join('')}</div>`;
   }
   $('meta-content').innerHTML=h;
+}
+window.editarMeta=function(){
+  const tw=$('meta-edit-wrap'),dd=$('meta-texto-display');
+  if(!tw||!dd)return;
+  tw.style.display='block';dd.style.display='none';
+  $('meta-edit-inp').focus();
+}
+window.cancelarEdicaoMeta=function(){
+  const tw=$('meta-edit-wrap'),dd=$('meta-texto-display');
+  if(!tw||!dd)return;
+  tw.style.display='none';dd.style.display='block';
+}
+window.salvarEdicaoMeta=function(){
+  const txt=$('meta-edit-inp').value.trim();
+  if(!txt){toast('Escreva sua meta.');return;}
+  const metas=UD.metas||[];
+  if(metas.length>0)metas[metas.length-1].texto=txt;
+  save('metas',metas);toast('Meta atualizada! ✅');renderMeta();
 }
 window.salvarMeta=function(){
   const txt=$('meta-inp').value.trim();
@@ -1270,9 +1316,9 @@ function renderMkt(){
       <div style="margin-top:12px;padding-top:10px;border-top:1px solid rgba(184,154,79,.1)">
         <div style="font-size:.65rem;color:var(--dim);margin-bottom:8px">📌 Fonte dos dados</div>
         <div style="display:flex;flex-direction:column;gap:6px">
-          <button onclick="window.open('https://www.vivareal.com.br/preco-metro-quadrado/santa-catarina/','_blank')" style="background:rgba(184,154,79,.1);border:1px solid rgba(184,154,79,.3);border-radius:6px;padding:8px 12px;font-size:.72rem;color:var(--gold);font-family:var(--font);cursor:pointer;text-align:left">🔗 VivaReal — Preço m² SC</button>
-          <button onclick="window.open('https://www.zapimoveis.com.br/media-do-metro-quadrado/sc+santa-catarina/','_blank')" style="background:rgba(184,154,79,.1);border:1px solid rgba(184,154,79,.3);border-radius:6px;padding:8px 12px;font-size:.72rem;color:var(--gold);font-family:var(--font);cursor:pointer;text-align:left">🔗 Zap Imóveis — Índice m² SC</button>
-          <button onclick="window.open('https://www.fipezap.com.br','_blank')" style="background:rgba(184,154,79,.1);border:1px solid rgba(184,154,79,.3);border-radius:6px;padding:8px 12px;font-size:.72rem;color:var(--gold);font-family:var(--font);cursor:pointer;text-align:left">🔗 FipeZap — Índice nacional</button>
+          <button onclick="window.open('https://www.fipe.org.br/pt-br/indices/fipezap','_blank')" style="background:rgba(184,154,79,.1);border:1px solid rgba(184,154,79,.3);border-radius:6px;padding:8px 12px;font-size:.72rem;color:var(--gold);font-family:var(--font);cursor:pointer;text-align:left">🔗 FipeZap — Índice de preços imobiliários</button>
+          <button onclick="window.open('https://www.dwv.com.br','_blank')" style="background:rgba(184,154,79,.1);border:1px solid rgba(184,154,79,.3);border-radius:6px;padding:8px 12px;font-size:.72rem;color:var(--gold);font-family:var(--font);cursor:pointer;text-align:left">🔗 DWV — Consultoria imobiliária SC</button>
+          <button onclick="window.open('https://www.braininteligencia.com.br','_blank')" style="background:rgba(184,154,79,.1);border:1px solid rgba(184,154,79,.3);border-radius:6px;padding:8px 12px;font-size:.72rem;color:var(--gold);font-family:var(--font);cursor:pointer;text-align:left">🔗 Brain Inteligência — Dados mercado SC</button>
         </div>
         <div style="font-size:.6rem;color:var(--dim);margin-top:8px">Valores estimados com base em anúncios ativos Q1/2026. Sempre valide com pesquisa local.</div>
       </div>
@@ -1372,8 +1418,16 @@ window.delConta=function(){
 
 // INIT
 window.abrirNoticia=function(url){window.open(url,'_blank');}
-window.irParaDisc=function(){showScr('sdisc');renderDisc();}
-window.pularDisc=function(){showScr('shome');renderHome();}
+window.pularDisc=function(){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  $('shome').classList.add('active');
+  renderHome();
+}
+window.irParaDisc=function(){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  $('sdisc').classList.add('active');
+  renderDisc();
+}
 
 // ── SWIPE NAVIGATION ──
 (function(){
