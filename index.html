@@ -143,7 +143,7 @@ html,body{height:100%;overflow:hidden;background:var(--navy);font-family:var(--f
 .dq-fill{height:100%;background:var(--gold);border-radius:3px;transition:.35s}
 .dq-text{font-size:.95rem;font-weight:600;color:var(--white);line-height:1.5;margin-bottom:16px}
 .dopt{background:var(--navy3);border:1px solid rgba(184,154,79,.18);border-radius:8px;padding:14px 16px;font-size:.83rem;color:var(--white);cursor:pointer;transition:.2s;text-align:left;font-family:var(--font);width:100%;margin-bottom:8px;line-height:1.4}
-.dopt:hover,.dopt:active{border-color:var(--gold);color:var(--gold)}
+.dopt:active{background:rgba(184,154,79,.08)}
 /* DISC RESULT */
 .dr-card{background:linear-gradient(135deg,var(--navy3),#1a3a50);border:2px solid var(--gold);border-radius:12px;padding:24px;text-align:center;margin:16px}
 .dr-letter{font-size:3.5rem;font-weight:700;color:var(--gold);line-height:1}
@@ -505,6 +505,10 @@ textarea.ta:focus{border-color:var(--gold)}
       <div class="hsec-title">📚 LEITURA DO MÊS</div>
       <div id="home-livro-card"></div>
     </div>
+    <div class="hsec" style="margin-bottom:6px">
+      <div class="hsec-title">🌿 TURISMO & REGIÃO SC</div>
+      <div id="home-turismo-card"></div>
+    </div>
     <div class="hsec" style="margin-bottom:16px">
       <div class="hsec-title">🧠 SEU PERFIL DISC</div>
       <div id="home-disc-card"></div>
@@ -865,8 +869,13 @@ function renderHome(){
   // Header
   var av = $('hdr-av');
   if(av){
-    if(p.foto) av.style.backgroundImage = 'url(' + p.foto + ')';
-    av.querySelector('span') && (av.querySelector('span').textContent = p.nome ? p.nome.charAt(0).toUpperCase() : 'C');
+    if(p.foto){
+      av.innerHTML = '<img src="' + p.foto + '" style="width:100%;height:100%;object-fit:cover;border-radius:50%">';
+      av.style.backgroundImage = '';
+    } else {
+      av.innerHTML = '<span>' + (p.nome ? p.nome.charAt(0).toUpperCase() : 'C') + '</span>';
+      av.style.backgroundImage = '';
+    }
   }
   var hNome = $('hdr-nome');
   if(hNome) hNome.textContent = p.nome ? 'Olá, ' + p.nome.split(' ')[0] + '!' : 'Olá!';
@@ -948,7 +957,19 @@ function renderHome(){
   var hojeStr = hoje.toDateString();
   var respHoje = regs.find(function(r){ return r.tipo === 'pergunta' && new Date(r.data).toDateString() === hojeStr; });
   var pqResp = $('home-pq-resp');
-  if(pqResp) pqResp.textContent = respHoje ? '✓ Respondida hoje' : 'Primeira conexão';
+  if(pqResp){
+    if(respHoje && respHoje.texto){
+      pqResp.textContent = '"' + respHoje.texto.substring(0,80) + (respHoje.texto.length > 80 ? '...' : '') + '"';
+      pqResp.style.color = 'var(--white)';
+      pqResp.style.fontStyle = 'italic';
+      pqResp.style.fontSize = '.75rem';
+    } else {
+      pqResp.textContent = 'Toque para responder a reflexão de hoje';
+      pqResp.style.color = 'var(--dim)';
+      pqResp.style.fontStyle = 'normal';
+      pqResp.style.fontSize = '.72rem';
+    }
+  }
 
   // Streak
   var dots = $('streak-dots');
@@ -983,6 +1004,7 @@ function renderHome(){
   // Novos cards da home
   renderMsgDia();
   renderLivroMes();
+  renderTurismo();
   renderDiscHome();
 }
 
@@ -1875,6 +1897,74 @@ window.pularDisc = function(){
   $('shome').classList.add('active');
   renderHome();
 };
+
+
+// ── TURISMO SC ──
+var NOTICIAS_TURISMO = [
+  {
+    cat:'🏖️ Litoral',
+    titulo:'Balneário Camboriú lidera ranking de valorização imobiliária entre destinos turísticos do Brasil',
+    resumo:'Com metro quadrado mais caro do país e infraestrutura de alto padrão, BC consolida posição como polo de turismo e investimento para o público premium.',
+    fonte:'NSC Total · Abril 2026'
+  },
+  {
+    cat:'🌊 Litoral Norte SC',
+    titulo:'Barra Velha e Piçarras atraem turistas em busca de praias tranquilas fora da alta temporada',
+    resumo:'Movimento crescente de visitantes entre março e outubro consolida o litoral norte como opção de turismo o ano todo, valorizando imóveis na região.',
+    fonte:'Notisul · Março 2026'
+  },
+  {
+    cat:'🏔️ Serra Gaúcha SC',
+    titulo:'Serra Catarinense bate recorde de visitantes no inverno e aquece mercado imobiliário em Urubici e São Joaquim',
+    resumo:'Neve, gastronomia e ecoturismo atraem novos moradores e investidores. Imóveis de temporada na serra valorizam até 18% ao ano.',
+    fonte:'G1 SC · Março 2026'
+  },
+  {
+    cat:'🌿 Turismo Rural',
+    titulo:'Turismo rural cresce 34% em SC — famílias buscam experiências no campo longe da agitação do litoral',
+    resumo:'Propriedades rurais na região de Joinville, Pomerode e Vale do Itajaí transformam turismo de fim de semana em oportunidade de negócio imobiliário.',
+    fonte:'Sebrae SC · Fevereiro 2026'
+  },
+  {
+    cat:'🍷 Vale Europeu',
+    titulo:'Pomerode e Blumenau consolidam rota cervejeira e gastronômica como destino turístico internacional',
+    resumo:'Arquitetura enxaimel, festivais culturais e culinária alemã atraem turistas europeus e geram demanda por imóveis de temporada na região.',
+    fonte:'Diário Catarinense · Fevereiro 2026'
+  },
+  {
+    cat:'🐬 Litoral Sul SC',
+    titulo:'Florianópolis entra no top 5 destinos mais procurados do Brasil para turismo de negócios e lazer em 2026',
+    resumo:'Capital catarinense combina praias, polo tecnológico e qualidade de vida. Mercado imobiliário responde com alta nos bairros Campeche, Jurerê e Lagoa.',
+    fonte:'Exame · Janeiro 2026'
+  },
+  {
+    cat:'🏕️ Ecoturismo',
+    titulo:'Chapecó e região oeste de SC lançam rotas de turismo rural e ecoturismo com foco em agricultura familiar',
+    resumo:'Turismo sustentável no oeste catarinense abre novo mercado para imóveis rurais e chácaras de fim de semana com alta demanda de Florianópolis e Curitiba.',
+    fonte:'NSC Total · Janeiro 2026'
+  }
+];
+
+function renderTurismo() {
+  var el = document.getElementById('home-turismo-card');
+  if(!el) return;
+  var hoje = new Date();
+  var idx = Math.floor(hoje.getTime() / 86400000) % NOTICIAS_TURISMO.length;
+  var n1 = NOTICIAS_TURISMO[idx];
+  var n2 = NOTICIAS_TURISMO[(idx + 1) % NOTICIAS_TURISMO.length];
+  el.innerHTML = buildNoticiaCard(n1) + '<div style="margin-top:8px"></div>' + buildNoticiaCard(n2);
+}
+
+function buildNoticiaCard(n) {
+  return '<div style="background:var(--navy3);border:1px solid rgba(184,154,79,.18);border-radius:12px;padding:14px">'
+    + '<div style="font-size:.58rem;font-weight:700;color:var(--gold);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;display:flex;align-items:center;gap:6px">'
+    + '<span style="width:6px;height:6px;border-radius:50%;background:var(--green);display:inline-block;flex-shrink:0"></span>'
+    + n.cat + '</div>'
+    + '<div style="font-size:.83rem;font-weight:600;color:var(--white);line-height:1.45;margin-bottom:6px">' + n.titulo + '</div>'
+    + '<div style="font-size:.72rem;color:var(--dim);line-height:1.55;margin-bottom:6px">' + n.resumo + '</div>'
+    + '<div style="font-size:.62rem;color:rgba(184,154,79,.6)">' + n.fonte + '</div>'
+    + '</div>';
+}
 
 
 // ── MENSAGEM DO DIA ──
