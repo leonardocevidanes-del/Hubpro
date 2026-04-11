@@ -718,8 +718,8 @@ function save(campo,val){
 
 // ── AUTH STATE ──
 let authResolved = false;
-onAuthStateChanged(auth,(user)=>{
-  authResolved = true;
+
+function rotearUsuario(user){
   hideLoad();
   if(user){
     CU=user;
@@ -728,9 +728,24 @@ onAuthStateChanged(auth,(user)=>{
     if(!UD.perfil?.nome){showScr('sonb');return;}
     showScr('shome');renderHome();
   }else{
-    CU=null;UD={};showScr('sa');
+    CU=null;UD={};
+    showScr('sa');
   }
+}
+
+onAuthStateChanged(auth,(user)=>{
+  authResolved=true;
+  rotearUsuario(user);
 });
+
+// Timeout de segurança: se Firebase não responder em 3s, vai para login
+setTimeout(()=>{
+  if(!authResolved){
+    authResolved=true;
+    hideLoad();
+    showScr('sa');
+  }
+},3000);
 
 // LGPD
 window.toggleLgpd=function(){
@@ -769,8 +784,9 @@ window.fazerLogin=async function(){
   try{
     const persist=$('rem-cb').checked?browserLocalPersistence:browserSessionPersistence;
     await setPersistence(auth,persist);
-    await signInWithEmailAndPassword(auth,email,senha);
-    // onAuthStateChanged vai redirecionar automaticamente
+    const cred=await signInWithEmailAndPassword(auth,email,senha);
+    // Redireciona diretamente sem esperar onAuthStateChanged
+    rotearUsuario(cred.user);
   }catch(e){
     hideLoad();
     const msgs={'auth/user-not-found':'E-mail não encontrado.','auth/wrong-password':'Senha incorreta.','auth/invalid-credential':'E-mail ou senha inválidos.','auth/too-many-requests':'Muitas tentativas. Aguarde.'};
@@ -782,10 +798,14 @@ window.esqueceuSenha=async function(){
   const err=$('l-err');err.classList.remove('on');
   if(!email){err.textContent='Digite seu e-mail acima para recuperar a senha.';err.classList.add('on');return;}
   showLoad('Enviando e-mail...');
+  // Timeout de segurança: se travar, libera em 8s
+  const to=setTimeout(()=>{hideLoad();err.textContent='Tempo esgotado. Verifique sua conexão.';err.classList.add('on');},8000);
   try{
     await sendPasswordResetEmail(auth,email);
-    hideLoad();toast('E-mail de recuperação enviado! Verifique sua caixa de entrada. ✅',4000);
+    clearTimeout(to);
+    hideLoad();toast('✅ E-mail enviado! Verifique sua caixa de entrada.',4000);
   }catch(e){
+    clearTimeout(to);
     hideLoad();
     const msgs={'auth/user-not-found':'E-mail não encontrado.','auth/invalid-email':'E-mail inválido.'};
     err.textContent=msgs[e.code]||'Erro ao enviar. Tente novamente.';err.classList.add('on');
@@ -802,8 +822,8 @@ window.criarConta=async function(){
     CU=cred.user;
     UD={perfil:{nome,email}};
     localStorage.setItem('hp_'+CU.uid,JSON.stringify(UD));
-    hideLoad();
-    // onAuthStateChanged redireciona automaticamente
+    // Redireciona diretamente
+    rotearUsuario(CU);
   }catch(e){
     hideLoad();
     const msgs={'auth/email-already-in-use':'E-mail já cadastrado.','auth/invalid-email':'E-mail inválido.','auth/weak-password':'Senha muito fraca.'};
@@ -1534,7 +1554,12 @@ window.irParaDisc=function(){
   };
 })();
 
-window.addEventListener('load',()=>{ setTimeout(()=>{ hideLoad(); },5000); });
+window.addEventListener('load',()=>{
+  // Garante que loading nunca fica preso — libera em 5s no máximo
+  setTimeout(()=>{ hideLoad(); },5000);
+  // Clique no loading overlay libera (escape de emergência)
+  document.getElementById('loading').addEventListener('click',()=>{ hideLoad(); });
+});
 </script>
 </body>
 </html>
