@@ -604,11 +604,9 @@ textarea.ta:focus{border-color:var(--gold)}
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, deleteUser, setPersistence, browserLocalPersistence, browserSessionPersistence, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, doc, setDoc, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const fb = initializeApp({apiKey:"AIzaSyCSjGcpyiAhj6jAkf75s-p_Zld0V0eiXgg",authDomain:"hub-pro-5486e.firebaseapp.com",projectId:"hub-pro-5486e",storageBucket:"hub-pro-5486e.firebasestorage.app",messagingSenderId:"365102238083",appId:"1:365102238083:web:55829279cad61e75baceb6"});
 const auth = getAuth(fb);
-const db = getFirestore(fb);
 
 let CU = null, UD = {}, privOrig = 'lgpd';
 
@@ -638,34 +636,31 @@ window.goSec = function(s){
   if(s==='perfil')renderPerf();
 }
 
-// DATA LAYER — localStorage primary, Firestore background sync
-async function loadUD(){
-  const k='hp_'+CU.uid;
-  try{const l=localStorage.getItem(k);if(l)UD=JSON.parse(l);else UD={};}catch(e){UD={};}
-  try{
-    const snap=await Promise.race([getDoc(doc(db,'users',CU.uid)),new Promise((_,r)=>setTimeout(()=>r(new Error('t')),2000))]);
-    if(snap.exists()){UD={...UD,...snap.data()};localStorage.setItem(k,JSON.stringify(UD));}
-  }catch(e){}
+// ── DATA LAYER — 100% localStorage, instantâneo ──
+function lsKey(){ return 'hp_'+(CU?.uid||'anon'); }
+function loadUD(){
+  try{ const raw=localStorage.getItem(lsKey()); UD=raw?JSON.parse(raw):{}; }
+  catch(e){ UD={}; }
 }
-async function save(campo,val){
-  if(!CU)return;
+function save(campo,val){
   UD[campo]=val;
-  try{localStorage.setItem('hp_'+CU.uid,JSON.stringify(UD));}catch(e){}
-  try{setDoc(doc(db,'users',CU.uid),{[campo]:val},{merge:true}).catch(()=>{});}catch(e){}
+  try{ localStorage.setItem(lsKey(),JSON.stringify(UD)); }catch(e){}
 }
 
-// AUTH STATE
+// ── AUTH STATE ──
 let authResolved = false;
-onAuthStateChanged(auth,async(user)=>{
+onAuthStateChanged(auth,(user)=>{
   authResolved = true;
   hideLoad();
   if(user){
-    CU=user;showLoad('Carregando...');
-    await loadUD();hideLoad();
+    CU=user;
+    loadUD();
     if(!UD.lgpd){showScr('slgpd');return;}
     if(!UD.perfil?.nome){showScr('sonb');return;}
     showScr('shome');renderHome();
-  }else{CU=null;UD={};showScr('sa');}
+  }else{
+    CU=null;UD={};showScr('sa');
+  }
 });
 
 // LGPD
@@ -673,10 +668,8 @@ window.toggleLgpd=function(){
   const cb=$('lgpd-cb');cb.checked=!cb.checked;
   $('btn-lgpd').disabled=!cb.checked;
 }
-window.aceitarLgpd=async function(){
-  showLoad('Salvando...');
-  await save('lgpd',{ok:true,data:new Date().toISOString()});
-  hideLoad();
+window.aceitarLgpd=function(){
+  save('lgpd',{ok:true,data:new Date().toISOString()});
   if(!UD.perfil?.nome)showScr('sonb');else{showScr('shome');renderHome();}
 }
 window.showPriv=function(o='lgpd'){privOrig=o;showScr('spriv')}
@@ -708,6 +701,7 @@ window.fazerLogin=async function(){
     const persist=$('rem-cb').checked?browserLocalPersistence:browserSessionPersistence;
     await setPersistence(auth,persist);
     await signInWithEmailAndPassword(auth,email,senha);
+    // onAuthStateChanged vai redirecionar automaticamente
   }catch(e){
     hideLoad();
     const msgs={'auth/user-not-found':'E-mail não encontrado.','auth/wrong-password':'Senha incorreta.','auth/invalid-credential':'E-mail ou senha inválidos.','auth/too-many-requests':'Muitas tentativas. Aguarde.'};
@@ -736,9 +730,11 @@ window.criarConta=async function(){
   showLoad('Criando conta...');
   try{
     const cred=await createUserWithEmailAndPassword(auth,email,senha);
+    CU=cred.user;
     UD={perfil:{nome,email}};
-    localStorage.setItem('hp_'+cred.user.uid,JSON.stringify(UD));
-    setDoc(doc(db,'users',cred.user.uid),{perfil:{nome,email},criado:new Date().toISOString()},{merge:true}).catch(()=>{});
+    localStorage.setItem('hp_'+CU.uid,JSON.stringify(UD));
+    hideLoad();
+    // onAuthStateChanged redireciona automaticamente
   }catch(e){
     hideLoad();
     const msgs={'auth/email-already-in-use':'E-mail já cadastrado.','auth/invalid-email':'E-mail inválido.','auth/weak-password':'Senha muito fraca.'};
@@ -753,17 +749,16 @@ window.prevFoto=function(inp){
   r.onload=e=>{$('onb-fp').src=e.target.result;$('onb-fp').style.display='block';$('onb-fph').style.display='none';};
   r.readAsDataURL(f);
 }
-window.salvarOnb=async function(){
+window.salvarOnb=function(){
   const nome=$('onb-nome').value.trim();
   if(!nome){toast('Digite seu nome.');return;}
-  showLoad('Salvando perfil...');
-  const perfil={nome,cidade:$('onb-cidade').value.trim(),tempo:$('onb-tempo').value,especialidade:$('onb-esp').value,email:CU.email||''};
-  const fp=$('onb-foto');
-  if(fp.files[0]){
+  const perfil={nome,cidade:$('onb-cidade').value.trim(),tempo:$('onb-tempo').value,especialidade:$('onb-esp').value,email:CU?.email||''};
+  const fp=$('onb-galeria').files[0]||$('onb-camera').files[0];
+  if(fp){
     const r=new FileReader();
-    r.onload=async e=>{perfil.foto=e.target.result;await save('perfil',perfil);hideLoad();showScr('shome');renderHome();};
-    r.readAsDataURL(fp.files[0]);
-  }else{await save('perfil',perfil);hideLoad();showScr('shome');renderHome();}
+    r.onload=e=>{perfil.foto=e.target.result;save('perfil',perfil);showScr('shome');renderHome();};
+    r.readAsDataURL(fp);
+  }else{save('perfil',perfil);showScr('shome');renderHome();}
 }
 
 // HOME
@@ -823,10 +818,10 @@ function renderHome(){
   $('home-plano-bar').style.width=pct+'%';
   $('home-plano-hint').textContent=done>0?`${done}/${tasks.length} tarefas concluídas`:'Toque para começar o dia 1';
 }
-window.checkinHome=async function(r){
+window.checkinHome=function(r){
   const metas=UD.metas||[];
   if(metas.length>0)metas[metas.length-1].checkin=r;
-  await save('metas',metas);
+  save('metas',metas);
   toast(r==='sim'?'Meta alcançada! 🏆 Parabéns!':'Continue firme na próxima semana 💪');
   renderHome();
 }
@@ -880,13 +875,13 @@ function renderDiscQ(c){
   const pct=Math.round(ds.qIdx/DISC_DATA.length*100);
   c.innerHTML=`<div class="dq-wrap"><div class="dq-num">Pergunta ${ds.qIdx+1} de ${DISC_DATA.length}</div><div class="dq-prog"><div class="dq-fill" style="width:${pct}%"></div></div><div class="dq-text">${q.q}</div>${q.ops.map(o=>`<button class="dopt" onclick="respDisc('${o.p}')">${o.t}</button>`).join('')}</div>`;
 }
-window.respDisc=async function(p){
+window.respDisc=function(p){
   ds.scores[p]++;ds.qIdx++;
   if(ds.qIdx>=DISC_DATA.length){
     const sc=ds.scores,tot=Object.values(sc).reduce((a,b)=>a+b,0);
     const w=Object.entries(sc).sort((a,b)=>b[1]-a[1])[0][0];
     const res={perfil:w,nome:DP[w].nome,scores:sc,total:tot};
-    showLoad('Salvando...');await save('disc',res);hideLoad();
+    save('disc',res);
     renderDiscRes($('disc-content'),res);
   }else renderDiscQ($('disc-content'));
 }
@@ -898,7 +893,7 @@ function renderDiscRes(c,disc){
     <div class="ins-card"><h3>Seu perfil em vendas</h3><div class="ins-item"><h4>💪 Pontos fortes</h4><p>${p.fortes.join(' · ')}</p></div><div class="ins-item"><h4>⚠️ Pontos de atenção</h4><p>${p.atencao.join(' · ')}</p></div><div class="ins-item"><h4>📚 Como você aprende melhor</h4><p>${p.aprende}</p></div></div>
     <div style="padding:0 16px 16px"><button class="btn-s" onclick="refDisc()">Refazer o quiz</button></div>`;
 }
-window.refDisc=async function(){showLoad('Resetando...');await save('disc',null);hideLoad();renderDisc();}
+window.refDisc=function(){save('disc',null);renderDisc();}
 
 // PILARES
 const PIL=[
@@ -940,10 +935,10 @@ function renderPlano(){
   }).join('')}</div>`;
 }
 window.togSem=function(h){h.nextElementSibling.classList.toggle('open');}
-window.togTrf=async function(id,sem){
+window.togTrf=function(id,sem){
   const pd={...(UD.plano||{})};pd[id]=!pd[id];
   pd[`streak_${new Date().toDateString()}`]=true;
-  showLoad('Salvando...');await save('plano',pd);hideLoad();
+  save('plano',pd);
   const s=PLANO.find(x=>x.semana===sem);
   if(s&&s.tarefas.every(t=>pd[t.id])&&pd[id]){
     $('celeb-titulo').textContent=`🏆 Semana ${sem} concluída!`;
@@ -967,15 +962,14 @@ function renderPergunta(){
     <button class="btn-p" onclick="salvarPQ('${pq.replace(/'/g,"\\'")}')">Salvar reflexão</button>
     <div style="height:8px"></div>`;
 }
-window.salvarPQ=async function(pq){
+window.salvarPQ=function(pq){
   const txt=$('pq-resp').value.trim();
   if(!txt){toast('Escreva sua reflexão primeiro.');return;}
-  showLoad('Salvando...');
   const regs=UD.registros||[],hoje=new Date().toDateString();
   const idx=regs.findIndex(r=>r.tipo==='pergunta'&&new Date(r.data).toDateString()===hoje);
   const reg={tipo:'pergunta',pergunta:pq,texto:txt,data:new Date().toISOString()};
   if(idx>=0)regs[idx]=reg;else regs.push(reg);
-  await save('registros',regs);hideLoad();toast('Reflexão salva! ✅');
+  save('registros',regs);toast('Reflexão salva! ✅');
 }
 
 // META
@@ -999,16 +993,16 @@ function renderMeta(){
   }
   $('meta-content').innerHTML=h;
 }
-window.salvarMeta=async function(){
+window.salvarMeta=function(){
   const txt=$('meta-inp').value.trim();
   if(!txt){toast('Escreva sua meta primeiro.');return;}
-  showLoad('Salvando...');const metas=UD.metas||[];metas.push({texto:txt,data:new Date().toISOString()});
-  await save('metas',metas);hideLoad();toast('Meta definida! 💪');renderMeta();
+  const metas=UD.metas||[];metas.push({texto:txt,data:new Date().toISOString()});
+  save('metas',metas);toast('Meta definida! 💪');renderMeta();
 }
-window.checkinMeta=async function(r){
-  showLoad('Salvando...');const metas=UD.metas||[];
+window.checkinMeta=function(r){
+  const metas=UD.metas||[];
   if(metas.length>0)metas[metas.length-1].checkin=r;
-  await save('metas',metas);hideLoad();
+  save('metas',metas);
   toast(r==='sim'?'Parabéns! Meta alcançada! 🏆':r==='parcial'?'Progresso é progresso! 📈':'Aprenda e ajuste na próxima semana 💪');
   renderMeta();
 }
@@ -1122,19 +1116,17 @@ function renderPerf(){
 window.atualizarFoto=function(inp){
   const f=inp.files[0];if(!f)return;
   const r=new FileReader();
-  r.onload=async e=>{showLoad('Salvando foto...');const p={...(UD.perfil||{}),foto:e.target.result};await save('perfil',p);hideLoad();toast('Foto atualizada! 📷');renderPerf();};
+  r.onload=e=>{const p={...(UD.perfil||{}),foto:e.target.result};save('perfil',p);toast('Foto atualizada! 📷');renderPerf();};
   r.readAsDataURL(f);
 }
-window.salvarPerf=async function(){
-  showLoad('Salvando...');
+window.salvarPerf=function(){
   const p={...(UD.perfil||{}),nome:$('pf-nome').value.trim(),cidade:$('pf-cidade').value.trim(),especialidade:$('pf-esp').value,tempo:$('pf-tempo').value};
-  await save('perfil',p);hideLoad();toast('Perfil atualizado! ✅');renderPerf();
+  save('perfil',p);toast('Perfil atualizado! ✅');renderPerf();
 }
 window.logout=async function(){showLoad('Saindo...');await signOut(auth);hideLoad();}
 window.delConta=function(){
   if(confirm('Tem certeza? Todos os seus dados serão permanentemente excluídos.')){
     showLoad('Excluindo...');
-    deleteDoc(doc(db,'users',CU.uid)).catch(()=>{});
     localStorage.removeItem('hp_'+CU.uid);
     deleteUser(CU).then(()=>hideLoad()).catch(()=>{hideLoad();toast('Faça logout e login novamente antes de excluir.');});
   }
