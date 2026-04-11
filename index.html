@@ -304,8 +304,8 @@ textarea.ta:focus{border-color:var(--gold)}
 <body>
 <div id="app">
 
-<!-- SPLASH -->
-<div id="ss" class="screen active">
+<!-- SPLASH (oculta por padrão — Firebase redireciona se logado) -->
+<div id="ss" class="screen">
   <div class="sl">
     <div class="hub">HUB</div>
     <div class="lit">LITORAL</div>
@@ -340,7 +340,7 @@ textarea.ta:focus{border-color:var(--gold)}
 </div>
 
 <!-- AUTH -->
-<div id="sa" class="screen">
+<div id="sa" class="screen active">
   <div class="ah">
     <div class="hub">HUB</div>
     <div class="lit">LITORAL</div>
@@ -1131,21 +1131,10 @@ window.delConta=function(){
   }
 }
 
-// INIT — splash nunca trava
+// INIT — auth screen já está ativa, Firebase redireciona se logado
 window.addEventListener('load',()=>{
-  // 1.5s: se Firebase ainda não respondeu, mostra tela de login
-  setTimeout(()=>{
-    if($('ss').classList.contains('active')){
-      showScr('sa');
-    }
-  },1500);
-  // 4s: fallback extra — garante que nunca fica preso em qualquer tela de carregamento
-  setTimeout(()=>{
-    if($('ss').classList.contains('active')||document.querySelector('.loading.on')){
-      hideLoad();
-      if(!authResolved) showScr('sa');
-    }
-  },4000);
+  // Fallback: esconde qualquer loading preso após 5s
+  setTimeout(()=>{ hideLoad(); },5000);
 });
 </script>
 </body>
