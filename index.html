@@ -16,7 +16,7 @@
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;overflow:hidden;background:var(--navy);font-family:var(--font);color:var(--white)}
 #app{height:100%;overflow:hidden;position:relative}
-.screen{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;display:none;flex-direction:column;background:var(--navy)}
+.screen{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;display:none;flex-direction:column;background:var(--navy);touch-action:pan-y}
 .screen.active{display:flex}
 /* SPLASH */
 #ss{align-items:center;justify-content:center}
@@ -111,7 +111,7 @@ html,body{height:100%;overflow:hidden;background:var(--navy);font-family:var(--f
 .streak-card .sc-title{font-size:.6rem;font-weight:700;color:var(--gold);letter-spacing:2px;text-transform:uppercase}
 .streak-card .sc-link{font-size:.68rem;color:var(--gold)}
 .streak-dots{display:flex;gap:6px}
-.sd{flex:1;height:32px;border-radius:6px;background:var(--navy);border:1px solid rgba(184,154,79,.15);display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:700;color:var(--dim)}
+.sd{flex:1;height:32px;border-radius:6px;font-size:.55rem;background:var(--navy);border:1px solid rgba(184,154,79,.15);display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:700;color:var(--dim)}
 .sd.done{background:var(--gold);border-color:var(--gold);color:var(--navy)}
 .sd.today{border-color:var(--gold);color:var(--gold)}
 /* PLANO CARD */
@@ -193,8 +193,8 @@ html,body{height:100%;overflow:hidden;background:var(--navy);font-family:var(--f
 .trf{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid rgba(184,154,79,.07);cursor:pointer}
 .trf:last-child{border-bottom:none}
 .trf-chk{width:20px;height:20px;border-radius:4px;border:2px solid rgba(184,154,79,.35);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:.2s;margin-top:1px}
-.trf-chk.done{background:var(--gold);border-color:var(--gold)}
-.trf-chk.done::after{content:'✓';font-size:.68rem;color:var(--navy);font-weight:700}
+.trf-chk.done{background:var(--green);border-color:var(--green)}
+.trf-chk.done::after{content:'✓';font-size:.68rem;color:var(--white);font-weight:700}
 .trf-txt{font-size:.8rem;color:var(--white);line-height:1.5;flex:1}
 .trf-txt.done{text-decoration:line-through;color:var(--dim)}
 /* SCRIPTS */
@@ -222,8 +222,8 @@ html,body{height:100%;overflow:hidden;background:var(--navy);font-family:var(--f
 .sim-opts{display:flex;flex-direction:column;gap:9px}
 .sim-opt{background:var(--navy3);border:1px solid rgba(184,154,79,.18);border-radius:8px;padding:13px 14px;font-size:.8rem;color:var(--white);cursor:pointer;text-align:left;font-family:var(--font);transition:.2s;line-height:1.45}
 .sim-opt:hover{border-color:var(--gold)}
-.sim-opt.ok{background:rgba(76,175,125,.12);border-color:var(--green);color:var(--green)}
-.sim-opt.err{background:rgba(224,85,85,.08);border-color:var(--red);color:var(--red)}
+.sim-opt.ok{background:rgba(76,175,125,.15);border-color:var(--green);color:var(--green);font-weight:600}
+.sim-opt.err{background:rgba(224,85,85,.12);border-color:var(--red);color:var(--red);font-weight:600}
 .sim-fb{background:var(--navy3);border:1px solid rgba(184,154,79,.18);border-radius:8px;padding:13px;font-size:.8rem;color:var(--white);line-height:1.6;display:none}
 .sim-fb.on{display:block}
 .sim-fb .fbl{font-size:.62rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:5px}
@@ -480,7 +480,7 @@ textarea.ta:focus{border-color:var(--gold)}
         PERGUNTA DO DIA <span style="font-size:.65rem;color:var(--gold);text-decoration:underline;text-transform:none;font-weight:400;letter-spacing:0" onclick="event.stopPropagation();goSec('registros')">Ver registros</span>
       </div>
       <div class="pq-card">
-        <div class="pq-lbl">REFLEXÃO DE HOJE</div>
+        <div class="mc-label">REFLEXÃO DE HOJE</div>
         <div id="home-pq" class="pq-text" style="font-size:.9rem;font-weight:500;color:var(--white);line-height:1.55"></div>
         <div id="home-pq-resp" class="pq-resp"></div>
       </div>
@@ -513,10 +513,22 @@ textarea.ta:focus{border-color:var(--gold)}
     <div class="hsec" style="margin-bottom:16px">
       <div class="hsec-title">📰 NOTÍCIAS DA REGIÃO</div>
       <div id="news-container">
-        <div class="news-card" onclick="abrirNoticia('https://ndonline.com.br/litoral','NDOnline — Litoral SC')">
-          <div class="nc-label"><span class="nc-dot"></span>AO VIVO</div>
-          <div class="nc-title">Mercado imobiliário do litoral SC segue aquecido no Q1/2026 com alta demanda por segunda residência</div>
-          <div class="nc-source">NDOnline · Toque para ler no navegador</div>
+        <div id="news-items">
+          <div class="news-card" onclick="window.open('https://www.nsctotal.com.br/noticias/litoral','_blank')">
+            <div class="nc-label"><span class="nc-dot"></span>LITORAL SC</div>
+            <div class="nc-title">NSC Total — Notícias do litoral catarinense</div>
+            <div class="nc-source">nsctotal.com.br · Toque para abrir</div>
+          </div>
+          <div class="news-card" style="margin-top:8px" onclick="window.open('https://www.anoticia.com.br','_blank')">
+            <div class="nc-label"><span class="nc-dot"></span>REGIONAL</div>
+            <div class="nc-title">A Notícia — Cobertura da região norte de SC</div>
+            <div class="nc-source">anoticia.com.br · Toque para abrir</div>
+          </div>
+          <div class="news-card" style="margin-top:8px" onclick="window.open('https://www.segs.com.br/financas','_blank')">
+            <div class="nc-label"><span class="nc-dot"></span>ECONOMIA</div>
+            <div class="nc-title">Selic 14,75% — Copom pode cortar novamente em 28/abr. Impacto no crédito imobiliário</div>
+            <div class="nc-source">segs.com.br · Economia · Toque para abrir</div>
+          </div>
         </div>
       </div>
     </div>
@@ -540,6 +552,31 @@ textarea.ta:focus{border-color:var(--gold)}
       <span class="ni-emoji">👤</span>PERFIL
     </button>
   </nav>
+</div>
+
+<!-- DISC INTRO (após onboarding) -->
+<div id="sdisc-intro" class="screen">
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;padding:32px 24px;text-align:center;gap:20px">
+    <div style="font-size:3rem">🧠</div>
+    <div>
+      <div style="font-size:1.2rem;font-weight:700;color:var(--gold);margin-bottom:10px">Conheça seu Perfil DISC</div>
+      <p style="font-size:.88rem;color:var(--dim);line-height:1.7">O DISC é uma metodologia comportamental usada pelas maiores empresas do mundo para desenvolver profissionais de alto desempenho.</p>
+    </div>
+    <div style="background:var(--navy3);border:1px solid rgba(184,154,79,.2);border-radius:12px;padding:18px;text-align:left">
+      <div style="font-size:.7rem;font-weight:700;color:var(--gold);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px">Por que fazer agora?</div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="font-size:.82rem;color:var(--white);display:flex;gap:10px"><span style="color:var(--green)">✓</span>Descubra como você naturalmente vende e se comunica</div>
+        <div style="font-size:.82rem;color:var(--white);display:flex;gap:10px"><span style="color:var(--green)">✓</span>Receba scripts de objeção personalizados para o seu perfil</div>
+        <div style="font-size:.82rem;color:var(--white);display:flex;gap:10px"><span style="color:var(--green)">✓</span>Entenda seus pontos fortes e onde precisa desenvolver</div>
+        <div style="font-size:.82rem;color:var(--white);display:flex;gap:10px"><span style="color:var(--green)">✓</span>Leva apenas 3 minutos — 12 perguntas simples</div>
+      </div>
+    </div>
+    <div style="background:rgba(184,154,79,.08);border:1px solid rgba(184,154,79,.2);border-radius:8px;padding:14px">
+      <p style="font-size:.78rem;color:var(--dim);font-style:italic">"O corretor que se conhece fecha mais. O que não se conhece repete os mesmos erros."</p>
+    </div>
+    <button class="btn-p" onclick="irParaDisc()">Fazer o Quiz DISC agora →</button>
+    <button class="btn-s" style="padding:12px" onclick="pularDisc()">Pular por agora — fazer depois</button>
+  </div>
 </div>
 
 <!-- DISC -->
@@ -783,9 +820,9 @@ window.salvarOnb=function(){
   const fp=$('onb-galeria').files[0]||$('onb-camera').files[0];
   if(fp){
     const r=new FileReader();
-    r.onload=e=>{perfil.foto=e.target.result;save('perfil',perfil);showScr('shome');renderHome();};
+    r.onload=e=>{perfil.foto=e.target.result;save('perfil',perfil);if(!UD.disc)showScr('sdisc-intro');else{showScr('shome');renderHome();};};
     r.readAsDataURL(fp);
-  }else{save('perfil',perfil);showScr('shome');renderHome();}
+  }else{save('perfil',perfil);if(!UD.disc)showScr('sdisc-intro');else{showScr('shome');renderHome();}}
 }
 
 // HOME
@@ -855,7 +892,7 @@ window.checkinHome=function(r){
 function renderStreak(){
   const pd=UD.plano||{};
   const hoje=new Date();
-  const dias=['DOM','SEG','TER','QUA','QUI','SEX','SAB'];
+  const dias=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
   const dow=hoje.getDay();
   const cont=$('streak-dots');cont.innerHTML='';
   for(let i=0;i<7;i++){
@@ -864,7 +901,7 @@ function renderStreak(){
     const isToday=i===dow;
     const el=document.createElement('div');
     el.className=`sd${done?' done':''}${isToday&&!done?' today':''}`;
-    el.textContent=done?'✓':dias[i].charAt(0);
+    el.textContent=done?'✓':dias[i].substring(0,3);
     cont.appendChild(el);
   }
 }
@@ -949,10 +986,42 @@ window.togAcc=function(h){const b=h.nextElementSibling;h.classList.toggle('open'
 
 // PLANO
 const PLANO=[
-  {semana:1,titulo:'Semana 1 — Consciência',sub:'Entenda onde você está',tarefas:[{id:'s1t1',t:'Complete o Quiz DISC e leia seu resultado completo'},{id:'s1t2',t:'Escreva sua "Declaração de Identidade" — quem você é como corretor'},{id:'s1t3',t:'Liste os 3 maiores obstáculos que te impedem de fechar mais'},{id:'s1t4',t:'Calcule seus 5 números de performance'},{id:'s1t5',t:'Responda a Pergunta do Dia por 3 dias seguidos'},{id:'s1t6',t:'Identifique seu maior padrão de sabotagem em vendas'},{id:'s1t7',t:'Defina claramente sua meta mensal de comissão'}]},
-  {semana:2,titulo:'Semana 2 — Reprogramação',sub:'Mude os padrões que não servem',tarefas:[{id:'s2t1',t:'Implemente um ritual matinal de 20 minutos por 5 dias'},{id:'s2t2',t:'Leia os 4 insights do Pilar Mentalidade'},{id:'s2t3',t:'Pratique 3 scripts de objeção em voz alta'},{id:'s2t4',t:'Revise e melhore seu pitch de apresentação'},{id:'s2t5',t:'Entre em contato com 5 clientes antigos da sua carteira'},{id:'s2t6',t:'Complete todos os 5 cenários do Simulador de Negociação'},{id:'s2t7',t:'Defina sua cadência de follow-up e aplique em 3 clientes ativos'}]},
-  {semana:3,titulo:'Semana 3 — Ação Disciplinada',sub:'Execute com método',tarefas:[{id:'s3t1',t:'Faça 10 contatos de prospecção em um único dia'},{id:'s3t2',t:'Qualifique 100% das suas visitas da semana com checklist'},{id:'s3t3',t:'Leia os 4 insights do Pilar Processo'},{id:'s3t4',t:'Peça feedback a um cliente que não fechou'},{id:'s3t5',t:'Atualize seu pipeline de vendas por escrito'},{id:'s3t6',t:'Estude os dados do Mercado SC e memorize 3 argumentos'},{id:'s3t7',t:'Faça uma parceria com um corretor de outra imobiliária'}]},
-  {semana:4,titulo:'Semana 4 — Consolidação',sub:'Cristalize os novos hábitos',tarefas:[{id:'s4t1',t:'Revise todos os registros da Pergunta do Dia das últimas 3 semanas'},{id:'s4t2',t:'Escreva os 3 maiores aprendizados do mês'},{id:'s4t3',t:'Defina sua meta para os próximos 30 dias'},{id:'s4t4',t:'Compartilhe um insight do Hub Pro com um colega corretor'},{id:'s4t5',t:'Crie seu dashboard semanal de métricas'},{id:'s4t6',t:'Planeje uma ação de prospecção para o próximo mês'},{id:'s4t7',t:'Celebre: liste 5 conquistas reais deste mês'}]}
+  {semana:1,titulo:'Semana 1 — Consciência e Identidade',sub:'Entenda quem você é e onde está',tarefas:[
+    {id:'s1t1',t:'Complete o Quiz DISC e leia seu resultado completo'},
+    {id:'s1t2',t:'Escreva sua Declaração de Identidade — quem você é como corretor, não o que você faz'},
+    {id:'s1t3',t:'Liste os 3 maiores obstáculos que te impedem de fechar mais'},
+    {id:'s1t4',t:'Calcule seus 5 números de performance (conversão, ticket, ciclo, custo por lead, taxa proposta→venda)'},
+    {id:'s1t5',t:'🎤 Oratória: grave um áudio de 2 minutos se apresentando como corretor e se escute criticamente'},
+    {id:'s1t6',t:'🏋️ Exercício físico: 30 minutos de caminhada ou academia para descompressão — anote como se sentiu depois'},
+    {id:'s1t7',t:'📖 Leitura dinâmica: leia 10 páginas de um livro sobre vendas ou comportamento humano'}
+  ]},
+  {semana:2,titulo:'Semana 2 — Comunicação e Branding',sub:'Construa sua presença e voz',tarefas:[
+    {id:'s2t1',t:'🎙️ Dicção: pratique trava-línguas por 5 minutos ao dia durante 5 dias — registre sua evolução'},
+    {id:'s2t2',t:'📱 Branding pessoal: atualize sua bio no WhatsApp, Instagram e LinkedIn com sua proposta de valor real'},
+    {id:'s2t3',t:'Grave um vídeo de 60 segundos sobre um imóvel ou o mercado da sua cidade — poste ou guarde para análise'},
+    {id:'s2t4',t:'Pratique 3 scripts de objeção em voz alta na frente do espelho — observe sua linguagem corporal'},
+    {id:'s2t5',t:'Entre em contato com 5 clientes antigos da carteira — não para vender, para gerar conexão'},
+    {id:'s2t6',t:'🏋️ Exercício físico: 3 sessões de 30 minutos — note o impacto na sua energia e foco'},
+    {id:'s2t7',t:'📖 Leitura dinâmica: leia um capítulo completo e anote 3 insights aplicáveis à sua rotina de corretor'}
+  ]},
+  {semana:3,titulo:'Semana 3 — PNL e Matemática Financeira',sub:'Domine mente e números',tarefas:[
+    {id:'s3t1',t:'🧠 PNL: pratique ancoragem positiva — defina um gesto ou palavra que ativa seu estado de alta performance antes de visitas'},
+    {id:'s3t2',t:'🧠 PNL: técnica do espelho — passe 5 minutos se comunicando com confiança com seu reflexo antes de cada ligação importante'},
+    {id:'s3t3',t:'📊 Matemática financeira: aprenda a calcular porcentagem de comissão, desconto e valorização — resolva 10 exercícios práticos'},
+    {id:'s3t4',t:'📊 Calcule: se um imóvel vale R$500k e valoriza 12% ao ano, quanto vale em 3 anos? Treine apresentar esse raciocínio ao cliente'},
+    {id:'s3t5',t:'Faça 10 contatos de prospecção em um único dia — use técnicas de PNL para criar rapport rápido'},
+    {id:'s3t6',t:'🏋️ Exercício físico: 3 sessões — relacione sua disciplina física com sua disciplina comercial'},
+    {id:'s3t7',t:'Qualifique 100% das visitas da semana com checklist — sem exceção'}
+  ]},
+  {semana:4,titulo:'Semana 4 — Produto, Mercado e Consolidação',sub:'Especialista que fecha mais',tarefas:[
+    {id:'s4t1',t:'🏠 Produto novo: visite ou estude detalhadamente um lançamento ou empreendimento que você ainda não conhece bem'},
+    {id:'s4t2',t:'Prepare uma apresentação de 3 minutos sobre esse produto — com diferenciais, público-alvo e argumentos de venda'},
+    {id:'s4t3',t:'Estude os dados do Mercado SC e memorize 5 argumentos concretos com números reais'},
+    {id:'s4t4',t:'🧠 PNL: pratique ressignificação — escolha uma objeção que te trava e reformule mentalmente como oportunidade'},
+    {id:'s4t5',t:'📖 Leitura dinâmica: leia um artigo ou capítulo sobre psicologia do consumidor — anote 3 gatilhos que você vai usar'},
+    {id:'s4t6',t:'🏋️ Exercício físico: comprometa-se com uma rotina de 3x por semana para os próximos 30 dias — registre aqui'},
+    {id:'s4t7',t:'Celebre: liste 5 conquistas reais deste mês e defina sua meta desafiadora para os próximos 30 dias'}
+  ]}
 ];
 function renderPlano(){
   const pd=UD.plano||{};
@@ -1091,17 +1160,88 @@ window.resetScripts=function(){scriptsScore={acertos:0,erros:0,vistos:[]};save('
 
 // SIMULADOR
 const CENS=[
-  {titulo:'O cliente quer esperar os juros baixarem',desc:'Um comprador interessado diz que prefere esperar a Selic cair antes de financiar. Como você responde?',opts:[{t:'Concordar e dizer que vai entrar em contato quando os juros baixarem',c:false,fb:'Aguardar passivamente significa perder o cliente. Quando os juros baixarem, ele terá muitas outras opções.'},{t:'Mostrar que enquanto ele espera, o preço do imóvel sobe — e o custo total pode ser maior do que financiar agora',c:true,fb:'Excelente! Você apresenta o raciocínio financeiro completo: valorização vs redução dos juros. Isso coloca o cliente como quem perde ao esperar.'},{t:'Dizer que ele está errado e que os juros vão subir',c:false,fb:'Contradizer o cliente cria resistência. Ninguém quer comprar de alguém que os faz sentir errados.'}]},
-  {titulo:'Casal indeciso após 3 visitas',desc:'Um casal fez 3 visitas, gostou muito, mas fica sempre com "deixa a gente pensar". O que você faz na próxima interação?',opts:[{t:'Ligar e perguntar se eles já decidiram',c:false,fb:'Essa abordagem é passiva. O cliente provavelmente vai dizer "ainda não" e a conversa acaba.'},{t:'Enviar uma análise comparativa com imóveis similares vendidos recentemente, mostrando que o mercado está ativo',c:true,fb:'Perfeito! Você cria senso de oportunidade com dados reais, sem pressionar. O cliente sente que pode perder uma boa opção.'},{t:'Dar um ultimato: "Esse imóvel tem outros interessados, preciso de uma resposta hoje"',c:false,fb:'Falso senso de urgência cria desconfiança. Se o cliente perceber, você perde a credibilidade.'}]},
-  {titulo:'Cliente quer negociar muito além do limite',desc:'O cliente oferece 15% abaixo do preço. O proprietário autorizou no máximo 5% de desconto. Como você conduz?',opts:[{t:'Rejeitar a oferta imediatamente',c:false,fb:'Rejeitar sem abrir diálogo fecha a negociação. O cliente pode se sentir humilhado.'},{t:'Aceitar a oferta e resolver depois com o proprietário',c:false,fb:'Prometer o que não está autorizado gera conflito com o proprietário e quebra sua credibilidade com ambos.'},{t:'Agradecer a oferta, validar o interesse e apresentar contraproposta estruturada com o máximo autorizado',c:true,fb:'Excelente! Você mantém o cliente engajado, é transparente com os limites e avança para uma solução real.'}]},
-  {titulo:'Cliente compara com imóvel mais barato em outra cidade',desc:'O cliente diz que em Itajaí encontrou algo 30% mais barato. Por que compraria em Balneário Camboriú?',opts:[{t:'Concordar que em Itajaí é mais barato e sugerir que ele compre lá',c:false,fb:'Você desistiu da venda. Ceder sem apresentar valor é a principal causa de perda de vendas.'},{t:'Apresentar dados de valorização, liquidez e qualidade de vida de BC vs outras cidades',c:true,fb:'Perfeito! Você compete com inteligência — não em preço, mas em valor percebido. O cliente compra onde entende que faz o melhor negócio.'},{t:'Dizer que a qualidade de BC é superior e que ele vai se arrepender',c:false,fb:'Fazer o cliente se sentir mal pela comparação cria resistência.'}]},
-  {titulo:'Herdeiro querendo vender rápido e barato',desc:'Um herdeiro quer vender 20% abaixo do mercado para "se livrar logo". O que você faz?',opts:[{t:'Aceitar imediatamente e vender pelo preço que ele quer',c:false,fb:'Vender sem orientar o cliente é falhar no seu papel. Um corretor ético apresenta o valor real de mercado.'},{t:'Apresentar avaliação de mercado e propor estratégia de venda rápida pelo preço justo em 30-45 dias',c:true,fb:'Excelente! Você agrega valor real, protege o herdeiro de decisão impulsiva e posiciona a venda profissionalmente. Isso gera indicação.'},{t:'Dizer que não vai trabalhar com preço abaixo do mercado',c:false,fb:'Recusar sem propor alternativa é perder uma oportunidade. O cliente precisa de orientação.'}]}
+  {nivel:'★★★',titulo:'Cliente quer esperar os juros baixarem',desc:'Um comprador qualificado, com entrada disponível, diz: "Prefiro esperar a Selic cair mais. Assim o financiamento fica mais barato." Como você responde sem perder a venda?',opts:[
+    {t:'Concordar e dizer que ligará quando os juros melhorarem mais',c:false,fb:'❌ Você abdicou da venda. O cliente vai comprar com outro corretor assim que os juros caírem — ou o preço do imóvel vai subir antes disso.'},
+    {t:'Mostrar que o preço do imóvel sobe enquanto ele espera, e que pode refinanciar quando os juros caírem',c:true,fb:'✅ Raciocínio financeiro completo: o custo de esperar é a valorização perdida. Quem compra agora trava o preço; quando os juros caírem, pode refinanciar. Argumento técnico e difícil de rebater.'},
+    {t:'Dizer que os juros não vão cair tão cedo',c:false,fb:'❌ Você não pode prever o futuro — e o cliente sabe disso. Perda de credibilidade imediata.'}
+  ]},
+  {nivel:'★★★',titulo:'Casal indeciso após 4 visitas — cônjuge não compareceu',desc:'Um cliente veio sozinho 4 vezes. Está apaixonado pelo imóvel, mas diz que a esposa ainda não viu e ela é quem decide. Você tem apenas mais uma janela de oportunidade. O que você faz?',opts:[
+    {t:'Enviar fotos e vídeos para o cliente encaminhar à esposa',c:false,fb:'❌ Delegar a apresentação para o cliente é a forma mais rápida de perder o controle da negociação. Ele vai apresentar mal e a esposa vai dizer não.'},
+    {t:'Propor uma visita exclusiva à esposa com experiência personalizada — flores, carta, café — e tratar ela como a compradora real',c:true,fb:'✅ A esposa é a tomadora de decisão real. Criar uma experiência personalizada para ela transforma a dinâmica. Corretores de alto nível vendem para quem decide.'},
+    {t:'Pressionar o cliente a fechar antes sem a esposa e depois convencê-la',c:false,fb:'❌ Venda sem o cônjuge quase sempre gera cancelamento ou conflito. Você perde a venda e a indicação futura.'}
+  ]},
+  {nivel:'★★★',titulo:'Cliente com proposta 20% abaixo — proprietário inflexível',desc:'Um cliente fez uma proposta 20% abaixo do preço. O proprietário disse que não sai por menos de 5% de desconto. A negociação está travada. O que você faz?',opts:[
+    {t:'Dizer ao cliente que o proprietário não aceita e encerrar a negociação',c:false,fb:'❌ Você desistiu antes de tentar. Corretores de elite encontram saídas criativas — é isso que justifica a comissão.'},
+    {t:'Trabalhar dos dois lados: ajudar o cliente a entender o valor real do imóvel e o proprietário a entender o custo de perder um comprador qualificado agora',c:true,fb:'✅ Negociação bilateral é a essência do trabalho do corretor. Apresente ao proprietário o custo de tempo no mercado; ao cliente, os dados de valorização. Encontre o ponto de equilíbrio.'},
+    {t:'Dizer ao proprietário que vai perder a venda e aceitar a proposta do cliente',c:false,fb:'❌ Forçar o proprietário viola sua relação de confiança com ele. Além disso, você pode perder o mandato de venda.'}
+  ]},
+  {nivel:'★★★★',titulo:'Investidor comparando retorno com renda fixa',desc:'Um investidor diz: "Com a Selic em 14,75%, meu dinheiro rende mais na renda fixa do que em imóvel. Por que eu compraria agora?" Como você responde tecnicamente?',opts:[
+    {t:'Dizer que imóvel sempre valoriza e que renda fixa é arriscada',c:false,fb:'❌ Mentira técnica. Renda fixa com Selic em 14,75% é segura e líquida. Investidor experiente vai saber que você está equivocado.'},
+    {t:'Apresentar o retorno combinado: aluguel por temporada (12-18% a.a. no litoral SC) + valorização histórica (10-15% a.a.) vs Selic real (14,75% menos IR menos inflação de 4,14%)',c:true,fb:'✅ Resposta técnica correta. O retorno real da Selic após IR (22,5%) e inflação é de ~7,3% a.a. O imóvel no litoral SC com aluguel de temporada pode superar isso — além de ser ativo real e proteção patrimonial.'},
+    {t:'Concordar que renda fixa é melhor agora e sugerir que ele espere os juros caírem',c:false,fb:'❌ Você perdeu a venda sem lutar. E o cliente vai comprar com outro corretor quando os juros caírem — e o preço já vai estar mais alto.'}
+  ]},
+  {nivel:'★★★★',titulo:'Cliente que foi mal atendido por outro corretor da sua imobiliária',desc:'Um cliente chega até você dizendo que foi mal atendido por um colega seu na mesma imobiliária. Ele está irritado e desconfiante com a marca. Como você conduz?',opts:[
+    {t:'Criticar o colega para ganhar a confiança do cliente',c:false,fb:'❌ Nunca critique um colega de trabalho para o cliente. Isso passa deslealdade — e o cliente vai se perguntar o que você fala dele para outros.'},
+    {t:'Assumir a responsabilidade como membro da equipe, pedir desculpas genuínas, ouvir o cliente sem interromper e mostrar por ações (não palavras) que sua experiência será diferente',c:true,fb:'✅ Gestão de crise de relacionamento correta. Empatia genuína + responsabilidade + ação concreta. O cliente que foi mal atendido e depois foi bem tratado tem alto potencial de indicação.'},
+    {t:'Dizer que não tem nada a ver com o que aconteceu antes e focar em vender',c:false,fb:'❌ O cliente não quer ouvir isso. Ele quer se sentir ouvido. Ignorar o problema é a segunda decepção seguida — e a última.'}
+  ]},
+  {nivel:'★★★★',titulo:'Visita técnica — cliente com conhecimento de engenharia',desc:'Durante uma visita, um cliente com formação em engenharia começa a questionar tecnicamente: padrão construtivo, espessura de laje, tipo de revestimento, instalações elétricas. Você não sabe responder com precisão. O que você faz?',opts:[
+    {t:'Improvisar respostas técnicas para não parecer despreparado',c:false,fb:'❌ Um engenheiro vai identificar a imprecisão imediatamente. Você perde credibilidade de forma irreparável.'},
+    {t:'Reconhecer honestamente que não é o especialista técnico, valorizar o conhecimento do cliente, e comprometer-se a trazer as respostas precisas do engenheiro da construtora em até 24h',c:true,fb:'✅ Honestidade inteligente. Ninguém espera que o corretor seja engenheiro. O que o cliente quer é confiar em você. Assumir os limites e entregar a resposta certa cria mais confiança do que improvisar.'},
+    {t:'Mudar de assunto e falar dos diferenciais de localização e valorização',c:false,fb:'❌ Esquivar da pergunta técnica sem responder é percebido como desvio intencional. O cliente vai ficar ainda mais desconfiado.'}
+  ]},
+  {nivel:'★★★★',titulo:'Cliente quer comprar mas tem nome negativado',desc:'Um cliente qualificado, com renda compatível, confessa que tem o nome negativado e não sabe se consegue financiar. Como você ajuda sem perder a venda?',opts:[
+    {t:'Dizer que infelizmente não pode ajudar e indicar que limpe o nome antes de voltar',c:false,fb:'❌ Você perdeu um cliente qualificado sem explorar alternativas. Corretores de elite sabem que há caminhos mesmo com restrições.'},
+    {t:'Mapear as alternativas: consórcio contemplado, compra com cônjuge sem restrição, imóvel direto com incorporador, ou ajudá-lo a regularizar a situação com um plano de 3-6 meses',c:true,fb:'✅ Solução consultiva de alto nível. O cliente que tem restrição mas é ajudado a resolver vira cliente fiel para vida. Você se torna um consultor de vida, não só um vendedor de imóveis.'},
+    {t:'Tentar vender um imóvel mais barato para evitar financiamento bancário',c:false,fb:'❌ Forçar uma solução sem entender o caso completo pode criar problema jurídico e frustração. Diagnostique antes de prescrever.'}
+  ]},
+  {nivel:'★★★★★',titulo:'Branding pessoal — cliente pesquisou você antes da visita',desc:'No início de uma visita, o cliente diz: "Pesquisei você antes de vir. Vi que você tem poucas avaliações online e não encontrei muito sobre você." Como você responde?',opts:[
+    {t:'Ficar desconfortável, pedir desculpas e tentar mudar de assunto',c:false,fb:'❌ Defensividade sinaliza insegurança. O cliente já estava com dúvida — você confirmou a dúvida dele.'},
+    {t:'Transformar o momento em oportunidade: "Você tem razão, estou construindo minha presença digital — mas minha reputação está nos resultados dos meus clientes. Posso te conectar com 3 deles agora pelo WhatsApp?"',c:true,fb:'✅ Resposta de alta performance. Reconhece a verdade, redireciona para o que importa (prova social real) e cria ação concreta imediata. Confiança é construída com transparência + demonstração.'},
+    {t:'Inventar que tem muitos clientes satisfeitos mas prefere manter discrição',c:false,fb:'❌ Mentira verificável. Se o cliente tentar checar depois, você perde a confiança completamente.'}
+  ]},
+  {nivel:'★★★★★',titulo:'Oratória na apresentação — cliente distante e no celular',desc:'Você está fazendo a apresentação do imóvel. O cliente está claramente distraído, olhando o celular e respondendo com monossílabos. O que você faz para reconquistar a atenção?',opts:[
+    {t:'Continuar a apresentação normalmente e esperar que ele preste atenção',c:false,fb:'❌ Você está falando para si mesmo. Apresentação sem audiência ativa é tempo e energia desperdiçados.'},
+    {t:'Parar a apresentação, fazer uma pergunta direta e pessoal que exige reflexão ("Imagina sua família aqui num domingo — como seria a manhã de vocês?") e criar engajamento emocional',c:true,fb:'✅ Técnica de PNL e oratória aplicada. Perguntas que ativam a imaginação desligam a distração. O silêncio estratégico e a pergunta certa valem mais do que 10 minutos de apresentação técnica.'},
+    {t:'Perguntar se ele quer remarcar a visita para outro momento',c:false,fb:'❌ Você perdeu a oportunidade. O cliente vai ir embora e provavelmente não vai remarcar.'}
+  ]},
+  {nivel:'★★★★★',titulo:'PNL — cliente que diz "não" de forma categórica',desc:'Você faz uma proposta clara. O cliente responde: "Não. Definitivamente não. Não é o que eu procuro." Linguagem corporal fechada. Como você reage?',opts:[
+    {t:'Aceitar o não e encerrar a conversa educadamente',c:false,fb:'❌ Um não categórico quase sempre esconde uma objeção real não revelada. O corretor de elite vai descobrir o que está por trás antes de aceitar.'},
+    {t:'Fazer a pergunta de PNL: "Entendo. Me ajuda a entender — o que exatamente não se encaixa? Porque quero garantir que, se existir algo certo para você, eu vá atrás." — e ouvir sem interromper',c:true,fb:'✅ Técnica avançada de PNL: o "não" é uma porta, não uma parede. A pergunta certa, feita com calma, abre o canal para a objeção real. Frequentemente o cliente revela o verdadeiro bloqueio depois dessa pergunta.'},
+    {t:'Tentar fazer uma nova proposta imediatamente para mostrar alternativas',c:false,fb:'❌ Antes de entender o "porquê" do não, qualquer nova proposta vai ser rejeitada também. Diagnóstico antes de prescrição.'}
+  ]},
+  {nivel:'★★★★★',titulo:'Matemática financeira — cliente questiona o valor do m²',desc:'O cliente diz: "Esse imóvel tem 85m² e custa R$765.000. O m² está em R$9.000. Mas vi online que a média da cidade é R$7.500/m². Você está me cobrando caro." Como você responde com dados?',opts:[
+    {t:'Dizer que o preço está correto e que o cliente deve estar comparando imóveis diferentes',c:false,fb:'❌ Resposta vaga sem argumentação técnica. O cliente vai embora convicto de que você tentou enganá-lo.'},
+    {t:'Calcular ao vivo com o cliente: mostrar que a média de R$7.500/m² considera imóveis antigos e sem acabamento premium — e que o diferencial de localização, andar e acabamento deste imóvel justifica o ágio de 20%',c:true,fb:'✅ Matemática financeira aplicada à venda. Você precisa saber calcular: preço médio por faixa de acabamento, impacto de andar (1-2% por andar em prédios), localização premium. Cliente que faz conta precisa de corretor que também sabe fazer conta.'},
+    {t:'Oferecer um desconto para igualar o preço à média do mercado',c:false,fb:'❌ Você desvalorizou o produto sem defender o preço. Se não acredita no valor do imóvel, o cliente também não vai acreditar.'}
+  ]},
+  {nivel:'★★★★★',titulo:'Ética profissional — colega pede para omitir informação do cliente',desc:'Um colega corretor te pede para não mencionar ao cliente que o imóvel vizinho tem um processo de demolição previsto. "Ele não vai descobrir antes de fechar", diz o colega. O que você faz?',opts:[
+    {t:'Concordar para não criar conflito com o colega e manter o bom relacionamento de equipe',c:false,fb:'❌ Omissão de informação relevante é crime. Você pode responder judicialmente junto com o colega. Além disso, quando o cliente descobrir, você perde credibilidade para sempre.'},
+    {t:'Recusar com firmeza, informar o cliente sobre o processo de demolição e conversar com o gestor sobre a conduta do colega',c:true,fb:'✅ Ética é inegociável. O corretor de alto nível sabe que reputação é construída ao longo de anos e destruída em um caso. Transparência gera confiança duradoura — e clientes para a vida toda.'},
+    {t:'Não mencionar ativamente, mas não mentir se o cliente perguntar',c:false,fb:'❌ Omissão ativa de informação relevante para a decisão de compra é equiparada juridicamente à falsa declaração. Não há zona cinza aqui.'}
+  ]},
+  {nivel:'★★★★★',titulo:'Gestão de crise — imóvel entregue com problemas graves',desc:'Um cliente que comprou com você há 8 meses liga furioso: o imóvel foi entregue com infiltrações graves, elétrica deficiente e acabamento muito abaixo do prometido. Ele quer seu dinheiro de volta e ameaça processar. Como você age?',opts:[
+    {t:'Dizer que sua responsabilidade encerrou com a venda e indicar o cliente a procurar a construtora',c:false,fb:'❌ Tecnicamente pode ser verdade, mas praticamente é a destruição da sua reputação. Esse cliente vai contar para 50 pessoas a experiência negativa.'},
+    {t:'Assumir o papel de intermediário ativo: acompanhar o cliente na reunião com a construtora, documentar os problemas, cobrar soluções e não sair de cena até a resolução',c:true,fb:'✅ Pós-venda é onde os grandes corretores se diferenciam. O cliente que viveu um problema sério e foi amparado pelo corretor até a resolução se torna o defensor mais fiel da sua carreira.'},
+    {t:'Pedir para o cliente aguardar e não fazer nada enquanto espera a construtora resolver',c:false,fb:'❌ Passividade em crise é conivência com o problema. O cliente vai processar você junto com a construtora.'}
+  ]},
+  {nivel:'★★★★★',titulo:'Fechamento — silêncio pós-proposta',desc:'Você fez a proposta. Apresentou preço, condições, documentação. O cliente ficou em silêncio por 30 segundos. Sua tentação é preencher o silêncio com mais argumentos. O que você deve fazer?',opts:[
+    {t:'Começar a falar novamente sobre os benefícios do imóvel para não deixar o silêncio durar',c:false,fb:'❌ O silêncio após a proposta é sagrado. Quem fala primeiro depois da proposta, cede. Você vai diluir a proposta com informação desnecessária — ou pior, oferecer desconto sem precisar.'},
+    {t:'Manter o silêncio com postura tranquila e confiante — e esperar o cliente falar',c:true,fb:'✅ Técnica clássica de fechamento: silêncio pós-proposta. O desconforto do silêncio é real para os dois lados, mas quem cede primeiro perde vantagem de negociação. Postura calma e confiante comunica certeza no valor do que você está oferecendo.'},
+    {t:'Perguntar "O que você acha?" para quebrar o silêncio',c:false,fb:'❌ Pergunta aberta após proposta abre espaço para objeção sem necessidade. O cliente já sabe o que acha — está processando. Deixe-o processar.'}
+  ]},
+  {nivel:'★★★★★',titulo:'Gestão de carteira — cliente sumiu após 3 visitas',desc:'Um cliente fez 3 visitas animadas. Depois, simplesmente sumiu. Não responde WhatsApp, não atende ligação. Faz 3 semanas. Qual é a abordagem certa?',opts:[
+    {t:'Tentar ligar mais uma vez e, se não atender, desistir',c:false,fb:'❌ Você desistiu cedo demais. Estudos de vendas mostram que 80% das vendas fecham após o 5º contato. Um cliente que sumiu quase sempre tem um motivo — muitas vezes contornável.'},
+    {t:'Mudar o canal e o tom: enviar uma mensagem de texto curta, direta e sem pressão ("Oi [nome], tudo bem? Não quero insistir — só queria saber se posso te ajudar com algo ou se encontrou o que procurava.") e aguardar',c:true,fb:'✅ Mudança de canal + tom sem pressão é a técnica certa. Mensagem curta, humana e sem julgamento. Muitos clientes sumidos voltam porque se sentiram bem-tratados mesmo no silêncio. É a semente de uma indicação futura.'},
+    {t:'Enviar uma lista de novos imóveis disponíveis para mostrar que você continua ativo',c:false,fb:'❌ Parece spam para quem está evitando contato. O cliente vai ignorar e se sentir perseguido.'}
+  ]}
 ];
-let simAt=null;
+let simAt=null,simScore={acertos:0,erros:0,total:0};
 function renderSim(){
   const c=$('sim-content');
   if(simAt!==null){renderSimAt(c);return;}
-  c.innerHTML=`<div class="sim-list">${CENS.map((cn,i)=>`<div class="sim-crd" onclick="abrirSim(${i})"><div class="sim-num">CENÁRIO ${i+1}</div><div class="sim-title">${cn.titulo}</div><div class="sim-desc">${cn.desc}</div></div>`).join('')}</div>`;
+  const scoreHtml=simScore.total>0?`<div class="score-wrap" style="margin:14px 16px 0"><h3>🎯 Seu Desempenho</h3><div class="score-nums"><div class="score-item ok"><div class="sn">${simScore.acertos}</div><div class="sl">acertos</div></div><div class="score-item err"><div class="sn">${simScore.erros}</div><div class="sl">erros</div></div><div class="score-item"><div class="sn" style="color:var(--gold)">${simScore.total}</div><div class="sl">feitos</div></div></div><div style="margin-top:10px"><button class="btn-s" onclick="simScore={acertos:0,erros:0,total:0};renderSim()" style="padding:8px 16px;font-size:.75rem;width:auto">↺ Reiniciar pontuação</button></div></div>`:'';
+  c.innerHTML=scoreHtml+`<div class="sim-list">${CENS.map((cn,i)=>`<div class="sim-crd" onclick="abrirSim(${i})"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><div class="sim-num">CENÁRIO ${i+1}</div><div style="font-size:.75rem;color:${cn.nivel.length>=4?'var(--red)':cn.nivel.length===3?'var(--gold)':'var(--green)'}">${cn.nivel}</div></div><div class="sim-title">${cn.titulo}</div><div class="sim-desc">${cn.desc.substring(0,80)}...</div></div>`).join('')}</div>`;
 }
 window.abrirSim=function(i){simAt={idx:i,resp:false};renderSimAt($('sim-content'));}
 function renderSimAt(c){
@@ -1114,6 +1254,8 @@ window.respSim=function(i){
   document.getElementById('so'+i).classList.add(o.c?'ok':'err');
   const fb=$('sim-fb');fb.classList.add('on',o.c?'ok-fb':'err-fb');
   fb.innerHTML=`<div class="fbl">${o.c?'✅ Resposta correta!':'❌ Não é a melhor abordagem'}</div>${o.fb}`;
+  simScore.total++;
+  if(o.c)simScore.acertos++;else simScore.erros++;
   const nxt=document.createElement('button');nxt.className='btn-p';nxt.style.marginTop='10px';
   nxt.textContent=simAt.idx<CENS.length-1?'Próximo cenário →':'↩ Ver todos os cenários';
   nxt.onclick=()=>{if(simAt.idx<CENS.length-1)simAt={idx:simAt.idx+1,resp:false};else simAt=null;renderSim();};
@@ -1125,6 +1267,15 @@ function renderMkt(){
   $('mkt-content').innerHTML=`<div class="mkt-sec">
     <div class="mkt-crd"><h3>📍 Preço médio m² — Litoral SC (Q1/2026)</h3>
       ${[['Balneário Camboriú','R$ 15.200/m²'],['Itajaí','R$ 7.600/m²'],['Camboriú','R$ 6.800/m²'],['Navegantes','R$ 6.100/m²'],['Penha','R$ 5.200/m²'],['Barra Velha','R$ 4.500/m²'],['Balneário Piçarras','R$ 4.800/m²'],['Itapema','R$ 9.400/m²']].map(([c,p])=>`<div class="cid-row"><div class="cid-nome">${c}</div><div class="cid-preco">${p}</div></div>`).join('')}
+      <div style="margin-top:12px;padding-top:10px;border-top:1px solid rgba(184,154,79,.1)">
+        <div style="font-size:.65rem;color:var(--dim);margin-bottom:8px">📌 Fonte dos dados</div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <button onclick="window.open('https://www.vivareal.com.br/preco-metro-quadrado/santa-catarina/','_blank')" style="background:rgba(184,154,79,.1);border:1px solid rgba(184,154,79,.3);border-radius:6px;padding:8px 12px;font-size:.72rem;color:var(--gold);font-family:var(--font);cursor:pointer;text-align:left">🔗 VivaReal — Preço m² SC</button>
+          <button onclick="window.open('https://www.zapimoveis.com.br/media-do-metro-quadrado/sc+santa-catarina/','_blank')" style="background:rgba(184,154,79,.1);border:1px solid rgba(184,154,79,.3);border-radius:6px;padding:8px 12px;font-size:.72rem;color:var(--gold);font-family:var(--font);cursor:pointer;text-align:left">🔗 Zap Imóveis — Índice m² SC</button>
+          <button onclick="window.open('https://www.fipezap.com.br','_blank')" style="background:rgba(184,154,79,.1);border:1px solid rgba(184,154,79,.3);border-radius:6px;padding:8px 12px;font-size:.72rem;color:var(--gold);font-family:var(--font);cursor:pointer;text-align:left">🔗 FipeZap — Índice nacional</button>
+        </div>
+        <div style="font-size:.6rem;color:var(--dim);margin-top:8px">Valores estimados com base em anúncios ativos Q1/2026. Sempre valide com pesquisa local.</div>
+      </div>
     </div>
     <div class="mkt-crd"><h3>📈 Indicadores econômicos — Abril/2026</h3>
       ${[
@@ -1220,11 +1371,34 @@ window.delConta=function(){
 }
 
 // INIT
-window.abrirNoticia=function(url){window.open(url,"_blank");}
-window.addEventListener('load',()=>{
-  // Fallback: esconde qualquer loading preso após 5s
-  setTimeout(()=>{ hideLoad(); },5000);
-});
+window.abrirNoticia=function(url){window.open(url,'_blank');}
+window.irParaDisc=function(){showScr('sdisc');renderDisc();}
+window.pularDisc=function(){showScr('shome');renderHome();}
+
+// ── SWIPE NAVIGATION ──
+(function(){
+  let tx=0,ty=0,hist=[];
+  document.addEventListener('touchstart',e=>{tx=e.touches[0].clientX;ty=e.touches[0].clientY;},{passive:true});
+  document.addEventListener('touchend',e=>{
+    const dx=e.changedTouches[0].clientX-tx;
+    const dy=e.changedTouches[0].clientY-ty;
+    if(Math.abs(dx)>70&&Math.abs(dx)>Math.abs(dy)*1.5){
+      if(dx>0&&hist.length>0){
+        const prev=hist.pop();
+        document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+        document.getElementById(prev).classList.add('active');
+      }
+    }
+  },{passive:true});
+  const orig=window.goSec;
+  window.goSec=function(s){
+    const cur=document.querySelector('.screen.active');
+    if(cur&&cur.id!=='s'+s){hist.push(cur.id);if(hist.length>15)hist.shift();}
+    orig(s);
+  };
+})();
+
+window.addEventListener('load',()=>{ setTimeout(()=>{ hideLoad(); },5000); });
 </script>
 </body>
 </html>
