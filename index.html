@@ -40,6 +40,9 @@ html,body{height:100%;overflow:hidden;background:var(--navy);font-family:var(--f
 .fl input{background:var(--navy3);border:1px solid rgba(184,154,79,.25);border-radius:8px;padding:13px 14px;font-size:.9rem;font-family:var(--font);color:var(--white);outline:none;width:100%;transition:.2s}
 .fl input:focus{border-color:var(--gold)}
 .fl input::placeholder{color:var(--dim)}
+.pw-wrap{position:relative}
+.pw-wrap input{padding-right:46px}
+.pw-eye{position:absolute;right:0;top:0;bottom:0;width:44px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--dim);font-size:1.1rem;background:transparent;border:none}
 .rem-row{display:flex;align-items:center;background:var(--navy3);border:1px solid rgba(184,154,79,.2);border-radius:8px;cursor:pointer;overflow:hidden}
 .rem-row-touch{min-width:48px;display:flex;align-items:center;justify-content:center;padding:14px 12px;flex-shrink:0}
 .rem-row-touch input[type=checkbox]{width:20px;height:20px;accent-color:var(--gold);pointer-events:none}
@@ -352,7 +355,7 @@ textarea.ta:focus{border-color:var(--gold)}
   </div>
   <div id="form-login" class="aform on mc" style="padding-top:20px">
     <div class="fl"><label>E-mail</label><input type="email" id="l-email" placeholder="seu@email.com" autocomplete="email"></div>
-    <div class="fl"><label>Senha</label><input type="password" id="l-senha" placeholder="••••••••" autocomplete="current-password"></div>
+    <div class="fl"><label>Senha</label><div class="pw-wrap"><input type="password" id="l-senha" placeholder="••••••••" autocomplete="current-password"><button class="pw-eye" onclick="toggleSenha('l-senha',this)" tabindex="-1">👁</button></div></div>
     <div class="rem-row" onclick="document.getElementById('rem-cb').click()">
       <div class="rem-row-touch"><input type="checkbox" id="rem-cb" onclick="event.stopPropagation()"></div>
       <label for="rem-cb" onclick="event.stopPropagation();document.getElementById('rem-cb').click()">Lembrar meu login neste dispositivo</label>
@@ -364,7 +367,7 @@ textarea.ta:focus{border-color:var(--gold)}
   <div id="form-cad" class="aform mc" style="padding-top:20px">
     <div class="fl"><label>Nome completo</label><input type="text" id="c-nome" placeholder="Seu nome completo" autocomplete="name" autocapitalize="words"></div>
     <div class="fl"><label>E-mail</label><input type="email" id="c-email" placeholder="seu@email.com" autocomplete="email"></div>
-    <div class="fl"><label>Senha</label><input type="password" id="c-senha" placeholder="mínimo 6 caracteres" autocomplete="new-password"></div>
+    <div class="fl"><label>Senha</label><div class="pw-wrap"><input type="password" id="c-senha" placeholder="mínimo 6 caracteres" autocomplete="new-password"><button class="pw-eye" onclick="toggleSenha('c-senha',this)" tabindex="-1">👁</button></div></div>
     <div id="c-err" class="aerr"></div>
     <button class="btn-p" onclick="criarConta()">Criar conta</button>
   </div>
@@ -600,7 +603,7 @@ textarea.ta:focus{border-color:var(--gold)}
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, deleteUser, setPersistence, browserLocalPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, deleteUser, setPersistence, browserLocalPersistence, browserSessionPersistence, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getFirestore, doc, setDoc, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const fb = initializeApp({apiKey:"AIzaSyCSjGcpyiAhj6jAkf75s-p_Zld0V0eiXgg",authDomain:"hub-pro-5486e.firebaseapp.com",projectId:"hub-pro-5486e",storageBucket:"hub-pro-5486e.firebasestorage.app",messagingSenderId:"365102238083",appId:"1:365102238083:web:55829279cad61e75baceb6"});
@@ -684,6 +687,12 @@ window.voltarPriv=function(){
 }
 
 // AUTH FUNCS
+window.toggleSenha=function(id,btn){
+  const inp=$(id);
+  const show=inp.type==='password';
+  inp.type=show?'text':'password';
+  btn.textContent=show?'🙈':'👁';
+}
 window.authTab=function(t){
   document.querySelectorAll('.atab').forEach(x=>x.classList.remove('on'));
   document.querySelectorAll('.aform').forEach(x=>x.classList.remove('on'));
@@ -711,7 +720,6 @@ window.esqueceuSenha=async function(){
   if(!email){err.textContent='Digite seu e-mail acima para recuperar a senha.';err.classList.add('on');return;}
   showLoad('Enviando e-mail...');
   try{
-    const {sendPasswordResetEmail}=await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js");
     await sendPasswordResetEmail(auth,email);
     hideLoad();toast('E-mail de recuperação enviado! Verifique sua caixa de entrada. ✅',4000);
   }catch(e){
@@ -720,6 +728,7 @@ window.esqueceuSenha=async function(){
     err.textContent=msgs[e.code]||'Erro ao enviar. Tente novamente.';err.classList.add('on');
   }
 }
+window.criarConta=async function(){
   const nome=$('c-nome').value.trim(),email=$('c-email').value.trim(),senha=$('c-senha').value;
   const err=$('c-err');err.classList.remove('on');
   if(!nome||!email||!senha){err.textContent='Preencha todos os campos.';err.classList.add('on');return;}
