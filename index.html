@@ -640,7 +640,7 @@ async function loadUD(){
   const k='hp_'+CU.uid;
   try{const l=localStorage.getItem(k);if(l)UD=JSON.parse(l);else UD={};}catch(e){UD={};}
   try{
-    const snap=await Promise.race([getDoc(doc(db,'users',CU.uid)),new Promise((_,r)=>setTimeout(()=>r(new Error('t')),3000))]);
+    const snap=await Promise.race([getDoc(doc(db,'users',CU.uid)),new Promise((_,r)=>setTimeout(()=>r(new Error('t')),2000))]);
     if(snap.exists()){UD={...UD,...snap.data()};localStorage.setItem(k,JSON.stringify(UD));}
   }catch(e){}
 }
@@ -652,7 +652,9 @@ async function save(campo,val){
 }
 
 // AUTH STATE
+let authResolved = false;
 onAuthStateChanged(auth,async(user)=>{
+  authResolved = true;
   hideLoad();
   if(user){
     CU=user;showLoad('Carregando...');
@@ -1129,11 +1131,21 @@ window.delConta=function(){
   }
 }
 
-// INIT
+// INIT — splash nunca trava
 window.addEventListener('load',()=>{
+  // 1.5s: se Firebase ainda não respondeu, mostra tela de login
   setTimeout(()=>{
-    if($('ss').classList.contains('active'))showScr('sa');
-  },1200);
+    if($('ss').classList.contains('active')){
+      showScr('sa');
+    }
+  },1500);
+  // 4s: fallback extra — garante que nunca fica preso em qualquer tela de carregamento
+  setTimeout(()=>{
+    if($('ss').classList.contains('active')||document.querySelector('.loading.on')){
+      hideLoad();
+      if(!authResolved) showScr('sa');
+    }
+  },4000);
 });
 </script>
 </body>
