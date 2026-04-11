@@ -670,12 +670,9 @@ textarea.ta:focus{border-color:var(--gold)}
   <button class="btn-p" style="margin-top:22px;max-width:260px" onclick="document.getElementById('celeb').classList.remove('on')">Continuar →</button>
 </div>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, deleteUser, setPersistence, browserLocalPersistence, browserSessionPersistence, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-
-const fb = initializeApp({apiKey:"AIzaSyCSjGcpyiAhj6jAkf75s-p_Zld0V0eiXgg",authDomain:"hub-pro-5486e.firebaseapp.com",projectId:"hub-pro-5486e",storageBucket:"hub-pro-5486e.firebasestorage.app",messagingSenderId:"365102238083",appId:"1:365102238083:web:55829279cad61e75baceb6"});
-const auth = getAuth(fb);
+<script>
+// ── HUB PRO — 100% Local, Zero Firebase ──
+// Autenticação via localStorage — sem dependência de rede, sem travamento
 
 let CU = null, UD = {}, privOrig = 'lgpd';
 
@@ -706,46 +703,45 @@ window.goSec = function(s){
 }
 
 // ── DATA LAYER — 100% localStorage, instantâneo ──
-function lsKey(){ return 'hp_'+(CU?.uid||'anon'); }
+function lsKey(){ return 'hp_'+(CU?.email||'anon'); }
 function loadUD(){
-  try{ const raw=localStorage.getItem(lsKey()); UD=raw?JSON.parse(raw):{}; if(UD.scripts_score)scriptsScore={...scriptsScore,...UD.scripts_score}; }
-  catch(e){ UD={}; }
+  try{
+    const raw=localStorage.getItem(lsKey());
+    UD=raw?JSON.parse(raw):{};
+    if(UD.scripts_score)scriptsScore={...scriptsScore,...UD.scripts_score};
+  }catch(e){ UD={}; }
 }
 function save(campo,val){
   UD[campo]=val;
   try{ localStorage.setItem(lsKey(),JSON.stringify(UD)); }catch(e){}
 }
 
-// ── AUTH STATE ──
-let authResolved = false;
+// ── AUTH LOCAL — sem Firebase, sem rede ──
+// Usuários armazenados localmente com senha hasheada (simples)
+function hashSenha(s){ let h=0;for(let i=0;i<s.length;i++){h=Math.imul(31,h)+s.charCodeAt(i)|0;}return h.toString(36); }
+function getUsuarios(){ try{return JSON.parse(localStorage.getItem('hp_users')||'{}');}catch(e){return{};} }
+function salvarUsuarios(u){ localStorage.setItem('hp_users',JSON.stringify(u)); }
 
-function rotearUsuario(user){
-  hideLoad();
-  if(user){
-    CU=user;
-    loadUD();
-    if(!UD.lgpd){showScr('slgpd');return;}
-    if(!UD.perfil?.nome){showScr('sonb');return;}
-    showScr('shome');renderHome();
-  }else{
-    CU=null;UD={};
-    showScr('sa');
-  }
+function rotearUsuario(){
+  if(!CU){showScr('sa');return;}
+  loadUD();
+  if(!UD.lgpd){showScr('slgpd');return;}
+  if(!UD.perfil?.nome){showScr('sonb');return;}
+  showScr('shome');renderHome();
 }
 
-onAuthStateChanged(auth,(user)=>{
-  authResolved=true;
-  rotearUsuario(user);
-});
-
-// Timeout de segurança: se Firebase não responder em 3s, vai para login
-setTimeout(()=>{
-  if(!authResolved){
-    authResolved=true;
-    hideLoad();
-    showScr('sa');
-  }
-},3000);
+// Inicializa: verifica se há sessão salva
+(function init(){
+  try{
+    const sess=localStorage.getItem('hp_session');
+    if(sess){
+      const u=JSON.parse(sess);
+      const users=getUsuarios();
+      if(users[u.email]){CU={email:u.email,uid:u.email};rotearUsuario();return;}
+    }
+  }catch(e){}
+  showScr('sa');
+})();
 
 // LGPD
 window.toggleLgpd=function(){
@@ -763,7 +759,7 @@ window.voltarPriv=function(){
   else goSec('home');
 }
 
-// AUTH FUNCS
+// ── AUTH FUNCS — 100% local, zero rede ──
 window.toggleSenha=function(id,btn){
   const inp=$(id);
   const show=inp.type==='password';
@@ -776,59 +772,48 @@ window.authTab=function(t){
   $('form-'+t).classList.add('on');
   document.querySelector(`.atab:${t==='login'?'first':'last'}-child`).classList.add('on');
 }
-window.fazerLogin=async function(){
-  const email=$('l-email').value.trim(),senha=$('l-senha').value;
+window.fazerLogin=function(){
+  const email=$('l-email').value.trim().toLowerCase();
+  const senha=$('l-senha').value;
   const err=$('l-err');err.classList.remove('on');
   if(!email||!senha){err.textContent='Preencha e-mail e senha.';err.classList.add('on');return;}
-  showLoad('Entrando...');
-  try{
-    const persist=$('rem-cb').checked?browserLocalPersistence:browserSessionPersistence;
-    await setPersistence(auth,persist);
-    const cred=await signInWithEmailAndPassword(auth,email,senha);
-    // Redireciona diretamente sem esperar onAuthStateChanged
-    rotearUsuario(cred.user);
-  }catch(e){
-    hideLoad();
-    const msgs={'auth/user-not-found':'E-mail não encontrado.','auth/wrong-password':'Senha incorreta.','auth/invalid-credential':'E-mail ou senha inválidos.','auth/too-many-requests':'Muitas tentativas. Aguarde.'};
-    err.textContent=msgs[e.code]||'Erro ao entrar.';err.classList.add('on');
-  }
+  const users=getUsuarios();
+  if(!users[email]){err.textContent='E-mail não encontrado.';err.classList.add('on');return;}
+  if(users[email].hash!==hashSenha(senha)){err.textContent='Senha incorreta.';err.classList.add('on');return;}
+  CU={email,uid:email};
+  if($('rem-cb').checked){localStorage.setItem('hp_session',JSON.stringify({email}));}
+  rotearUsuario();
 }
-window.esqueceuSenha=async function(){
-  const email=$('l-email').value.trim();
+window.esqueceuSenha=function(){
+  const email=$('l-email').value.trim().toLowerCase();
   const err=$('l-err');err.classList.remove('on');
-  if(!email){err.textContent='Digite seu e-mail acima para recuperar a senha.';err.classList.add('on');return;}
-  showLoad('Enviando e-mail...');
-  // Timeout de segurança: se travar, libera em 8s
-  const to=setTimeout(()=>{hideLoad();err.textContent='Tempo esgotado. Verifique sua conexão.';err.classList.add('on');},8000);
-  try{
-    await sendPasswordResetEmail(auth,email);
-    clearTimeout(to);
-    hideLoad();toast('✅ E-mail enviado! Verifique sua caixa de entrada.',4000);
-  }catch(e){
-    clearTimeout(to);
-    hideLoad();
-    const msgs={'auth/user-not-found':'E-mail não encontrado.','auth/invalid-email':'E-mail inválido.'};
-    err.textContent=msgs[e.code]||'Erro ao enviar. Tente novamente.';err.classList.add('on');
-  }
+  if(!email){err.textContent='Digite seu e-mail acima.';err.classList.add('on');return;}
+  const users=getUsuarios();
+  if(!users[email]){err.textContent='E-mail não encontrado.';err.classList.add('on');return;}
+  // Mostra a senha atual (app local — sem e-mail real)
+  const nova=prompt('Digite uma nova senha (mínimo 6 caracteres):');
+  if(!nova||nova.length<6){toast('Senha deve ter pelo menos 6 caracteres.');return;}
+  users[email].hash=hashSenha(nova);
+  salvarUsuarios(users);
+  toast('✅ Senha alterada com sucesso! Faça login com a nova senha.',4000);
 }
-window.criarConta=async function(){
-  const nome=$('c-nome').value.trim(),email=$('c-email').value.trim(),senha=$('c-senha').value;
+window.criarConta=function(){
+  const nome=$('c-nome').value.trim();
+  const email=$('c-email').value.trim().toLowerCase();
+  const senha=$('c-senha').value;
   const err=$('c-err');err.classList.remove('on');
   if(!nome||!email||!senha){err.textContent='Preencha todos os campos.';err.classList.add('on');return;}
   if(senha.length<6){err.textContent='Senha deve ter pelo menos 6 caracteres.';err.classList.add('on');return;}
-  showLoad('Criando conta...');
-  try{
-    const cred=await createUserWithEmailAndPassword(auth,email,senha);
-    CU=cred.user;
-    UD={perfil:{nome,email}};
-    localStorage.setItem('hp_'+CU.uid,JSON.stringify(UD));
-    // Redireciona diretamente
-    rotearUsuario(CU);
-  }catch(e){
-    hideLoad();
-    const msgs={'auth/email-already-in-use':'E-mail já cadastrado.','auth/invalid-email':'E-mail inválido.','auth/weak-password':'Senha muito fraca.'};
-    err.textContent=msgs[e.code]||'Erro ao criar conta.';err.classList.add('on');
-  }
+  if(!email.includes('@')){err.textContent='E-mail inválido.';err.classList.add('on');return;}
+  const users=getUsuarios();
+  if(users[email]){err.textContent='E-mail já cadastrado.';err.classList.add('on');return;}
+  users[email]={hash:hashSenha(senha),nome,criado:new Date().toISOString()};
+  salvarUsuarios(users);
+  CU={email,uid:email};
+  UD={perfil:{nome,email}};
+  localStorage.setItem(lsKey(),JSON.stringify(UD));
+  if($('rem-cb')?.checked){localStorage.setItem('hp_session',JSON.stringify({email}));}
+  rotearUsuario();
 }
 
 // ONBOARDING
@@ -1509,12 +1494,25 @@ window.salvarPerf=function(){
   const p={...(UD.perfil||{}),nome:$('pf-nome').value.trim(),cidade:$('pf-cidade').value.trim(),especialidade:$('pf-esp').value,tempo:$('pf-tempo').value};
   save('perfil',p);toast('Perfil atualizado! ✅');renderPerf();
 }
-window.logout=async function(){showLoad('Saindo...');await signOut(auth);hideLoad();}
+window.logout=function(){
+  localStorage.removeItem('hp_session');
+  CU=null;UD={};
+  showScr('sa');
+  toast('Logout realizado.');
+}
 window.delConta=function(){
   if(confirm('Tem certeza? Todos os seus dados serão permanentemente excluídos.')){
-    showLoad('Excluindo...');
-    localStorage.removeItem('hp_'+CU.uid);
-    deleteUser(CU).then(()=>hideLoad()).catch(()=>{hideLoad();toast('Faça logout e login novamente antes de excluir.');});
+    const email=CU?.email;
+    if(email){
+      localStorage.removeItem(lsKey());
+      localStorage.removeItem('hp_session');
+      const users=getUsuarios();
+      delete users[email];
+      salvarUsuarios(users);
+    }
+    CU=null;UD={};
+    showScr('sa');
+    toast('Conta excluída.');
   }
 }
 
