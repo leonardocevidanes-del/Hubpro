@@ -480,7 +480,7 @@ textarea.ta:focus{border-color:var(--gold)}
         PERGUNTA DO DIA <span style="font-size:.65rem;color:var(--gold);text-decoration:underline;text-transform:none;font-weight:400;letter-spacing:0" onclick="event.stopPropagation();goSec('registros')">Ver registros</span>
       </div>
       <div class="pq-card">
-        <div class="mc-label">REFLEXÃO DE HOJE</div>
+        <div class="pq-lbl">REFLEXÃO DE HOJE</div>
         <div id="home-pq" class="pq-text" style="font-size:.9rem;font-weight:500;color:var(--white);line-height:1.55"></div>
         <div id="home-pq-resp" class="pq-resp"></div>
       </div>
@@ -1067,7 +1067,7 @@ function renderPergunta(){
   const regs=UD.registros||[],hoje=new Date().toDateString();
   const resp=regs.find(r=>r.tipo==='pergunta'&&new Date(r.data).toDateString()===hoje);
   $('pq-content').innerHTML=`
-    <div class="pq-full"><div class="pq-lbl">💭 Reflexão — ${new Date().toLocaleDateString('pt-BR',{day:'numeric',month:'long'})}</div><div class="pq-q">${pq}</div></div>
+    <div class="pq-full"><div class="pq-lbl">REFLEXÃO DE HOJE · ${new Date().toLocaleDateString('pt-BR',{day:'numeric',month:'long'})}</div><div class="pq-q">${pq}</div></div>
     <div class="fl"><label>Sua resposta</label><textarea class="ta" id="pq-resp" placeholder="Escreva sua reflexão aqui...">${resp?resp.texto:''}</textarea></div>
     <button class="btn-p" onclick="salvarPQ('${pq.replace(/'/g,"\\'")}')">Salvar reflexão</button>
     <div style="height:8px"></div>`;
@@ -1083,57 +1083,107 @@ window.salvarPQ=function(pq){
 }
 
 // META
+function buildMetaCard(m,editMode){
+  // editMode = which section is open: null | 'texto' | 'resultado'
+  const cor=m.checkin==='sim'?'var(--green)':m.checkin==='parcial'?'var(--gold)':m.checkin==='nao'?'var(--red)':'var(--dim)';
+  const corTxt=m.checkin==='sim'?'✅ Alcançada':m.checkin==='parcial'?'📝 Parcialmente':m.checkin==='nao'?'❌ Não alcançada':'Pendente';
+  return `<div style="background:var(--navy3);border:1px solid rgba(184,154,79,.25);border-radius:10px;padding:14px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      <div style="font-size:.6rem;font-weight:700;color:var(--gold);letter-spacing:2px;text-transform:uppercase">META DESTA SEMANA</div>
+      <button onclick="abrirEdicaoMeta('texto')" style="background:rgba(184,154,79,.12);border:1px solid rgba(184,154,79,.35);border-radius:5px;padding:4px 10px;font-size:.65rem;font-weight:600;color:var(--gold);font-family:var(--font);cursor:pointer">✏️ Editar</button>
+    </div>
+    ${editMode==='texto'?`
+      <textarea class="ta" id="meta-edit-texto" style="min-height:70px;margin-bottom:8px">${m.texto}</textarea>
+      <div style="display:flex;gap:8px">
+        <button class="btn-p" style="flex:1;padding:10px;font-size:.8rem" onclick="salvarTextoMeta()">Salvar</button>
+        <button class="btn-s" style="flex:1;padding:10px;font-size:.8rem" onclick="renderMeta()">Cancelar</button>
+      </div>`:`<div style="font-size:.85rem;color:var(--white);line-height:1.5;margin-bottom:10px">${m.texto}</div>`}
+    ${m.checkin?`
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;padding-top:8px;border-top:1px solid rgba(184,154,79,.1)">
+        <div style="font-size:.78rem;font-weight:600;color:${cor}">${corTxt}</div>
+        <button onclick="abrirEdicaoMeta('resultado')" style="background:rgba(184,154,79,.1);border:1px solid rgba(184,154,79,.3);border-radius:5px;padding:3px 9px;font-size:.62rem;font-weight:600;color:var(--gold);font-family:var(--font);cursor:pointer">✏️ Alterar</button>
+      </div>
+      ${editMode==='resultado'?`
+        <div style="margin-top:10px">
+          <div style="font-size:.65rem;font-weight:700;color:var(--gold);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">Alterar resultado:</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button onclick="salvarCheckinMeta('sim')" style="background:rgba(76,175,125,.15);border:1px solid var(--green);border-radius:6px;padding:9px 12px;font-size:.78rem;font-weight:700;color:var(--green);font-family:var(--font);cursor:pointer;flex:1">✅ Alcancei</button>
+            <button onclick="salvarCheckinMeta('parcial')" style="background:rgba(184,154,79,.1);border:1px solid var(--gold);border-radius:6px;padding:9px 12px;font-size:.78rem;font-weight:700;color:var(--gold);font-family:var(--font);cursor:pointer;flex:1">📝 Parcial</button>
+            <button onclick="salvarCheckinMeta('nao')" style="background:rgba(224,85,85,.1);border:1px solid var(--red);border-radius:6px;padding:9px 12px;font-size:.78rem;font-weight:700;color:var(--red);font-family:var(--font);cursor:pointer;flex:1">❌ Não</button>
+          </div>
+        </div>`:''
+      }
+      ${(m.checkin==='nao'||m.checkin==='parcial')?`
+        <div style="margin-top:10px;padding-top:8px;border-top:1px solid rgba(184,154,79,.08)">
+          <div style="font-size:.65rem;font-weight:700;color:var(--dim);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px">💭 O que acredita que aconteceu?</div>
+          ${m.reflexao?`<div style="font-size:.8rem;color:var(--dim);line-height:1.6;font-style:italic">"${m.reflexao}"</div><button onclick="abrirEdicaoMeta('reflexao')" style="margin-top:6px;background:transparent;border:none;font-size:.68rem;color:var(--gold);font-family:var(--font);cursor:pointer;text-decoration:underline">✏️ Editar reflexão</button>`:
+            editMode==='reflexao'?`
+              <textarea class="ta" id="meta-edit-reflexao" style="min-height:80px;margin-bottom:8px" placeholder="O que você acredita que impediu de alcançar? O que faria diferente?">${m.reflexao||''}</textarea>
+              <div style="display:flex;gap:8px">
+                <button class="btn-p" style="flex:1;padding:9px;font-size:.78rem" onclick="salvarReflexaoMeta()">Salvar reflexão</button>
+                <button class="btn-s" style="flex:1;padding:9px;font-size:.78rem" onclick="renderMeta()">Cancelar</button>
+              </div>`:
+            `<textarea class="ta" id="meta-edit-reflexao" style="min-height:80px;margin-bottom:8px" placeholder="O que você acredita que impediu de alcançar? O que faria diferente?"></textarea>
+             <button class="btn-p" style="padding:9px;font-size:.78rem;width:100%" onclick="salvarReflexaoMeta()">Salvar reflexão</button>`
+          }
+        </div>`:''
+      }
+    `:`<div style="font-size:.72rem;color:var(--dim);font-style:italic">Check-in disponível na sexta-feira.</div>`}
+  </div>`;
+}
+
+let _metaEditMode=null;
 function renderMeta(){
   const metas=UD.metas||[],agora=new Date(),dow=agora.getDay();
   const metaAtual=metas.length>0?metas[metas.length-1]:null;
   const metaViva=metaAtual&&(new Date(metaAtual.data)>new Date(agora.getTime()-7*24*60*60*1000));
   let h=`<h2>🎯 Meta da Semana</h2>`;
   if(dow===1||!metaViva){
-    h+=`<p>Qual é a sua meta para esta semana? Seja específico.</p><div class="fl"><label>Sua meta</label><textarea class="ta" id="meta-inp" placeholder="Ex: Realizar 5 visitas qualificadas e converter 2 em proposta..."></textarea></div><button class="btn-p" onclick="salvarMeta()">Definir meta</button>`;
+    h+=`<p>Qual é a sua meta para esta semana? Seja específico — uma meta clara vale mais que dez vagas.</p>
+    <div class="fl"><label>Sua meta</label><textarea class="ta" id="meta-inp" placeholder="Ex: Realizar 5 visitas qualificadas e converter 2 em proposta..."></textarea></div>
+    <button class="btn-p" onclick="salvarMeta()">Definir meta</button>`;
   }else if(metaViva&&!metaAtual.checkin&&(dow===5||dow===6||dow===0)){
-    h+=`<div style="background:var(--navy3);border:1px solid rgba(184,154,79,.25);border-radius:10px;padding:14px;margin-bottom:8px"><div style="font-size:.6rem;font-weight:700;color:var(--gold);letter-spacing:2px;text-transform:uppercase;margin-bottom:7px">SUA META DESTA SEMANA</div><div style="font-size:.85rem;color:var(--white);line-height:1.5">${metaAtual.texto}</div></div>
-    <p>Chegou a sexta — você chegou lá?</p>
-    <div style="display:flex;gap:10px;margin-top:4px"><button class="btn-sim" onclick="checkinMeta('sim')" style="padding:13px;font-size:.83rem">✅ Sim, alcancei!</button><button class="btn-nao" onclick="checkinMeta('parcial')" style="padding:13px;font-size:.83rem;background:rgba(184,154,79,.1);border-color:var(--gold);color:var(--gold)">📝 Parcialmente</button></div>
-    <button class="btn-s" style="margin-top:10px" onclick="checkinMeta('nao')">❌ Não alcancei dessa vez</button>`;
-  }else if(metaViva){
-    h+=`<div style="background:var(--navy3);border:1px solid rgba(184,154,79,.25);border-radius:10px;padding:14px">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px">
-        <div style="font-size:.6rem;font-weight:700;color:var(--gold);letter-spacing:2px;text-transform:uppercase">META DESTA SEMANA</div>
-        <button onclick="editarMeta()" style="background:rgba(184,154,79,.15);border:1px solid rgba(184,154,79,.4);border-radius:5px;padding:4px 10px;font-size:.65rem;font-weight:600;color:var(--gold);font-family:var(--font);cursor:pointer">✏️ Editar</button>
+    h+=buildMetaCard(metaAtual,null);
+    h+=`<div style="margin-top:12px">
+      <p style="font-size:.83rem;color:var(--dim);margin-bottom:10px">Chegou a sexta — você chegou lá?</p>
+      <div style="display:flex;gap:8px">
+        <button class="btn-sim" onclick="salvarCheckinMeta('sim')" style="flex:1;padding:12px;font-size:.82rem">✅ Sim, alcancei!</button>
+        <button onclick="salvarCheckinMeta('parcial')" style="flex:1;background:rgba(184,154,79,.1);border:1px solid var(--gold);border-radius:8px;padding:12px;font-size:.82rem;font-weight:700;color:var(--gold);font-family:var(--font);cursor:pointer">📝 Parcialmente</button>
       </div>
-      <div id="meta-texto-display" style="font-size:.85rem;color:var(--white);line-height:1.5">${metaAtual.texto}</div>
-      <div id="meta-edit-wrap" style="display:none;margin-top:10px">
-        <textarea class="ta" id="meta-edit-inp" style="min-height:70px">${metaAtual.texto}</textarea>
-        <div style="display:flex;gap:8px;margin-top:8px">
-          <button class="btn-p" style="flex:1;padding:10px;font-size:.8rem" onclick="salvarEdicaoMeta()">Salvar</button>
-          <button class="btn-s" style="flex:1;padding:10px;font-size:.8rem" onclick="cancelarEdicaoMeta()">Cancelar</button>
-        </div>
-      </div>
-      ${metaAtual.checkin?`<div style="margin-top:8px;font-size:.78rem;color:${metaAtual.checkin==='sim'?'var(--green)':metaAtual.checkin==='parcial'?'var(--gold)':'var(--red)'}">${metaAtual.checkin==='sim'?'✅ Meta alcançada!':metaAtual.checkin==='parcial'?'📝 Parcialmente alcançada':'❌ Não alcançada — aprenda e siga em frente'}</div>`:''}
+      <button class="btn-s" style="margin-top:8px;width:100%" onclick="salvarCheckinMeta('nao')">❌ Não alcancei dessa vez</button>
     </div>`;
+  }else if(metaViva){
+    h+=buildMetaCard(metaAtual,_metaEditMode);
   }
   if(metas.length>1){
-    h+=`<div class="meta-hist"><h3>Histórico</h3>${[...metas].reverse().slice(0,5).map(m=>`<div class="mhi"><div class="mhi-d">${new Date(m.data).toLocaleDateString('pt-BR',{day:'2-digit',month:'short'})}</div><div class="mhi-t">${m.texto}</div>${m.checkin?`<div class="mhi-c" style="color:${m.checkin==='sim'?'var(--green)':m.checkin==='parcial'?'var(--gold)':'var(--red)'}">${m.checkin==='sim'?'✅ Alcançada':m.checkin==='parcial'?'📝 Parcial':'❌ Não alcançada'}</div>`:''}</div>`).join('')}</div>`;
+    h+=`<div class="meta-hist"><h3>Histórico</h3>${[...metas].reverse().slice(0,5).map(m=>{
+      const cor=m.checkin==='sim'?'var(--green)':m.checkin==='parcial'?'var(--gold)':m.checkin==='nao'?'var(--red)':'var(--dim)';
+      return `<div class="mhi"><div class="mhi-d">${new Date(m.data).toLocaleDateString('pt-BR',{day:'2-digit',month:'short'})}</div><div class="mhi-t">${m.texto}</div>${m.checkin?`<div class="mhi-c" style="color:${cor}">${m.checkin==='sim'?'✅ Alcançada':m.checkin==='parcial'?'📝 Parcial':'❌ Não alcançada'}</div>`:''}${m.reflexao?`<div style="font-size:.72rem;color:var(--dim);margin-top:3px;font-style:italic">"${m.reflexao.substring(0,60)}${m.reflexao.length>60?'...':''}"</div>`:''}</div>`;
+    }).join('')}</div>`;
   }
   $('meta-content').innerHTML=h;
 }
-window.editarMeta=function(){
-  const tw=$('meta-edit-wrap'),dd=$('meta-texto-display');
-  if(!tw||!dd)return;
-  tw.style.display='block';dd.style.display='none';
-  $('meta-edit-inp').focus();
-}
-window.cancelarEdicaoMeta=function(){
-  const tw=$('meta-edit-wrap'),dd=$('meta-texto-display');
-  if(!tw||!dd)return;
-  tw.style.display='none';dd.style.display='block';
-}
-window.salvarEdicaoMeta=function(){
-  const txt=$('meta-edit-inp').value.trim();
+window.abrirEdicaoMeta=function(modo){_metaEditMode=modo;renderMeta();setTimeout(()=>{const el=$('meta-edit-'+modo);if(el)el.focus();},50);}
+window.salvarTextoMeta=function(){
+  const txt=$('meta-edit-texto').value.trim();
   if(!txt){toast('Escreva sua meta.');return;}
   const metas=UD.metas||[];
   if(metas.length>0)metas[metas.length-1].texto=txt;
-  save('metas',metas);toast('Meta atualizada! ✅');renderMeta();
+  save('metas',metas);_metaEditMode=null;toast('Meta atualizada! ✅');renderMeta();
+}
+window.salvarCheckinMeta=function(r){
+  const metas=UD.metas||[];
+  if(metas.length>0)metas[metas.length-1].checkin=r;
+  save('metas',metas);_metaEditMode=null;
+  toast(r==='sim'?'🏆 Meta alcançada! Parabéns!':r==='parcial'?'📈 Progresso é progresso!':'💪 Aprenda e ajuste na próxima');
+  renderMeta();
+}
+window.salvarReflexaoMeta=function(){
+  const txt=$('meta-edit-reflexao').value.trim();
+  if(!txt){toast('Escreva sua reflexão.');return;}
+  const metas=UD.metas||[];
+  if(metas.length>0)metas[metas.length-1].reflexao=txt;
+  save('metas',metas);_metaEditMode=null;toast('Reflexão salva! ✅');renderMeta();
 }
 window.salvarMeta=function(){
   const txt=$('meta-inp').value.trim();
@@ -1141,13 +1191,7 @@ window.salvarMeta=function(){
   const metas=UD.metas||[];metas.push({texto:txt,data:new Date().toISOString()});
   save('metas',metas);toast('Meta definida! 💪');renderMeta();
 }
-window.checkinMeta=function(r){
-  const metas=UD.metas||[];
-  if(metas.length>0)metas[metas.length-1].checkin=r;
-  save('metas',metas);
-  toast(r==='sim'?'Parabéns! Meta alcançada! 🏆':r==='parcial'?'Progresso é progresso! 📈':'Aprenda e ajuste na próxima semana 💪');
-  renderMeta();
-}
+window.checkinMeta=window.salvarCheckinMeta;
 
 // SCRIPTS
 const OBJ=[
@@ -1290,9 +1334,23 @@ function renderSim(){
   c.innerHTML=scoreHtml+`<div class="sim-list">${CENS.map((cn,i)=>`<div class="sim-crd" onclick="abrirSim(${i})"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><div class="sim-num">CENÁRIO ${i+1}</div><div style="font-size:.75rem;color:${cn.nivel.length>=4?'var(--red)':cn.nivel.length===3?'var(--gold)':'var(--green)'}">${cn.nivel}</div></div><div class="sim-title">${cn.titulo}</div><div class="sim-desc">${cn.desc.substring(0,80)}...</div></div>`).join('')}</div>`;
 }
 window.abrirSim=function(i){simAt={idx:i,resp:false};renderSimAt($('sim-content'));}
+window.voltarSim=function(){simAt=null;renderSim();}
 function renderSimAt(c){
   const cn=CENS[simAt.idx];
-  c.innerHTML=`<div class="sim-active"><button class="btn-back" onclick="simAt=null;renderSim()">← Voltar</button><div class="sim-num">CENÁRIO ${simAt.idx+1} DE ${CENS.length}</div><div class="sim-scenario">${cn.desc}</div><div class="sim-opts">${cn.opts.map((o,i)=>`<button class="sim-opt" id="so${i}" onclick="respSim(${i})">${o.t}</button>`).join('')}</div><div class="sim-fb" id="sim-fb"></div></div>`;
+  const niv=cn.nivel;
+  const nivColor=niv.length>=9?'var(--red)':niv.length>=7?'var(--red)':niv.length>=5?'var(--gold)':'var(--green)';
+  c.innerHTML=`<div class="sim-active">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <button class="btn-back" onclick="voltarSim()">← Voltar</button>
+      <div style="font-size:.75rem;color:${nivColor}">${cn.nivel}</div>
+    </div>
+    <div class="sim-num">CENÁRIO ${simAt.idx+1} DE ${CENS.length}</div>
+    <div style="font-size:.88rem;font-weight:600;color:var(--gold);margin:6px 0 10px;line-height:1.4">${cn.titulo}</div>
+    <div class="sim-scenario">${cn.desc}</div>
+    <div style="font-size:.65rem;font-weight:700;color:var(--dim);letter-spacing:2px;text-transform:uppercase;margin:12px 0 8px">Escolha a melhor resposta:</div>
+    <div class="sim-opts">${cn.opts.map((o,i)=>`<button class="sim-opt" id="so${i}" onclick="window.respSim(${i})"><span style="font-weight:700;color:var(--gold);margin-right:8px">${i+1}.</span>${o.t}</button>`).join('')}</div>
+    <div class="sim-fb" id="sim-fb"></div>
+  </div>`;
 }
 window.respSim=function(i){
   if(simAt.resp)return;simAt.resp=true;
@@ -1311,17 +1369,10 @@ window.respSim=function(i){
 // MERCADO
 function renderMkt(){
   $('mkt-content').innerHTML=`<div class="mkt-sec">
-    <div class="mkt-crd"><h3>📍 Preço médio m² — Litoral SC (Q1/2026)</h3>
-      ${[['Balneário Camboriú','R$ 15.200/m²'],['Itajaí','R$ 7.600/m²'],['Camboriú','R$ 6.800/m²'],['Navegantes','R$ 6.100/m²'],['Penha','R$ 5.200/m²'],['Barra Velha','R$ 4.500/m²'],['Balneário Piçarras','R$ 4.800/m²'],['Itapema','R$ 9.400/m²']].map(([c,p])=>`<div class="cid-row"><div class="cid-nome">${c}</div><div class="cid-preco">${p}</div></div>`).join('')}
-      <div style="margin-top:12px;padding-top:10px;border-top:1px solid rgba(184,154,79,.1)">
-        <div style="font-size:.65rem;color:var(--dim);margin-bottom:8px">📌 Fonte dos dados</div>
-        <div style="display:flex;flex-direction:column;gap:6px">
-          <button onclick="window.open('https://www.fipe.org.br/pt-br/indices/fipezap','_blank')" style="background:rgba(184,154,79,.1);border:1px solid rgba(184,154,79,.3);border-radius:6px;padding:8px 12px;font-size:.72rem;color:var(--gold);font-family:var(--font);cursor:pointer;text-align:left">🔗 FipeZap — Índice de preços imobiliários</button>
-          <button onclick="window.open('https://www.dwv.com.br','_blank')" style="background:rgba(184,154,79,.1);border:1px solid rgba(184,154,79,.3);border-radius:6px;padding:8px 12px;font-size:.72rem;color:var(--gold);font-family:var(--font);cursor:pointer;text-align:left">🔗 DWV — Consultoria imobiliária SC</button>
-          <button onclick="window.open('https://www.braininteligencia.com.br','_blank')" style="background:rgba(184,154,79,.1);border:1px solid rgba(184,154,79,.3);border-radius:6px;padding:8px 12px;font-size:.72rem;color:var(--gold);font-family:var(--font);cursor:pointer;text-align:left">🔗 Brain Inteligência — Dados mercado SC</button>
-        </div>
-        <div style="font-size:.6rem;color:var(--dim);margin-top:8px">Valores estimados com base em anúncios ativos Q1/2026. Sempre valide com pesquisa local.</div>
-      </div>
+    <div class="mkt-crd">
+      <h3>📍 Preço do m² — Litoral SC</h3>
+      <p style="font-size:.78rem;color:var(--dim);line-height:1.7;margin-bottom:14px">O valor do metro quadrado varia significativamente por cidade, bairro, andar, acabamento e momento de mercado. Para consultar o índice atualizado por cidade, acesse o FipeZap — a fonte mais confiável do mercado imobiliário brasileiro.</p>
+      <button onclick="window.open('https://www.fipe.org.br/pt-br/indices/fipezap','_blank')" style="background:rgba(184,154,79,.12);border:1px solid rgba(184,154,79,.4);border-radius:8px;padding:13px 16px;font-size:.82rem;font-weight:600;color:var(--gold);font-family:var(--font);cursor:pointer;text-align:left;width:100%;display:flex;align-items:center;gap:10px"><span style="font-size:1.2rem">🔗</span><div><div>FipeZap — Índice de Preços Imobiliários</div><div style="font-size:.65rem;font-weight:400;color:var(--dim);margin-top:2px">fipe.org.br · Atualizado mensalmente · Toque para consultar</div></div></button>
     </div>
     <div class="mkt-crd"><h3>📈 Indicadores econômicos — Abril/2026</h3>
       ${[
