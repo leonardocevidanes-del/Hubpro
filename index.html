@@ -246,11 +246,11 @@ html,body{height:100%;overflow:hidden;background:var(--navy);font-family:var(--f
 .val-item h4{font-size:.75rem;font-weight:600;color:var(--gold);margin-bottom:3px}
 .val-item p{font-size:.75rem;color:var(--dim);line-height:1.6}
 /* PERGUNTA SCREEN */
-.pq-screen{padding:16px;display:flex;flex-direction:column;gap:14px}
+.pq-screen{padding:16px 16px 80px;display:flex;flex-direction:column;gap:14px}
 .pq-full{background:linear-gradient(135deg,var(--navy3),#1a3a50);border:1px solid rgba(184,154,79,.3);border-radius:12px;padding:18px}
 .pq-full .pq-lbl{font-size:.6rem;font-weight:700;color:var(--gold);letter-spacing:2px;text-transform:uppercase;margin-bottom:9px}
 .pq-full .pq-q{font-size:.95rem;font-weight:500;color:var(--white);line-height:1.6}
-textarea.ta{background:var(--navy3);border:1px solid rgba(184,154,79,.25);border-radius:8px;padding:13px;font-size:.85rem;font-family:var(--font);color:var(--white);outline:none;resize:none;width:100%;min-height:100px}
+textarea.ta{background:var(--navy3);border:1px solid rgba(184,154,79,.25);border-radius:8px;padding:13px;font-size:.85rem;font-family:var(--font);color:var(--white);outline:none;resize:vertical;width:100%;min-height:140px}
 textarea.ta:focus{border-color:var(--gold)}
 /* META SCREEN */
 .meta-screen{padding:16px;display:flex;flex-direction:column;gap:14px}
@@ -409,20 +409,7 @@ textarea.ta:focus{border-color:var(--gold)}
       <input type="file" id="onb-camera" accept="image/*" capture="user" style="display:none" onchange="prevFoto(this)">
     </div>
     <div class="fl"><label>Nome completo</label><input type="text" id="onb-nome" placeholder="Como você quer ser chamado" autocomplete="name" autocapitalize="words"></div>
-    <div class="fl"><label>Cidade onde atua</label><input type="text" id="onb-cidade" placeholder="Ex: Balneário Camboriú" autocomplete="address-level2" autocapitalize="words" list="cidades-list">
-      <datalist id="cidades-list">
-        <option value="Balneário Camboriú">
-        <option value="Balneário Piçarras">
-        <option value="Itajaí">
-        <option value="Camboriú">
-        <option value="Navegantes">
-        <option value="Penha">
-        <option value="Barra Velha">
-        <option value="Florianópolis">
-        <option value="Joinville">
-        <option value="Itapema">
-      </datalist>
-    </div>
+    <div class="fl"><label>Cidade onde atua</label><input type="text" id="onb-cidade" placeholder="Ex: Balneário Camboriú" autocomplete="off" autocapitalize="words"></div>
     <div class="fl"><label>Tempo como corretor</label>
       <select id="onb-tempo" style="background:var(--navy3);border:1px solid rgba(184,154,79,.25);border-radius:8px;padding:13px 14px;font-size:.9rem;font-family:var(--font);color:var(--white);outline:none;width:100%">
         <option value="">Selecione</option>
@@ -509,33 +496,18 @@ textarea.ta:focus{border-color:var(--gold)}
       </div>
     </div>
 
-    <!-- NOTÍCIAS -->
+    <!-- MENSAGEM DO DIA + LIVRO + DISC HOME -->
+    <div class="hsec" style="margin-bottom:6px" id="home-msg-dia-sec">
+      <div class="hsec-title">✨ MENSAGEM DO DIA</div>
+      <div id="home-msg-dia-card"></div>
+    </div>
+    <div class="hsec" style="margin-bottom:6px">
+      <div class="hsec-title">📚 LEITURA DO MÊS</div>
+      <div id="home-livro-card"></div>
+    </div>
     <div class="hsec" style="margin-bottom:16px">
-      <div class="hsec-title">📰 NOTÍCIAS DA REGIÃO</div>
-      <div id="news-container">
-        <div id="news-items">
-          <div class="news-card" onclick="window.open('https://ndmais.com.br/economia/e-possivel-comprar-apartamento-pe-na-areia-em-sc/','_blank')">
-            <div class="nc-label"><span class="nc-dot"></span>08/04/2026 · ND MAIS</div>
-            <div class="nc-title">Barra Velha e Balneário Barra do Sul com valorização acima de 25% ao ano no radar dos investidores em 2026</div>
-            <div class="nc-source">ndmais.com.br · Mercado Imobiliário SC</div>
-          </div>
-          <div class="news-card" style="margin-top:8px" onclick="window.open('https://www.notisul.com.br/mercado-imobiliario-laguna-investimentos-sc/','_blank')">
-            <div class="nc-label"><span class="nc-dot"></span>09/04/2026 · NOTISUL</div>
-            <div class="nc-title">Litoral SC deixa de ser destino sazonal e atrai moradores fixos e investidores o ano todo</div>
-            <div class="nc-source">notisul.com.br · Mercado Imobiliário</div>
-          </div>
-          <div class="news-card" style="margin-top:8px" onclick="window.open('https://exame.com/mercado-imobiliario/mercado-imobiliario-bate-recorde-movimenta-r-264-bi-e-sc-lidera-no-sul/','_blank')">
-            <div class="nc-label"><span class="nc-dot"></span>19/03/2026 · EXAME</div>
-            <div class="nc-title">SC lidera o Sul: mercado imobiliário avança 14,4% no VGV e 8,5% em unidades em 2025</div>
-            <div class="nc-source">exame.com · Mercado Imobiliário Brasil</div>
-          </div>
-          <div class="news-card" style="margin-top:8px" onclick="window.open('https://terrabrasilnoticias.com/2026/04/nova-torre-residencial-em-santa-catarina-vai-se-tornar-a-mais-alta-do-mundo-ja-ultrapassa-r-22-bilhoes-em-vendas-e-inclui-apartamentos-mansoes-suspensas-e-coberturas-de-alto-padrao','_blank')">
-            <div class="nc-label"><span class="nc-dot"></span>07/04/2026 · TERRA BRASIL</div>
-            <div class="nc-title">Senna Tower em BC ultrapassa R$ 2,2 bi em vendas — será o prédio residencial mais alto do mundo</div>
-            <div class="nc-source">terrabrasilnoticias.com · Balneário Camboriú</div>
-          </div>
-        </div>
-      </div>
+      <div class="hsec-title">🧠 SEU PERFIL DISC</div>
+      <div id="home-disc-card"></div>
     </div>
   </div>
 
@@ -654,7 +626,7 @@ textarea.ta:focus{border-color:var(--gold)}
       <h2>3. Como usamos</h2><p>Dados utilizados exclusivamente para personalizar sua experiência no Hub Pro. Não compartilhamos com terceiros para fins comerciais.</p>
       <h2>4. Armazenamento</h2><p>Dados armazenados localmente no seu dispositivo via localStorage e opcionalmente sincronizados via Firebase (Google Cloud) com criptografia.</p>
       <h2>5. Seus direitos (LGPD)</h2><p>Acesso, correção e exclusão dos dados a qualquer momento. Acesse Perfil → Excluir conta.</p>
-      <h2>6. Contato</h2><p>leonardocevidanes@gmail.com</p>
+      <h2>6. Contato</h2><p><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="a8c4cdc7c6c9daccc7cbcddec1ccc9c6cddbe8cfc5c9c1c486cbc7c5">[email&#160;protected]</a></p>
       <p style="margin-top:18px;color:var(--dim);font-size:.72rem">Última atualização: Abril de 2026</p>
     </div>
   </div>
@@ -671,7 +643,7 @@ textarea.ta:focus{border-color:var(--gold)}
 </div>
 
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 
 // ── HUB PRO v4 — 100% Local, Zero Firebase ──
 'use strict';
@@ -789,9 +761,8 @@ window.fazerLogin = function(){
   if(!users[email]){ err.textContent = 'E-mail não encontrado.'; err.classList.add('on'); return; }
   if(users[email].hash !== hashSenha(senha)){ err.textContent = 'Senha incorreta.'; err.classList.add('on'); return; }
   CU = {email: email, uid: email};
-  if($('rem-cb') && $('rem-cb').checked){
-    localStorage.setItem('hp_session', JSON.stringify({email: email}));
-  }
+  // Sempre salvar sessão ao criar conta (usuário novo nunca quer fazer login de novo)
+  localStorage.setItem('hp_session', JSON.stringify({email: email}));
   rotearUsuario();
 };
 window.esqueceuSenha = function(){
@@ -823,9 +794,8 @@ window.criarConta = function(){
   CU = {email: email, uid: email};
   UD = {perfil: {nome: nome, email: email}};
   localStorage.setItem(lsKey(), JSON.stringify(UD));
-  if($('rem-cb') && $('rem-cb').checked){
-    localStorage.setItem('hp_session', JSON.stringify({email: email}));
-  }
+  // Sempre salvar sessão ao criar conta
+  localStorage.setItem('hp_session', JSON.stringify({email: email}));
   rotearUsuario();
 };
 
@@ -838,6 +808,7 @@ window.toggleLgpd = function(){
 window.aceitarLgpd = function(){
   save('lgpd', {ok: true, data: new Date().toISOString()});
   if(!UD.perfil || !UD.perfil.nome) showScr('sonb');
+  else if(!UD.disc) showScr('sdisc-intro');
   else { showScr('shome'); renderHome(); }
 };
 window.showPriv = function(o){ privOrig = o || 'lgpd'; showScr('spriv'); };
@@ -1008,6 +979,11 @@ function renderHome(){
   if(bar) bar.style.width = pct + '%';
   var hint = $('home-plano-hint');
   if(hint) hint.textContent = pct === 0 ? 'Toque para começar o dia 1' : pct === 100 ? '🏆 Plano concluído!' : done + ' de ' + tasks.length + ' tarefas';
+
+  // Novos cards da home
+  renderMsgDia();
+  renderLivroMes();
+  renderDiscHome();
 }
 
 window.checkinHome = function(r){
@@ -1783,7 +1759,7 @@ function renderPerf(){
   $('perf-content').innerHTML = '<div class="perf-screen">'
     + '<div class="perf-top">'
     + '<div class="perf-av" id="perf-av-el">' + (p.foto ? '<img src="' + p.foto + '" alt="foto">' : '<span>' + ((p.nome||'U').charAt(0).toUpperCase()) + '</span>') + '</div>'
-    + '<div style="display:flex;gap:8px;margin-top:8px">'
+    + '<div style="display:flex;gap:8px;margin-top:8px;justify-content:center">'
     + '<label style="background:rgba(184,154,79,.15);border:1px solid rgba(184,154,79,.4);border-radius:6px;padding:7px 14px;font-size:.75rem;font-weight:600;color:var(--gold);cursor:pointer">🖼️ Galeria<input type="file" accept="image/*" onchange="window.atualizarFoto(this)" style="display:none"></label>'
     + '<label style="background:rgba(184,154,79,.15);border:1px solid rgba(184,154,79,.4);border-radius:6px;padding:7px 14px;font-size:.75rem;font-weight:600;color:var(--gold);cursor:pointer">📸 Câmera<input type="file" accept="image/*" capture="environment" onchange="window.atualizarFoto(this)" style="display:none"></label>'
     + '</div>'
@@ -1792,7 +1768,7 @@ function renderPerf(){
     + '</div>'
     + '<div class="perf-sec"><h3>Informações</h3>'
     + '<div class="pf"><label>Nome</label><input type="text" id="pf-nome" value="' + (p.nome||'') + '" autocapitalize="words"></div>'
-    + '<div class="pf"><label>Cidade</label><input type="text" id="pf-cidade" value="' + (p.cidade||'') + '" autocapitalize="words" list="cidades-pf"><datalist id="cidades-pf"><option value="Balneário Camboriú"><option value="Balneário Piçarras"><option value="Itajaí"><option value="Camboriú"><option value="Navegantes"><option value="Penha"><option value="Barra Velha"><option value="Florianópolis"></datalist></div>'
+    + '<div class="pf"><label>Cidade</label><input type="text" id="pf-cidade" value="' + (p.cidade||'') + '" autocapitalize="words" autocomplete="off"></div>'
     + '<div class="pf"><label>Especialidade</label><select id="pf-esp" style="background:var(--navy);border:1px solid rgba(184,154,79,.18);border-radius:6px;padding:10px 12px;font-size:.83rem;font-family:var(--font);color:var(--white);outline:none;width:100%"><option value="">Selecione</option>'
     + ['Locação','Alto Padrão','Luxo','Médio Padrão','Terrenos e Lotes','Minha Casa Minha Vida','Imóveis Rurais','Imóveis Comerciais'].map(function(e){ return '<option ' + (p.especialidade===e?'selected':'') + '>' + e + '</option>'; }).join('')
     + '</select></div>'
@@ -1884,6 +1860,162 @@ window.pularDisc = function(){
   renderHome();
 };
 
+
+// ── MENSAGEM DO DIA ──
+var MSGS_DIA = [
+  'Cada visita que você faz hoje planta uma semente. Regue com presença e autenticidade.',
+  'O corretor que liga antes de todos os outros fecha mais que todos os outros.',
+  'Seu cliente nao compra imovel. Ele compra o sonho que voce representa.',
+  'Disciplina e a ponte entre metas e resultados. Atravesse ela todo dia.',
+  'Um nao hoje pode virar o maior sim da sua carreira amanha.',
+  'A melhor captacao e aquela que voce faz enquanto os outros descansam.',
+  'Conhecimento do produto e mesa. Conhecimento do cliente e diferencial.',
+  'Corretores medianos esperam clientes. Corretores de elite criam oportunidades.',
+  'Sua reputacao e construida em cada atendimento, mesmo nos que nao fecham.',
+  'O mercado nao recompensa quem sabe mais. Recompensa quem age mais.',
+  'Cada objecao e uma pergunta disfarçada. Aprenda a traduzir.',
+  'Voce e o maior ativo da sua carreira. Invista nele diariamente.',
+  'Um followup feito com cuidado vale mais que dez ligacoes frias.',
+  'O cliente que compra com voce uma vez pode te indicar dez vezes.',
+  'Alta performance nao e sobre trabalhar mais. E sobre trabalhar certo.',
+  'Seu mindset de manha define seus resultados a tarde.',
+  'A venda comeca quando o cliente diz nao pela primeira vez.',
+  'Organize sua carteira. Quem voce nao liga esquece de voce.',
+  'O corretor que estuda o mercado nao precisa inventar argumentos.',
+  'Seu entusiasmo e contagiante. Use isso como estrategia.',
+  'Metas sem data sao apenas desejos. Coloque prazo.',
+  'A melhor hora de captar foi ontem. A segunda melhor hora e agora.',
+  'Voce nao vende metros quadrados. Voce vende transformacao de vida.',
+  'Consistencia supera talento todo dia da semana.',
+  'O silencio depois de uma proposta e mais poderoso que qualquer argumento.',
+  'Aprenda com cada cliente. Cada conversa e uma aula gratuita.',
+  'Quem planeja a semana na segunda fecha mais na sexta.',
+  'Autenticidade fecha mais vendas do que tecnica.',
+  'O corretor de alto desempenho cuida da mente tanto quanto do pipeline.',
+  'Voce esta no negocio de pessoas. Imoveis sao apenas o motivo da conversa.'
+];
+
+var LIVROS_MES = [
+  {mes:0, titulo:'O Jeito Disney de Encantar Clientes', autor:'Michael D. Eisner', foco:'Atendimento e experiencia do cliente', obj:'Aprenda como criar momentos memoraveis em cada atendimento imobiliario.'},
+  {mes:1, titulo:'Como Fazer Amigos e Influenciar Pessoas', autor:'Dale Carnegie', foco:'Relacionamento e persuasao', obj:'Tecnicas atemporais para conquistar a confianca de qualquer cliente.'},
+  {mes:2, titulo:'A Biblia das Vendas', autor:'Jeffrey Gitomer', foco:'Tecnicas de venda e fechamento', obj:'O guia definitivo para transformar conversas em negociamentos.'},
+  {mes:3, titulo:'Os Segredos da Mente Milionaria', autor:'T. Harv Eker', foco:'Mentalidade financeira', obj:'Reprograme sua relacao com dinheiro e metas de comissionamento.'},
+  {mes:4, titulo:'Influencia', autor:'Robert Cialdini', foco:'Psicologia da persuasao', obj:'Entenda os 6 principios que movem decisoes de compra.'},
+  {mes:5, titulo:'O Poder do Habito', autor:'Charles Duhigg', foco:'Produtividade e rotina', obj:'Construa habitos que sustentam alta performance todos os dias.'},
+  {mes:6, titulo:'Negocie Como se Sua Vida Dependesse Disso', autor:'Chris Voss', foco:'Negociacao de alto nivel', obj:'Tecnicas do FBI aplicadas a negociacoes imobiliarias.'},
+  {mes:7, titulo:'Mindset', autor:'Carol Dweck', foco:'Mentalidade de crescimento', obj:'Desenvolva a mentalidade que separa corretores comuns dos extraordinarios.'},
+  {mes:8, titulo:'Vender e Humano', autor:'Daniel Pink', foco:'Vendas modernas', obj:'Como vender sem parecer vendedor em um mercado hiperconectado.'},
+  {mes:9, titulo:'A Arte da Guerra', autor:'Sun Tzu', foco:'Estrategia e posicionamento', obj:'Aplique estrategia milenar para dominar seu territorio de atuacao.'},
+  {mes:10, titulo:'O Codigo da Cultura', autor:'Daniel Coyle', foco:'Equipe e lideranca', obj:'Como construir uma equipe de alta performance em imobiliarias.'},
+  {mes:11, titulo:'Pense e Enriqueça', autor:'Napoleon Hill', foco:'Mentalidade e metas', obj:'Os principios que transformam ambicao em resultado concreto.'}
+];
+
+var DISC_DESCRICOES = {
+  D: {
+    titulo: 'Dominante — D',
+    cor: '#e05555',
+    emoji: '🦁',
+    resumo: 'Voce e direto, decidido e orientado a resultados. Age rapido e gosta de estar no controle.',
+    fortes: ['Fecha negociacoes com agilidade', 'Foco total no resultado', 'Nao perde tempo com indecisao'],
+    atencao: ['Pode pressionar demais clientes mais sensíveis', 'Tende a pular etapas de rapport'],
+    dica: 'Use sua determinacao para criar urgencia genuina — nao pressao artificial. Clientes D compram de quem vai direto ao ponto como eles.'
+  },
+  I: {
+    titulo: 'Influente — I',
+    cor: '#B89A4F',
+    emoji: '🌟',
+    resumo: 'Voce e comunicativo, entusiasmado e cria conexoes genuinas com facilidade.',
+    fortes: ['Cria rapport instantaneo', 'Entusiasmo e contagiante', 'Excelente em apresentacoes e visitas'],
+    atencao: ['Pode prometer mais do que entregar', 'Perde foco nos detalhes do contrato'],
+    dica: 'Seu maior ativo e fazer o cliente se sentir especial. Documente seus compromissos para nao deixar nada escapar.'
+  },
+  S: {
+    titulo: 'Estavel — S',
+    cor: '#4caf7d',
+    emoji: '🤝',
+    resumo: 'Voce e paciente, confiavel e um ouvinte excepcional. Gera seguranca nos clientes.',
+    fortes: ['Constroem relacionamentos duradouros', 'Clientes confiam profundamente', 'Excelente no pos-venda'],
+    atencao: ['Evita conflito quando precisa ser direto', 'Demora para criar urgencia no fechamento'],
+    dica: 'Sua consistencia e seu superpoder. Trabalhe tecnicas de fechamento com urgencia etica — o cliente precisa decidir, e voce pode ajudar.'
+  },
+  C: {
+    titulo: 'Consciencioso — C',
+    cor: '#4a9edd',
+    emoji: '🔬',
+    resumo: 'Voce e analitico, preciso e domina os detalhes do mercado melhor que ninguem.',
+    fortes: ['Dominio tecnico do produto e do mercado', 'Argumentos solidos e baseados em dados', 'Confiavel e preciso nas informacoes'],
+    atencao: ['Pode paralisar por excesso de analise', 'Clientes emocionais podem se sentir distantes'],
+    dica: 'Seu conhecimento e seu maior diferencial. Pratique apresentar dados de forma emocional — numeros convencem a mente, historias convencem o coracao.'
+  }
+};
+
+function renderMsgDia() {
+  var hoje = new Date();
+  var idx = Math.floor(hoje.getTime() / 86400000) % MSGS_DIA.length;
+  var msg = MSGS_DIA[idx];
+  var el = document.getElementById('home-msg-dia-card');
+  if(!el) return;
+  el.innerHTML = '<div style="background:linear-gradient(135deg,var(--navy3),#1a3a50);border:1px solid rgba(184,154,79,.3);border-radius:12px;padding:16px">'
+    + '<div style="font-size:.58rem;font-weight:700;color:var(--gold);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px">REFLEXÃO · ' + hoje.toLocaleDateString('pt-BR',{day:'numeric',month:'long'}) + '</div>'
+    + '<div style="font-size:.88rem;color:var(--white);line-height:1.65;font-style:italic">"' + msg + '"</div>'
+    + '</div>';
+}
+
+function renderLivroMes() {
+  var mes = new Date().getMonth();
+  var livro = LIVROS_MES[mes];
+  var el = document.getElementById('home-livro-card');
+  if(!el || !livro) return;
+  el.innerHTML = '<div style="background:var(--navy3);border:1px solid rgba(184,154,79,.2);border-radius:12px;padding:16px">'
+    + '<div style="display:flex;align-items:flex-start;gap:12px">'
+    + '<div style="font-size:2.2rem;flex-shrink:0">📖</div>'
+    + '<div style="flex:1">'
+    + '<div style="font-size:.82rem;font-weight:700;color:var(--white);line-height:1.4;margin-bottom:3px">' + livro.titulo + '</div>'
+    + '<div style="font-size:.7rem;color:var(--gold);margin-bottom:8px">' + livro.autor + '</div>'
+    + '<div style="background:rgba(184,154,79,.1);border-radius:6px;padding:8px 10px">'
+    + '<div style="font-size:.6rem;font-weight:700;color:var(--gold);letter-spacing:1px;text-transform:uppercase;margin-bottom:3px">Foco do mês: ' + livro.foco + '</div>'
+    + '<div style="font-size:.75rem;color:var(--dim);line-height:1.55">' + livro.obj + '</div>'
+    + '</div></div></div></div>';
+}
+
+function renderDiscHome() {
+  var el = document.getElementById('home-disc-card');
+  if(!el) return;
+  var disc = UD.disc;
+  if(!disc) {
+    el.innerHTML = '<div style="background:var(--navy3);border:1px solid rgba(184,154,79,.2);border-radius:12px;padding:20px;text-align:center">'
+      + '<div style="font-size:2rem;margin-bottom:8px">🧠</div>'
+      + '<div style="font-size:.88rem;font-weight:600;color:var(--white);margin-bottom:6px">Você ainda não fez o Quiz DISC</div>'
+      + '<div style="font-size:.75rem;color:var(--dim);line-height:1.6;margin-bottom:14px">Descubra seu perfil comportamental e receba scripts e dicas personalizados para o seu jeito de vender.</div>'
+      + '<button class="btn-p" style="max-width:240px;margin:0 auto;display:block" onclick="goSec(\'disc\')">Fazer o Quiz DISC agora →</button>'
+      + '</div>';
+    return;
+  }
+  var d = DISC_DESCRICOES[disc.perfil];
+  if(!d) return;
+  el.innerHTML = '<div style="background:var(--navy3);border:1px solid rgba(184,154,79,.2);border-radius:12px;padding:16px">'
+    + '<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">'
+    + '<div style="font-size:2rem">' + d.emoji + '</div>'
+    + '<div>'
+    + '<div style="font-size:.88rem;font-weight:700;color:var(--gold)">' + d.titulo + '</div>'
+    + '<div style="font-size:.72rem;color:var(--dim);margin-top:2px">' + d.resumo + '</div>'
+    + '</div></div>'
+    + '<div style="background:rgba(76,175,125,.08);border:1px solid rgba(76,175,125,.25);border-radius:8px;padding:10px;margin-bottom:10px">'
+    + '<div style="font-size:.6rem;font-weight:700;color:var(--green);letter-spacing:1px;text-transform:uppercase;margin-bottom:5px">💪 Seus pontos fortes</div>'
+    + d.fortes.map(function(f){ return '<div style="font-size:.75rem;color:var(--white);display:flex;gap:7px;margin-bottom:3px"><span style="color:var(--green)">✓</span>' + f + '</div>'; }).join('')
+    + '</div>'
+    + '<div style="background:rgba(224,85,85,.06);border:1px solid rgba(224,85,85,.2);border-radius:8px;padding:10px;margin-bottom:10px">'
+    + '<div style="font-size:.6rem;font-weight:700;color:var(--red);letter-spacing:1px;text-transform:uppercase;margin-bottom:5px">⚠️ Pontos de atenção</div>'
+    + d.atencao.map(function(a){ return '<div style="font-size:.75rem;color:var(--white);display:flex;gap:7px;margin-bottom:3px"><span style="color:var(--red)">!</span>' + a + '</div>'; }).join('')
+    + '</div>'
+    + '<div style="background:rgba(184,154,79,.08);border:1px solid rgba(184,154,79,.25);border-radius:8px;padding:10px">'
+    + '<div style="font-size:.6rem;font-weight:700;color:var(--gold);letter-spacing:1px;text-transform:uppercase;margin-bottom:5px">💡 Dica para você</div>'
+    + '<div style="font-size:.75rem;color:var(--dim);line-height:1.6">' + d.dica + '</div>'
+    + '</div>'
+    + '<button class="btn-s" style="margin-top:12px;font-size:.72rem" onclick="goSec(\'disc\')">Refazer o Quiz DISC</button>'
+    + '</div>';
+}
+
 // ── INIT ──
 (function(){
   try{
@@ -1893,14 +2025,9 @@ window.pularDisc = function(){
       var users = getUsuarios();
       if(users[u.email]){ CU = {email:u.email, uid:u.email}; rotearUsuario(); return; }
     }
-  }catch(e){}
+  } catch(e){}
   showScr('sa');
 })();
-
-window.addEventListener('load', function(){
-  setTimeout(function(){ hideLoad(); }, 3000);
-  $('loading').addEventListener('click', function(){ hideLoad(); });
-});
 
 </script>
 </body>
