@@ -888,7 +888,7 @@ function renderHome(){
   var hoje = new Date();
   var dow = hoje.getDay();
   var metaAtual = metas.length > 0 ? metas[metas.length - 1] : null;
-  var metaViva = metaAtual && (new Date(metaAtual.data) > new Date(hoje.getTime() - 7*24*60*60*1000));
+  var metaViva = metaAtual && (new Date(metaAtual.data) > new Date(hoje.getTime() - 7*24*60*60*1000)) && metaAtual.checkin !== 'manual';
   var labelEl = $('home-meta-label');
   var textEl = $('home-meta-text');
   var hintEl = $('home-meta-hint');
@@ -1028,7 +1028,7 @@ function renderDiscQ(){
     + '<div class="dq-prog"><div class="dq-fill" style="width:' + Math.round(ds.qIdx/DISC_DATA.length*100) + '%"></div></div>'
     + '<div class="dq-q">' + q.q + '</div>'
     + '<div class="dq-opts">' + q.opts.map(function(o,i){
-        return '<button class="dq-opt" onclick="window.respDisc(\'' + o.p + '\')">' + o.t + '</button>';
+        return '<button class="dopt" onclick="window.respDisc(\'' + o.p + '\')">' + o.t + '</button>';
       }).join('') + '</div>'
     + '</div>';
 }
@@ -1282,7 +1282,7 @@ function renderPergunta(){
   var regs = UD.registros || [];
   var hojeStr = hoje.toDateString();
   var resp = regs.find(function(r){ return r.tipo === 'pergunta' && new Date(r.data).toDateString() === hojeStr; });
-  $('perg-content').innerHTML = '<div class="pq-full">'
+  $('pq-content').innerHTML = '<div class="pq-full">'
     + '<div class="pq-lbl">REFLEXÃO DE HOJE · ' + hoje.toLocaleDateString('pt-BR', {day:'numeric',month:'long'}) + '</div>'
     + '<div class="pq-q">' + pq + '</div>'
     + '</div>'
@@ -1312,7 +1312,7 @@ window.renderMeta = function(){
   var hoje = new Date();
   var dow = hoje.getDay();
   var metaAtual = metas.length > 0 ? metas[metas.length-1] : null;
-  var metaViva = metaAtual && (new Date(metaAtual.data) > new Date(hoje.getTime() - 7*24*60*60*1000));
+  var metaViva = metaAtual && (new Date(metaAtual.data) > new Date(hoje.getTime() - 7*24*60*60*1000)) && metaAtual.checkin !== 'manual';
   var h = '<h2>🎯 Meta da Semana</h2>';
 
   if(dow === 1 || !metaViva){
@@ -1333,11 +1333,11 @@ window.renderMeta = function(){
     h += buildMetaCard(metaAtual, _metaEditMode);
   }
 
-  if(metas.length > 1){
+  if(metas.length >= 1){
     h += '<div class="meta-hist"><h3>Histórico</h3>'
-      + metas.slice().reverse().slice(0,5).map(function(m){
+      + metas.slice(0,-1).reverse().slice(0,5).map(function(m){
           var cor = m.checkin === 'sim' ? 'var(--green)' : m.checkin === 'parcial' ? 'var(--gold)' : m.checkin === 'nao' ? 'var(--red)' : 'var(--dim)';
-          var label = m.checkin === 'sim' ? '✅ Alcançada' : m.checkin === 'parcial' ? '📝 Parcial' : m.checkin === 'nao' ? '❌ Não alcançada' : '';
+          var label = m.checkin === 'sim' ? '✅ Alcançada' : m.checkin === 'parcial' ? '📝 Parcial' : m.checkin === 'nao' ? '❌ Não alcançada' : m.checkin === 'manual' ? '🔄 Substituída' : '';
           return '<div class="mhi">'
             + '<div class="mhi-d">' + new Date(m.data).toLocaleDateString('pt-BR',{day:'2-digit',month:'short'}) + '</div>'
             + '<div class="mhi-t">' + m.texto + '</div>'
@@ -1401,9 +1401,25 @@ function buildMetaCard(m, editMode){
     out += '<div style="font-size:.72rem;color:var(--dim);font-style:italic;margin-top:6px">Check-in disponível na sexta-feira.</div>';
   }
 
+  // Botão nova meta (reset para próxima semana)
+  out += '<button onclick="window.confirmarNovaMeta()" style="margin-top:12px;width:100%;background:transparent;border:1px solid rgba(184,154,79,.3);border-radius:8px;padding:11px;font-size:.78rem;font-weight:600;color:var(--dim);font-family:var(--font);cursor:pointer">🔄 Definir nova meta para esta semana</button>';
   out += '</div>';
   return out;
 }
+
+window.confirmarNovaMeta = function(){
+  if(confirm('Definir uma nova meta encerra a meta atual. Deseja continuar?')){
+    _metaEditMode = null;
+    // Força a tela de nova meta
+    var metas = UD.metas || [];
+    // Marca como encerrada manualmente se ainda não teve checkin
+    if(metas.length > 0 && !metas[metas.length-1].checkin){
+      metas[metas.length-1].checkin = 'manual';
+      save('metas', metas);
+    }
+    window.renderMeta();
+  }
+};
 
 window.abrirEdicaoMeta = function(modo){
   _metaEditMode = modo;
