@@ -292,7 +292,22 @@ textarea.ta:focus{border-color:var(--gold)}
 .celeb-em{font-size:3.5rem;margin-bottom:14px}
 .celeb h2{font-size:1.3rem;font-weight:700;color:var(--gold)}
 .celeb p{font-size:.85rem;color:var(--dim);margin-top:8px;line-height:1.6}
-/* UTILS */
+/* NEWS CARD */
+.news-card{background:var(--navy3);border:1px solid rgba(184,154,79,.2);border-radius:12px;padding:14px 16px;cursor:pointer;transition:.2s}
+.news-card:active{border-color:var(--gold)}
+.news-card .nc-label{font-size:.58rem;font-weight:700;color:var(--gold);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.news-card .nc-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.news-card .nc-title{font-size:.83rem;font-weight:600;color:var(--white);line-height:1.45;margin-bottom:4px}
+.news-card .nc-source{font-size:.68rem;color:var(--dim)}
+/* SCORE CARD */
+.score-wrap{background:var(--navy3);border:1px solid rgba(184,154,79,.25);border-radius:10px;padding:16px;margin:0 16px 12px;text-align:center}
+.score-wrap h3{font-size:.72rem;font-weight:700;color:var(--gold);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px}
+.score-nums{display:flex;justify-content:center;gap:24px}
+.score-item .sn{font-size:2rem;font-weight:700}
+.score-item .sl{font-size:.68rem;color:var(--dim);text-transform:uppercase;letter-spacing:1px}
+.score-item.ok .sn{color:var(--green)}
+.score-item.err .sn{color:var(--red)}
 .spinner{width:22px;height:22px;border:3px solid rgba(184,154,79,.25);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto}
 @keyframes spin{to{transform:rotate(360deg)}}
 .loading{position:fixed;inset:0;background:rgba(11,34,48,.82);z-index:300;display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px}
@@ -482,7 +497,7 @@ textarea.ta:focus{border-color:var(--gold)}
     </div>
 
     <!-- PLANO -->
-    <div class="hsec" onclick="goSec('plano')" style="margin-bottom:16px">
+    <div class="hsec" onclick="goSec('plano')" style="margin-bottom:4px">
       <div class="plano-card">
         <div class="pc-header">
           <div class="pc-title">PLANO 30 DIAS</div>
@@ -491,6 +506,18 @@ textarea.ta:focus{border-color:var(--gold)}
         <div class="pc-sub">Desenvolvimento de mentalidade</div>
         <div class="pc-hint" id="home-plano-hint">Toque para começar o dia 1</div>
         <div class="pb-track"><div class="pb-fill" id="home-plano-bar" style="width:0%"></div></div>
+      </div>
+    </div>
+
+    <!-- NOTÍCIAS -->
+    <div class="hsec" style="margin-bottom:16px">
+      <div class="hsec-title">📰 NOTÍCIAS DA REGIÃO</div>
+      <div id="news-container">
+        <div class="news-card" onclick="abrirNoticia('https://ndonline.com.br/litoral','NDOnline — Litoral SC')">
+          <div class="nc-label"><span class="nc-dot"></span>AO VIVO</div>
+          <div class="nc-title">Mercado imobiliário do litoral SC segue aquecido no Q1/2026 com alta demanda por segunda residência</div>
+          <div class="nc-source">NDOnline · Toque para ler no navegador</div>
+        </div>
       </div>
     </div>
   </div>
@@ -639,7 +666,7 @@ window.goSec = function(s){
 // ── DATA LAYER — 100% localStorage, instantâneo ──
 function lsKey(){ return 'hp_'+(CU?.uid||'anon'); }
 function loadUD(){
-  try{ const raw=localStorage.getItem(lsKey()); UD=raw?JSON.parse(raw):{}; }
+  try{ const raw=localStorage.getItem(lsKey()); UD=raw?JSON.parse(raw):{}; if(UD.scripts_score)scriptsScore={...scriptsScore,...UD.scripts_score}; }
   catch(e){ UD={}; }
 }
 function save(campo,val){
@@ -1009,25 +1036,58 @@ window.checkinMeta=function(r){
 
 // SCRIPTS
 const OBJ=[
-  {titulo:'Preço está alto demais',scripts:{D:'Entendo que o preço é um ponto crítico. Mas deixa eu te mostrar os dados: nessa região, imóveis similares valorizaram 18% nos últimos 12 meses. O preço de hoje é o melhor negócio que você vai fazer.',I:'Sabe que eu entendo completamente essa sensação? Mas olha o que aconteceu com o Carlos, que achava o mesmo — ele comprou, e 2 anos depois me ligou agradecendo porque o imóvel valorizou muito.',S:'É natural ter essa preocupação. Vamos sentar juntos e analisar com calma: o que você está comparando? Porque cada imóvel tem um contexto diferente, e quero garantir que você tome a melhor decisão.',C:'Vou te mandar uma comparação completa: 5 imóveis similares na região, com preço por m², tempo no mercado e histórico de valorização. Com esses dados, você terá base para avaliar com precisão.'}},
-  {titulo:'Os juros estão muito altos',scripts:{D:'Juros altos afetam quem financia 100%. Mas se você tem 30% de entrada, a parcela cabe perfeitamente. E o imóvel valoriza independente da taxa.',I:'Olha, todo mundo fala isso — mas os compradores espertos estão aproveitando agora porque tem menos concorrência. Quando os juros baixarem, o preço vai subir.',S:'É uma preocupação muito válida. Vamos fazer juntos uma simulação real de financiamento para o seu caso específico?',C:'Vou te apresentar uma análise: custo total do financiamento vs histórico de valorização do imóvel vs rendimento de renda fixa.'}},
-  {titulo:'Preciso falar com meu cônjuge',scripts:{D:'Totalmente compreensível. Quando você consegue agendar para vocês dois virem juntos? Posso reservar o imóvel por 48 horas.',I:'Claro! Que tal vocês dois virem tomar um café comigo? Adoro quando o casal decide junto — é mais especial.',S:'É muito importante tomar essa decisão em família. Quais são as principais preocupações que ele/ela pode ter?',C:'Vou preparar uma apresentação completa com todos os dados técnicos e simulações para que vocês analisem juntos.'}},
-  {titulo:'Preciso pensar melhor',scripts:{D:'Respeito isso. Mas me diz — o que especificamente está travando a decisão? Às vezes é uma dúvida concreta que consigo resolver agora mesmo.',I:'Claro! Mas me conta: o que te encantou no imóvel? E o que está dando aquela sensação de hesitação?',S:'Claro, sem pressão. Em uma escala de 1 a 10, quanto esse imóvel atende ao que você procura?',C:'Para ajudar na sua análise, posso te enviar um documento completo com especificações técnicas e análise de mercado.'}},
-  {titulo:'Não é o momento certo',scripts:{D:'Me diz: qual seria o momento certo? Porque enquanto você espera, outros compradores estão agindo.',I:'Você sabe que eu ouço isso com frequência — e depois me ligam arrependidos de ter esperado.',S:'Respeito muito isso. Qual seria o cenário ideal para você se sentir confortável em avançar?',C:'Quais critérios precisariam estar atendidos para o momento ser ideal? Taxa de juros, entrada, situação profissional?'}},
-  {titulo:'Tem outro corretor me atendendo',scripts:{D:'Tudo bem, é seu direito. Mas antes de decidir: posso mostrar algo específico que talvez ainda não tenha visto?',I:'Entendo! O que mais você está buscando que ainda não encontrou? Me dá 15 minutos?',S:'Respeito muito isso. A confiança no corretor é fundamental. Posso te mandar uma seleção para ter mais opções?',C:'Faz todo sentido. Se quiser um segundo olhar técnico — documentação, vistoria, análise de mercado — estou disponível.'}}
+  {titulo:'Preço está alto demais',scripts:{D:'Nessa região, imóveis similares valorizaram acima de 15% nos últimos 12 meses. O preço de hoje é o melhor negócio que você vai fazer — amanhã vai custar mais.',I:'Sabe que eu entendo essa sensação? Mas olha o que aconteceu com o Carlos, que achava o mesmo — ele comprou, e 2 anos depois me ligou agradecendo porque o imóvel valorizou muito.',S:'Vamos sentar juntos e analisar: o que você está comparando? Cada imóvel tem um contexto diferente, e quero garantir que você tome a melhor decisão.',C:'Vou te mandar uma comparação: 5 imóveis similares na região, com preço por m², tempo no mercado e histórico de valorização. Com esses dados, você avalia com precisão.'}},
+  {titulo:'Os juros estão muito altos',scripts:{D:'A Selic caiu para 14,75% em março — tendência de queda. Quem compra agora trava o preço do imóvel. Quando os juros baixarem mais, pode refinanciar.',I:'Os compradores espertos aproveitaram agora porque tinham menos concorrência. Quando os juros caírem de vez, o preço sobe e vai ter fila.',S:'Vamos fazer juntos uma simulação real de financiamento para o seu caso? Assim você vê exatamente quanto seria a parcela e decide com segurança.',C:'Vou te mostrar: custo total do financiamento hoje vs histórico de valorização do imóvel vs rendimento de renda fixa. Os números falam por si.'}},
+  {titulo:'Preciso falar com meu cônjuge',scripts:{D:'Quando você consegue agendar para vocês dois virem juntos? Posso segurar o imóvel por 48 horas.',I:'Que tal vocês dois virem tomar um café comigo? Quando o casal decide junto é mais especial e respondo todas as dúvidas ao mesmo tempo.',S:'Quais são as principais preocupações que ele ou ela pode ter? Assim eu me preparo para responder da melhor forma quando vocês vierem.',C:'Vou preparar uma apresentação com todos os dados técnicos e simulações para que vocês analisem juntos com calma.'}},
+  {titulo:'Preciso pensar melhor',scripts:{D:'O que especificamente está travando a decisão? Às vezes é uma dúvida concreta que consigo resolver agora mesmo.',I:'O que te encantou no imóvel? E o que está dando aquela sensação de hesitação? Quero entender para te ajudar a se sentir seguro.',S:'Em uma escala de 1 a 10, quanto esse imóvel atende ao que você procura? Isso me ajuda a entender onde focar.',C:'Posso te enviar um documento com especificações técnicas, documentação do imóvel e análise de mercado comparativa.'}},
+  {titulo:'Não é o momento certo',scripts:{D:'Qual seria o momento certo? Porque enquanto você espera, outros compradores estão agindo e o preço continua subindo.',I:'Eu ouço isso com frequência — e depois me ligam dizendo que queriam ter comprado antes. O que está travando o timing?',S:'Qual seria o cenário ideal para você se sentir confortável em avançar? Quero entender o que faria o momento ficar certo.',C:'Quais critérios precisariam estar atendidos? Taxa de juros, entrada, situação profissional? Me diz e te aviso quando esse cenário se aproximar.'}},
+  {titulo:'Tem outro corretor me atendendo',scripts:{D:'Posso mostrar algo específico que talvez ainda não tenha visto? Se preferir seguir com o outro, sem problema — quero garantir que você viu as melhores opções.',I:'O que mais você está buscando que ainda não encontrou? Porque a conexão com o corretor certo faz toda a diferença. Me dá 15 minutos?',S:'A confiança no corretor é fundamental. Só quero garantir que você está comparando imóveis equivalentes. Posso te mandar uma seleção?',C:'Se quiser um segundo olhar técnico — documentação, vistoria, análise de mercado — estou disponível para complementar o atendimento.'}},
+  {titulo:'O mercado vai cair — melhor esperar',scripts:{D:'Quem esperou o melhor momento em 2023 pagou 30% a mais em 2025. O litoral SC acumula valorização acima de 10% ao ano historicamente.',I:'Eu ouço isso há 5 anos e o mercado continua subindo aqui. Os dados do litoral SC mostram o contrário — e tenho como te provar.',S:'O litoral SC tem demanda estrutural — paulistas, gaúchos, paranaenses buscando qualidade de vida. Isso não para independente do ciclo econômico.',C:'Vou te enviar um estudo de 5 anos de valorização do m² no litoral SC. Mesmo nos momentos de crise, a queda aqui foi menor que no restante do país.'}},
+  {titulo:'O imóvel está muito longe da praia',scripts:{D:'A 800m da praia você tem imóvel 40% mais barato, sem engarrafamento de verão e com potencial de valorização maior no médio prazo.',I:'Os clientes mais satisfeitos que tenho são os que compraram "longe" e hoje valorizam por estar fora do barulho. Qualidade de vida não é só vista para o mar.',S:'O que você mais valoriza: estar na areia ou ter o mar como parte da vida com conforto e custo acessível? Às vezes eles não são a mesma coisa.',C:'A valorização de imóveis a 500m–1km da orla em Penha e Barra Velha foi superior a imóveis de frente para o mar nos últimos 3 anos. Contra-intuitivo, mas verdadeiro.'}},
+  {titulo:'Já tenho uma proposta melhor de outra imobiliária',scripts:{D:'Me diz o que a proposta oferece e vejo o que posso fazer. Mas antes: você está comparando o mesmo padrão? Localização, acabamento, documentação?',I:'Que bom para você! Mas o que a outra proposta tem que essa não tem? Às vezes o melhor está nos detalhes que a gente não percebe de primeira.',S:'Me conta os detalhes para eu entender se estão realmente comparando coisas equivalentes — quero te ajudar a tomar a melhor decisão.',C:'Me passe os dados da outra proposta para uma análise comparativa objetiva: m², localização, histórico de valorização e documentação.'}},
+  {titulo:'Tenho medo de não conseguir pagar',scripts:{D:'Esse medo é sinal de responsabilidade. Vamos fazer uma análise real de capacidade de pagamento antes de qualquer compromisso?',I:'Todo mundo sente isso. Mas quando você vê os números reais na sua frente, fica muito mais claro. Vamos fazer a simulação juntos agora — sem compromisso?',S:'Vamos calcular juntos: renda, comprometimento máximo e as opções disponíveis dentro da sua realidade.',C:'Preciso de três dados: renda bruta, valor de entrada disponível e prazo desejado. Com isso, faço a análise completa para você.'}},
+  {titulo:'Não tenho entrada suficiente',scripts:{D:'Existem opções com entrada parcelada direto com a construtora, uso de FGTS e consórcio. Vamos mapear o que se encaixa no seu momento?',I:'Você seria surpreendido com quantas pessoas compraram sem ter a entrada pronta. O FGTS pode ser um aliado incrível — você tem conta ativa há mais de 3 anos?',S:'Há imóveis com entrada facilitada pelo incorporador, e o FGTS pode cobrir parte ou toda a entrada. Qual é sua situação com o FGTS?',C:'Há pelo menos 4 caminhos: FGTS como entrada, consórcio, parcelamento direto com construtora e permuta. Me diz sua situação e faço um mapa completo.'}},
+  {titulo:'Prefiro continuar alugando — é mais flexível',scripts:{D:'Flexibilidade tem custo: aluguel em BC subiu em média 18% em 2024. Em 5 anos, você vai ter pago o equivalente a 30% do valor de um imóvel — sem ter nada ao final.',I:'Entendo a lógica da flexibilidade. Mas você está feliz pagando aluguel para enriquecer o proprietário do imóvel? O mercado aqui não favorece quem aluga.',S:'Em 10 anos, onde você quer estar? A diferença entre quem compra e quem continua alugando no litoral SC tende a ser muito grande.',C:'Vou te mostrar um comparativo financeiro: aluguel acumulado em 10 anos vs valor do imóvel hoje com valorização histórica do litoral SC.'}},
+  {titulo:'Não confio na construtora',scripts:{D:'Me fala qual é a construtora — vou te mandar o histórico de obras entregues, prazos e avaliações de compradores anteriores.',I:'Totalmente válido — tem gente que se queimou com isso. Por isso eu pesquiso cada construtora antes de indicar. Me conta o que gerou essa desconfiança.',S:'Vamos revisar juntos a documentação da construtora, o registro da incorporação e as garantias contratuais antes de qualquer decisão.',C:'Vou te enviar certidões negativas da construtora, histórico de entregas, prazo médio de atraso e documentação do registro de incorporação no cartório.'}},
+  {titulo:'Posso comprar direto com o proprietário',scripts:{D:'Você pode — mas o risco é real. Compra direta sem assessoria já gerou bloqueio de imóvel, dívidas ocultas e processos longos. Meu serviço cobre esses riscos sem custo extra para você.',I:'Muita gente pensa isso — e alguns chegaram até mim depois para resolver problemas que custaram caro. O que eu faço é garantir que você compre com segurança total.',S:'Me permite te contar o que já vi de problemas em compras diretas no litoral SC? Não para te assustar — mas para você decidir com informação completa.',C:'A comissão do corretor é paga pelo vendedor na maioria dos casos — então você não economiza comprando direto. E ganha análise jurídica, pesquisa de ônus reais e segurança total.'}},
+  {titulo:'Já tentei vender meu imóvel atual e não consegui',scripts:{D:'Imóvel encalhado geralmente tem um de três problemas: preço, apresentação ou exposição. Posso olhar o seu e te dar um diagnóstico honesto?',I:'Isso é mais comum do que parece — e quase sempre tem solução. Já tive clientes que ficaram 18 meses sem vender e venderam em 30 dias depois de pequenos ajustes.',S:'Me conta os detalhes: qual era o preço pedido e como estava sendo divulgado? Quero entender antes de desistir.',C:'Um imóvel sem venda após 90 dias geralmente indica desvio no preço de mercado, má qualidade das fotos ou distribuição limitada. Você tem os dados da estratégia anterior?'}}
 ];
+
+let scriptsScore={acertos:0,erros:0,vistos:[]};
+
 function renderScripts(){
+  if(UD.scripts_score)scriptsScore={...scriptsScore,...UD.scripts_score};
   const disc=UD.disc?.perfil;
   let h='';
   if(disc)h+=`<div style="padding:14px 16px 0"><div class="disc-top">✦ Seu perfil DISC: ${disc} — ${DP[disc].nome} · Seu script está destacado em cada objeção</div></div>`;
+  if(scriptsScore.vistos.length>0){
+    h+=`<div class="score-wrap"><h3>📚 Progresso de Estudo</h3><div class="score-nums"><div class="score-item ok"><div class="sn">${scriptsScore.acertos}</div><div class="sl">estudadas</div></div><div class="score-item"><div class="sn" style="color:var(--gold)">${OBJ.length}</div><div class="sl">total</div></div><div class="score-item"><div class="sn" style="color:var(--dim)">${OBJ.length-scriptsScore.acertos}</div><div class="sl">restam</div></div></div><div style="margin-top:10px"><button class="btn-s" onclick="resetScripts()" style="padding:8px 16px;font-size:.75rem;width:auto">↺ Reiniciar contagem</button></div></div>`;
+  }
   h+=`<div class="obj-list">`;
-  OBJ.forEach(ob=>{
-    h+=`<div class="obj-crd"><div class="obj-h" onclick="togObj(this)"><span>${ob.titulo}</span><span style="color:var(--gold);transition:.3s">▼</span></div><div class="obj-b">${['D','I','S','C'].map(p=>`<div class="scr ${disc===p?'hl':''}"><div class="scr-lbl">${p} — ${DP[p].nome}${disc===p?' ✦':''}</div><div class="scr-txt">${ob.scripts[p]}</div></div>`).join('')}</div></div>`;
+  OBJ.forEach((ob,i)=>{
+    const visto=scriptsScore.vistos.includes(i);
+    h+=`<div class="obj-crd" style="${visto?'border-color:rgba(76,175,125,.35)':''}">
+      <div class="obj-h" onclick="togObj(this,${i})">
+        <span style="${visto?'color:var(--green)':''}">${ob.titulo}</span>
+        <div style="display:flex;align-items:center;gap:8px">${visto?'<span style="font-size:.65rem;color:var(--green)">✓</span>':''}<span style="color:var(--gold);transition:.3s">▼</span></div>
+      </div>
+      <div class="obj-b">
+        <div class="disc-top" style="font-size:.7rem;margin-bottom:10px">💡 Estude as 4 abordagens — a do seu perfil está destacada</div>
+        ${['D','I','S','C'].map(p=>`<div class="scr ${disc===p?'hl':''}"><div class="scr-lbl">${p} — ${DP[p].nome}${disc===p?' ✦ Seu perfil':''}</div><div class="scr-txt">${ob.scripts[p]}</div></div>`).join('')}
+        ${!visto?`<button class="btn-p" style="margin-top:12px;font-size:.78rem;padding:10px" onclick="marcarEstudado(${i})">✓ Estudei esta objeção</button>`:'<div style="font-size:.72rem;color:var(--green);margin-top:10px;text-align:center;padding:8px;background:rgba(76,175,125,.1);border-radius:6px">✓ Objeção estudada — continue praticando!</div>'}
+      </div>
+    </div>`;
   });
   h+=`</div>`;
   $('scripts-content').innerHTML=h;
 }
-window.togObj=function(h){const b=h.nextElementSibling;b.classList.toggle('open');const chv=h.querySelector('span:last-child');chv.style.transform=b.classList.contains('open')?'rotate(180deg)':'';chv.style.transition='.3s';}
+window.togObj=function(h,idx){const b=h.nextElementSibling;b.classList.toggle('open');const chv=h.querySelector('span:last-child');chv.style.transform=b.classList.contains('open')?'rotate(180deg)':'';chv.style.transition='.3s';}
+window.marcarEstudado=function(idx){
+  if(!scriptsScore.vistos.includes(idx)){scriptsScore.vistos.push(idx);scriptsScore.acertos++;}
+  save('scripts_score',scriptsScore);renderScripts();
+  toast(`✅ ${scriptsScore.acertos}/${OBJ.length} objeções estudadas!`);
+}
+window.resetScripts=function(){scriptsScore={acertos:0,erros:0,vistos:[]};save('scripts_score',scriptsScore);renderScripts();toast('Contagem reiniciada!');}
 
 // SIMULADOR
 const CENS=[
@@ -1063,11 +1123,38 @@ window.respSim=function(i){
 // MERCADO
 function renderMkt(){
   $('mkt-content').innerHTML=`<div class="mkt-sec">
-    <div class="mkt-crd"><h3>📍 Preço médio m² — Litoral SC (Q1/2026)</h3>${[['Balneário Camboriú','R$ 14.800/m²'],['Itajaí','R$ 7.200/m²'],['Camboriú','R$ 6.400/m²'],['Navegantes','R$ 5.800/m²'],['Penha','R$ 4.900/m²'],['Barra Velha','R$ 4.200/m²']].map(([c,p])=>`<div class="cid-row"><div class="cid-nome">${c}</div><div class="cid-preco">${p}</div></div>`).join('')}</div>
-    <div class="mkt-crd"><h3>📈 Dados macroeconômicos</h3>${[['Selic (abril/2026)','13,75% a.a.'],['IPCA acumulado 12m','4,2%'],['FGTS — limite MCMV','R$ 1,5 milhão'],['Valorização m² BC (12m)','+12%'],['Crescimento regional Q1/26','+8% YoY'],['Taxa de vacância litoral SC','4,2%']].map(([l,v])=>`<div class="macro-row"><div class="macro-l">${l}</div><div class="macro-v">${v}</div></div>`).join('')}</div>
-    <div class="mkt-crd"><h3>🌊 Sazonalidade</h3><p style="font-size:.78rem;color:var(--dim);line-height:1.7">Dez–Fev concentra visitantes e gera intenção de compra. As melhores negociações acontecem de Mar–Out: menos concorrência, mais tempo, proprietários mais dispostos.</p><p style="font-size:.78rem;color:var(--gold);margin-top:8px">💡 Captar leads no verão, converter no outono/inverno.</p></div>
-    <div class="mkt-crd"><h3>🏖️ Valorização — Penha</h3>${[['Parque Beto Carrero','Maior parque temático da AL — turismo permanente e valorização sustentada'],['Infraestrutura em expansão','Novo trevo BR-101 e saneamento básico concluído em 2025'],['Preço de entrada','Ainda abaixo da média regional — janela de compra'],['Perfil do comprador','Famílias gaúchas e paranaenses buscando segunda residência']].map(([t,d])=>`<div class="val-item"><h4>${t}</h4><p>${d}</p></div>`).join('')}</div>
-    <div class="mkt-crd"><h3>🌅 Valorização — Barra Velha</h3>${[['Crescimento orgânico','Maior crescimento populacional do litoral norte SC nos últimos 3 anos'],['Qualidade de vida','Orla preservada, trânsito calmo, estrutura de cidade pequena'],['Incorporadoras chegando','Oportunidade de comprar antes da chegada do capital grande'],['Distância de BC','45 minutos de Balneário Camboriú']].map(([t,d])=>`<div class="val-item"><h4>${t}</h4><p>${d}</p></div>`).join('')}</div>
+    <div class="mkt-crd"><h3>📍 Preço médio m² — Litoral SC (Q1/2026)</h3>
+      ${[['Balneário Camboriú','R$ 15.200/m²'],['Itajaí','R$ 7.600/m²'],['Camboriú','R$ 6.800/m²'],['Navegantes','R$ 6.100/m²'],['Penha','R$ 5.200/m²'],['Barra Velha','R$ 4.500/m²'],['Balneário Piçarras','R$ 4.800/m²'],['Itapema','R$ 9.400/m²']].map(([c,p])=>`<div class="cid-row"><div class="cid-nome">${c}</div><div class="cid-preco">${p}</div></div>`).join('')}
+    </div>
+    <div class="mkt-crd"><h3>📈 Indicadores econômicos — Abril/2026</h3>
+      ${[
+        ['Selic (Copom mar/2026)','14,75% a.a.','↓ Queda de 0,25pp em março'],
+        ['Próxima reunião Copom','28-29/abr/2026','Expectativa: novo corte'],
+        ['IPCA acumulado 12m','4,14%','IBGE — março/2026'],
+        ['IPCA acumulado 2026','1,92%','Jan a março/2026'],
+        ['Meta inflação BC','3% (±1,5pp)','Teto: 4,5%'],
+        ['FGTS — teto MCMV','R$ 1,5 milhão','Habitação popular'],
+        ['Financiamento habitacional','Caixa a partir de 10,99% a.a.','Pré-fixado — abril/2026'],
+      ].map(([l,v,d])=>`<div class="macro-row" style="flex-direction:column;align-items:flex-start;padding:10px 0"><div style="display:flex;justify-content:space-between;width:100%"><div class="macro-l">${l}</div><div class="macro-v">${v}</div></div>${d?`<div style="font-size:.65rem;color:var(--gold);margin-top:2px">${d}</div>`:''}</div>`).join('')}
+    </div>
+    <div class="mkt-crd"><h3>🌊 Sazonalidade litoral SC</h3>
+      <p style="font-size:.78rem;color:var(--dim);line-height:1.7">Dez–Fev concentra visitantes e gera intenção de compra. As melhores negociações acontecem de Mar–Out: menos concorrência, mais tempo, proprietários mais dispostos.</p>
+      <p style="font-size:.78rem;color:var(--gold);margin-top:8px">💡 Agora é o momento ideal: captar quem viu no verão e ainda não decidiu.</p>
+    </div>
+    <div class="mkt-crd"><h3>📊 Contexto para o corretor — abril/2026</h3>
+      <p style="font-size:.78rem;color:var(--dim);line-height:1.7;margin-bottom:10px">Com Selic em 14,75% e perspectiva de novos cortes, o crédito imobiliário começa a melhorar. Clientes que estavam esperando os juros caírem já têm argumento concreto para avançar — a tendência é de queda, e o preço do imóvel não cai junto.</p>
+      ${[
+        ['Argumento para quem financia','Selic caiu em março. A tendência é de mais cortes. Quem compra agora trava o preço do imóvel — quando os juros baixarem mais, pode refinanciar.'],
+        ['Argumento para quem compra à vista','Imóvel é o único ativo que você usa enquanto valoriza. Com inflação em 4,14%, o dinheiro parado perde valor todo mês.'],
+        ['Argumento para investidor','Litoral SC valorizou acima da inflação nos últimos 3 anos. Aluguel por temporada gera rentabilidade de 12 a 18% ao ano em BC e Itapema.'],
+      ].map(([t,d])=>`<div class="val-item"><h4>${t}</h4><p>${d}</p></div>`).join('')}
+    </div>
+    <div class="mkt-crd"><h3>🏖️ Valorização — Penha</h3>
+      ${[['Parque Beto Carrero','Maior parque temático da AL — turismo permanente e valorização sustentada'],['BR-101 e infraestrutura','Novo trevo de acesso e saneamento básico concluído em 2025'],['Preço de entrada','Ainda abaixo da média regional — janela de compra antes da equalização com Navegantes'],['Perfil do comprador','Famílias gaúchas e paranaenses buscando segunda residência a preço acessível']].map(([t,d])=>`<div class="val-item"><h4>${t}</h4><p>${d}</p></div>`).join('')}
+    </div>
+    <div class="mkt-crd"><h3>🌅 Valorização — Barra Velha</h3>
+      ${[['Crescimento orgânico','Maior crescimento populacional do litoral norte SC nos últimos 3 anos'],['Qualidade de vida','Orla preservada, trânsito calmo, estrutura de cidade pequena'],['Grandes incorporadoras chegando','Oportunidade de comprar antes da chegada do capital grande'],['Distância de BC','45 minutos de Balneário Camboriú — qualidade sem pagar o preço de BC']].map(([t,d])=>`<div class="val-item"><h4>${t}</h4><p>${d}</p></div>`).join('')}
+    </div>
     <div style="height:8px"></div>
   </div>`;
 }
@@ -1132,7 +1219,8 @@ window.delConta=function(){
   }
 }
 
-// INIT — auth screen já está ativa, Firebase redireciona se logado
+// INIT
+window.abrirNoticia=function(url){window.open(url,"_blank");}
 window.addEventListener('load',()=>{
   // Fallback: esconde qualquer loading preso após 5s
   setTimeout(()=>{ hideLoad(); },5000);
