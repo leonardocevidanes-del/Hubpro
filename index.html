@@ -672,544 +672,820 @@ textarea.ta:focus{border-color:var(--gold)}
 
 
 <script>
-// ── HUB PRO — 100% Local, Zero Firebase ──
-// Autenticação via localStorage — sem dependência de rede, sem travamento
+
+// ── HUB PRO v4 — 100% Local, Zero Firebase ──
+'use strict';
 
 let CU = null, UD = {}, privOrig = 'lgpd';
 let scriptsScore = {acertos:0, erros:0, vistos:[]};
+let simScore = {acertos:0, erros:0, total:0};
+let simAt = null;
+let _metaEditMode = null;
 
-// UTILS
-const $ = id => document.getElementById(id);
-function showLoad(m='Carregando...'){$('loading').classList.add('on');$('loading-msg').textContent=m}
-function hideLoad(){$('loading').classList.remove('on')}
-function toast(m,d=2500){const t=$('toast');t.textContent=m;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),d)}
-function showScr(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));$(id).classList.add('active')}
+// ── UTILS ──
+function $(id){ return document.getElementById(id); }
+function showLoad(m){
+  $('loading').classList.add('on');
+  $('loading-msg').textContent = m || 'Carregando...';
+}
+function hideLoad(){ $('loading').classList.remove('on'); }
+function toast(m, d){
+  var t = $('toast');
+  t.textContent = m;
+  t.classList.add('on');
+  setTimeout(function(){ t.classList.remove('on'); }, d || 2500);
+}
+function showScr(id){
+  document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
+  $(id).classList.add('active');
+}
+function h(tag, attrs, inner){
+  var a = '';
+  if(attrs) Object.keys(attrs).forEach(function(k){ a += ' ' + k + '="' + attrs[k] + '"'; });
+  return '<' + tag + a + '>' + (inner||'') + '</' + tag + '>';
+}
+function div(cls, inner, style){
+  var s = style ? ' style="' + style + '"' : '';
+  return '<div class="' + cls + '"' + s + '>' + (inner||'') + '</div>';
+}
 
+// ── NAVIGATION ──
 window.goSec = function(s){
-  const screens=['home','disc','pilares','plano','pergunta','meta','scripts','simulador','mercado','registros','perfil','privacidade'];
-  document.querySelectorAll('.screen').forEach(sc=>sc.classList.remove('active'));
-  $('s'+s).classList.add('active');
-  document.querySelectorAll('.ni').forEach(n=>n.classList.remove('on'));
-  const nb=document.querySelector(`[data-s="${s}"]`);if(nb)nb.classList.add('on');
-  if(s==='home')renderHome();
-  if(s==='disc')renderDisc();
-  if(s==='pilares')renderPilares();
-  if(s==='plano')renderPlano();
-  if(s==='pergunta')renderPergunta();
-  if(s==='meta')renderMeta();
-  if(s==='scripts')renderScripts();
-  if(s==='simulador')renderSim();
-  if(s==='mercado')renderMkt();
-  if(s==='registros')renderReg();
-  if(s==='perfil')renderPerf();
-}
+  document.querySelectorAll('.screen').forEach(function(sc){ sc.classList.remove('active'); });
+  var el = $('s' + s);
+  if(el) el.classList.add('active');
+  document.querySelectorAll('.ni').forEach(function(n){ n.classList.remove('on'); });
+  var nb = document.querySelector('[data-s="' + s + '"]');
+  if(nb) nb.classList.add('on');
+  if(s === 'home')      renderHome();
+  if(s === 'disc')      renderDisc();
+  if(s === 'pilares')   renderPilares();
+  if(s === 'plano')     renderPlano();
+  if(s === 'pergunta')  renderPergunta();
+  if(s === 'meta')      renderMeta();
+  if(s === 'scripts')   renderScripts();
+  if(s === 'simulador') renderSim();
+  if(s === 'mercado')   renderMkt();
+  if(s === 'registros') renderReg();
+  if(s === 'perfil')    renderPerf();
+};
 
-// ── DATA LAYER — 100% localStorage, instantâneo ──
-function lsKey(){ return 'hp_'+(CU?.email||'anon'); }
+// ── DATA LAYER ──
+function lsKey(){ return 'hp_' + ((CU && CU.email) || 'anon'); }
 function loadUD(){
-  try{
-    const raw=localStorage.getItem(lsKey());
-    UD=raw?JSON.parse(raw):{};
-    if(UD.scripts_score)scriptsScore={...scriptsScore,...UD.scripts_score};
-  }catch(e){ UD={}; }
+  try {
+    var raw = localStorage.getItem(lsKey());
+    UD = raw ? JSON.parse(raw) : {};
+    if(UD.scripts_score) scriptsScore = Object.assign({}, scriptsScore, UD.scripts_score);
+  } catch(e) { UD = {}; }
 }
-function save(campo,val){
-  UD[campo]=val;
-  try{ localStorage.setItem(lsKey(),JSON.stringify(UD)); }catch(e){}
+function save(campo, val){
+  UD[campo] = val;
+  try { localStorage.setItem(lsKey(), JSON.stringify(UD)); } catch(e){}
 }
 
-// ── AUTH LOCAL — sem Firebase, sem rede ──
-// Usuários armazenados localmente com senha hasheada (simples)
-function hashSenha(s){ let h=0;for(let i=0;i<s.length;i++){h=Math.imul(31,h)+s.charCodeAt(i)|0;}return h.toString(36); }
-function getUsuarios(){ try{return JSON.parse(localStorage.getItem('hp_users')||'{}');}catch(e){return{};} }
-function salvarUsuarios(u){ localStorage.setItem('hp_users',JSON.stringify(u)); }
+// ── AUTH LOCAL ──
+function hashSenha(s){
+  var h = 0;
+  for(var i = 0; i < s.length; i++){ h = Math.imul(31, h) + s.charCodeAt(i) | 0; }
+  return h.toString(36);
+}
+function getUsuarios(){
+  try { return JSON.parse(localStorage.getItem('hp_users') || '{}'); } catch(e){ return {}; }
+}
+function salvarUsuarios(u){ localStorage.setItem('hp_users', JSON.stringify(u)); }
 
 function rotearUsuario(){
-  if(!CU){showScr('sa');return;}
+  if(!CU){ showScr('sa'); return; }
   loadUD();
-  if(!UD.lgpd){showScr('slgpd');return;}
-  if(!UD.perfil?.nome){showScr('sonb');return;}
-  showScr('shome');renderHome();
-}
-
-// Init — executa direto pois o script está no final do body (DOM já pronto)
-(function(){
-  try{
-    const sess=localStorage.getItem('hp_session');
-    if(sess){
-      const u=JSON.parse(sess);
-      const users=getUsuarios();
-      if(users[u.email]){CU={email:u.email,uid:u.email};rotearUsuario();return;}
-    }
-  }catch(e){}
-  showScr('sa');
-})();
-
-// LGPD
-window.toggleLgpd=function(){
-  const cb=$('lgpd-cb');cb.checked=!cb.checked;
-  $('btn-lgpd').disabled=!cb.checked;
-}
-window.aceitarLgpd=function(){
-  save('lgpd',{ok:true,data:new Date().toISOString()});
-  if(!UD.perfil?.nome)showScr('sonb');else{showScr('shome');renderHome();}
-}
-window.showPriv=function(o='lgpd'){privOrig=o;showScr('spriv')}
-window.voltarPriv=function(){
-  if(privOrig==='lgpd')showScr('slgpd');
-  else if(privOrig==='perfil')goSec('perfil');
-  else goSec('home');
-}
-
-// ── AUTH FUNCS — 100% local, zero rede ──
-window.toggleSenha=function(id,btn){
-  const inp=$(id);
-  const show=inp.type==='password';
-  inp.type=show?'text':'password';
-  btn.textContent=show?'🙈':'👁';
-}
-window.authTab=function(t){
-  document.querySelectorAll('.atab').forEach(x=>x.classList.remove('on'));
-  document.querySelectorAll('.aform').forEach(x=>x.classList.remove('on'));
-  $('form-'+t).classList.add('on');
-  document.querySelector(`.atab:${t==='login'?'first':'last'}-child`).classList.add('on');
-}
-window.fazerLogin=function(){
-  const email=$('l-email').value.trim().toLowerCase();
-  const senha=$('l-senha').value;
-  const err=$('l-err');err.classList.remove('on');
-  if(!email||!senha){err.textContent='Preencha e-mail e senha.';err.classList.add('on');return;}
-  const users=getUsuarios();
-  if(!users[email]){err.textContent='E-mail não encontrado.';err.classList.add('on');return;}
-  if(users[email].hash!==hashSenha(senha)){err.textContent='Senha incorreta.';err.classList.add('on');return;}
-  CU={email,uid:email};
-  if($('rem-cb').checked){localStorage.setItem('hp_session',JSON.stringify({email}));}
-  rotearUsuario();
-}
-window.esqueceuSenha=function(){
-  const email=$('l-email').value.trim().toLowerCase();
-  const err=$('l-err');err.classList.remove('on');
-  if(!email){err.textContent='Digite seu e-mail acima.';err.classList.add('on');return;}
-  const users=getUsuarios();
-  if(!users[email]){err.textContent='E-mail não encontrado.';err.classList.add('on');return;}
-  // Mostra a senha atual (app local — sem e-mail real)
-  const nova=prompt('Digite uma nova senha (mínimo 6 caracteres):');
-  if(!nova||nova.length<6){toast('Senha deve ter pelo menos 6 caracteres.');return;}
-  users[email].hash=hashSenha(nova);
-  salvarUsuarios(users);
-  toast('✅ Senha alterada com sucesso! Faça login com a nova senha.',4000);
-}
-window.criarConta=function(){
-  const nome=$('c-nome').value.trim();
-  const email=$('c-email').value.trim().toLowerCase();
-  const senha=$('c-senha').value;
-  const err=$('c-err');err.classList.remove('on');
-  if(!nome||!email||!senha){err.textContent='Preencha todos os campos.';err.classList.add('on');return;}
-  if(senha.length<6){err.textContent='Senha deve ter pelo menos 6 caracteres.';err.classList.add('on');return;}
-  if(!email.includes('@')){err.textContent='E-mail inválido.';err.classList.add('on');return;}
-  const users=getUsuarios();
-  if(users[email]){err.textContent='E-mail já cadastrado.';err.classList.add('on');return;}
-  users[email]={hash:hashSenha(senha),nome,criado:new Date().toISOString()};
-  salvarUsuarios(users);
-  CU={email,uid:email};
-  UD={perfil:{nome,email}};
-  localStorage.setItem(lsKey(),JSON.stringify(UD));
-  if($('rem-cb')?.checked){localStorage.setItem('hp_session',JSON.stringify({email}));}
-  rotearUsuario();
-}
-
-// ONBOARDING
-window.prevFoto=function(inp){
-  const f=inp.files[0];if(!f)return;
-  const r=new FileReader();
-  r.onload=e=>{$('onb-fp').src=e.target.result;$('onb-fp').style.display='block';$('onb-fph').style.display='none';};
-  r.readAsDataURL(f);
-}
-window.salvarOnb=function(){
-  const nome=$('onb-nome').value.trim();
-  if(!nome){toast('Digite seu nome.');return;}
-  const perfil={nome,cidade:$('onb-cidade').value.trim(),tempo:$('onb-tempo').value,especialidade:$('onb-esp').value,email:CU?.email||''};
-  const fp=$('onb-galeria').files[0]||$('onb-camera').files[0];
-  if(fp){
-    const r=new FileReader();
-    r.onload=e=>{perfil.foto=e.target.result;save('perfil',perfil);if(!UD.disc)showScr('sdisc-intro');else{showScr('shome');renderHome();};};
-    r.readAsDataURL(fp);
-  }else{save('perfil',perfil);if(!UD.disc)showScr('sdisc-intro');else{showScr('shome');renderHome();}}
-}
-
-// HOME
-function renderHome(){
-  const p=UD.perfil||{};
-  const fn=(p.nome||'Corretor').split(' ')[0];
-  $('hdr-nome').textContent=`${fn}`;
-  $('hdr-sub').textContent=p.especialidade?`${p.especialidade} · ${p.cidade||''}`:'Hub Litoral';
-  const av=$('hdr-av');
-  if(p.foto)av.innerHTML=`<img src="${p.foto}" alt="foto">`;
-  else{$('hdr-ini').textContent=fn.charAt(0).toUpperCase();}
-  // DISC badge
-  const disc=UD.disc;
-  const discEl=$('hdr-disc');
-  if(disc)discEl.innerHTML=`<div class="disc-badge">${disc.perfil} · ${disc.nome.toUpperCase()}</div>`;
-  else discEl.innerHTML=`<div style="font-size:.68rem;color:var(--dim);text-align:right;cursor:pointer" onclick="goSec('disc')">Fazer<br>Quiz DISC</div>`;
-  // META
-  const metas=UD.metas||[];
-  const agora=new Date(),dow=agora.getDay();
-  const metaAtual=metas.length>0?metas[metas.length-1]:null;
-  const metaViva=metaAtual&&(new Date(metaAtual.data)>new Date(agora.getTime()-7*24*60*60*1000));
-  if(metaViva){
-    $('home-meta-text').textContent=metaAtual.texto;
-    $('home-meta-hint').style.display='none';
-    if((dow===5||dow===6||dow===0)&&!metaAtual.checkin){
-      $('home-meta-label').textContent='VOCÊ CHEGOU LÁ?';
-      $('home-checkin-row').innerHTML=`<div class="checkin-row"><button class="btn-sim" onclick="event.stopPropagation();checkinHome('sim')">Sim, cheguei ✓</button><button class="btn-nao" onclick="event.stopPropagation();checkinHome('nao')">Não dessa vez</button></div>`;
-    }else if(metaAtual.checkin){
-      $('home-meta-label').textContent='SUA META DESTA SEMANA';
-      $('home-checkin-row').innerHTML=`<div style="font-size:.75rem;margin-top:8px;color:${metaAtual.checkin==='sim'?'var(--green)':'var(--dim)'}">${metaAtual.checkin==='sim'?'✅ Meta alcançada!':'📝 Registrado'}</div>`;
-    }else{
-      $('home-meta-label').textContent='SUA META DESTA SEMANA';
-      $('home-checkin-row').innerHTML='';
-    }
-  }else{
-    $('home-meta-label').textContent='META DA SEMANA';
-    $('home-meta-text').textContent='Defina sua meta para esta semana';
-    $('home-meta-hint').style.display='block';
-    $('home-meta-hint').textContent='Toque para registrar';
-    $('home-checkin-row').innerHTML='';
-  }
-  // PERGUNTA
-  const idx=new Date().getDate()%PERGUNTAS.length;
-  $('home-pq').textContent=PERGUNTAS[idx];
-  const regs=UD.registros||[];
-  const hoje=new Date().toDateString();
-  const resp=regs.find(r=>r.tipo==='pergunta'&&new Date(r.data).toDateString()===hoje);
-  $('home-pq-resp').textContent=resp?`✓ Respondida hoje — "${resp.texto.substring(0,40)}${resp.texto.length>40?'...':''}"` :'';
-  // STREAK
-  renderStreak();
-  // PLANO
-  const pd=UD.plano||{};
-  const tasks=PLANO.flatMap(s=>s.tarefas);
-  const done=tasks.filter(t=>pd[t.id]).length;
-  const pct=Math.round(done/tasks.length*100);
-  $('home-plano-pct').textContent=pct+'%';
-  $('home-plano-bar').style.width=pct+'%';
-  $('home-plano-hint').textContent=done>0?`${done}/${tasks.length} tarefas concluídas`:'Toque para começar o dia 1';
-}
-window.checkinHome=function(r){
-  const metas=UD.metas||[];
-  if(metas.length>0)metas[metas.length-1].checkin=r;
-  save('metas',metas);
-  toast(r==='sim'?'Meta alcançada! 🏆 Parabéns!':'Continue firme na próxima semana 💪');
+  if(!UD.lgpd){ showScr('slgpd'); return; }
+  if(!UD.perfil || !UD.perfil.nome){ showScr('sonb'); return; }
+  showScr('shome');
   renderHome();
 }
-function renderStreak(){
-  const pd=UD.plano||{};
-  const hoje=new Date();
-  const dias=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
-  const dow=hoje.getDay();
-  const cont=$('streak-dots');cont.innerHTML='';
-  for(let i=0;i<7;i++){
-    const d=new Date(hoje);d.setDate(hoje.getDate()-dow+i);
-    const done=pd[`streak_${d.toDateString()}`]||false;
-    const isToday=i===dow;
-    const el=document.createElement('div');
-    el.className=`sd${done?' done':''}${isToday&&!done?' today':''}`;
-    el.textContent=done?'✓':dias[i].substring(0,3);
-    cont.appendChild(el);
-  }
-}
 
-// DISC DATA
-const DISC_DATA=[
-  {q:"Quando enfrento um desafio difícil com um cliente, prefiro:",ops:[{t:"Ir direto ao ponto e resolver rápido",p:"D"},{t:"Conversar, entender e criar conexão",p:"I"},{t:"Ouvir com cuidado e buscar consenso",p:"S"},{t:"Analisar todos os dados antes de agir",p:"C"}]},
-  {q:"Meu estilo de comunicação com clientes é:",ops:[{t:"Direto, objetivo e focado em resultados",p:"D"},{t:"Animado, entusiasmado e persuasivo",p:"I"},{t:"Calmo, paciente e acolhedor",p:"S"},{t:"Preciso, detalhado e bem fundamentado",p:"C"}]},
-  {q:"O que mais me motiva em fechar uma venda:",ops:[{t:"Superar metas e ganhar",p:"D"},{t:"O relacionamento e o reconhecimento",p:"I"},{t:"Ajudar o cliente a realizar o sonho",p:"S"},{t:"Ter feito tudo certo e dentro das normas",p:"C"}]},
-  {q:"Quando um cliente pede prazo para pensar, eu:",ops:[{t:"Pressiono gentilmente para uma decisão",p:"D"},{t:"Reforço os benefícios com entusiasmo",p:"I"},{t:"Respeito o tempo e fico disponível",p:"S"},{t:"Envio mais dados e comparativos",p:"C"}]},
-  {q:"Meu maior ponto forte como corretor é:",ops:[{t:"Determinação e foco em resultados",p:"D"},{t:"Carisma e capacidade de influência",p:"I"},{t:"Confiabilidade e paciência",p:"S"},{t:"Conhecimento técnico e precisão",p:"C"}]},
-  {q:"Em uma reunião de equipe, normalmente:",ops:[{t:"Lidero a discussão e proponho ações",p:"D"},{t:"Animo o grupo e trago ideias",p:"I"},{t:"Escuto ativamente e apoio os colegas",p:"S"},{t:"Analiso os dados e questiono antes de decidir",p:"C"}]},
-  {q:"Ao receber uma objeção de preço, minha primeira reação é:",ops:[{t:"Mostrar o valor e fechar logo",p:"D"},{t:"Contar histórias de sucesso similares",p:"I"},{t:"Entender profundamente a preocupação",p:"S"},{t:"Apresentar comparativos e dados de mercado",p:"C"}]},
-  {q:"Prefiro trabalhar com clientes que:",ops:[{t:"São decididos e querem resultados rápidos",p:"D"},{t:"Gostam de conversa e conexão",p:"I"},{t:"Precisam de tempo e segurança",p:"S"},{t:"Valorizam detalhes e informação",p:"C"}]},
-  {q:"Quando cometo um erro em uma negociação:",ops:[{t:"Resolvo rápido e sigo em frente",p:"D"},{t:"Converso com o cliente e reestabeleço a confiança",p:"I"},{t:"Me preocupo com o impacto no relacionamento",p:"S"},{t:"Analiso o que deu errado para não repetir",p:"C"}]},
-  {q:"Minha abordagem de prospecção preferida é:",ops:[{t:"Ligações diretas e cold outreach agressivo",p:"D"},{t:"Indicações e networking em eventos",p:"I"},{t:"Relacionamento contínuo e indicações de clientes satisfeitos",p:"S"},{t:"Marketing de conteúdo com informações detalhadas",p:"C"}]},
-  {q:"Quando há conflito com um cliente, eu:",ops:[{t:"Enfrento direto e busco solução imediata",p:"D"},{t:"Uso o charme para suavizar a situação",p:"I"},{t:"Evito confronto e busco harmonia",p:"S"},{t:"Apresento fatos para resolver tecnicamente",p:"C"}]},
-  {q:"O que melhor descreve minha rotina de trabalho:",ops:[{t:"Intensa, focada em metas e números",p:"D"},{t:"Dinâmica, com muito contato e interação",p:"I"},{t:"Estruturada, consistente e previsível",p:"S"},{t:"Organizada, detalhada e documentada",p:"C"}]}
-];
-const DP={
-  D:{nome:"Dominante",desc:"Você é orientado a resultados, decidido e vai direto ao ponto. Fecha vendas com assertividade e não tem medo de pressionar quando necessário.",fortes:["Determinação e foco em metas","Fechamento rápido e assertivo","Liderança natural em negociações","Alta energia e resiliência"],atencao:["Pode ser percebido como impaciente","Precisa desenvolver escuta ativa","Risco de perder clientes que precisam de mais tempo"],aprende:"Você aprende melhor com desafios práticos, metas claras e resultados mensuráveis."},
-  I:{nome:"Influente",desc:"Você é carismático, entusiasmado e cria conexões genuínas. Vende pela emoção e pelo relacionamento. Sua energia é contagiante.",fortes:["Carisma e poder de persuasão","Criação de rapport instantâneo","Energia positiva que engaja clientes","Excelente em networking e indicações"],atencao:["Pode se perder nos detalhes","Precisa de mais disciplina no follow-up","Risco de prometer mais do que pode entregar"],aprende:"Você aprende melhor em grupo, com histórias inspiradoras e conteúdo dinâmico."},
-  S:{nome:"Estável",desc:"Você é paciente, confiável e cria relacionamentos duradouros. Seus clientes confiam em você como um consultor, não apenas como um vendedor.",fortes:["Confiabilidade e consistência","Paciência com clientes indecisos","Excelente em manter carteira de clientes","Escuta ativa e empatia"],atencao:["Pode ter dificuldade com urgência","Precisa desenvolver assertividade no fechamento","Tende a evitar conflitos necessários"],aprende:"Você aprende melhor com método estruturado, passo a passo e ambiente seguro para errar."},
-  C:{nome:"Consciencioso",desc:"Você é analítico, preciso e tecnicamente sólido. Seus clientes confiam na sua capacidade de apresentar dados e justificar cada decisão.",fortes:["Conhecimento técnico aprofundado","Argumentação baseada em dados","Precisão e atenção a detalhes","Credibilidade com clientes exigentes"],atencao:["Pode analisar demais e não fechar","Precisa desenvolver lado emocional da venda","Tende a sobrecarregar o cliente de informação"],aprende:"Você aprende melhor com dados, comparativos, estudos de caso e lógica."}
+// ── AUTH FUNCS ──
+window.toggleSenha = function(id, btn){
+  var inp = $(id);
+  var show = inp.type === 'password';
+  inp.type = show ? 'text' : 'password';
+  btn.textContent = show ? '🙈' : '👁';
 };
-let ds={qIdx:0,scores:{D:0,I:0,S:0,C:0}};
-function renderDisc(){
-  const c=$('disc-content');
-  if(UD.disc?.perfil){renderDiscRes(c,UD.disc);return;}
-  ds={qIdx:0,scores:{D:0,I:0,S:0,C:0}};
-  renderDiscQ(c);
-}
-function renderDiscQ(c){
-  const q=DISC_DATA[ds.qIdx];
-  const pct=Math.round(ds.qIdx/DISC_DATA.length*100);
-  c.innerHTML=`<div class="dq-wrap"><div class="dq-num">Pergunta ${ds.qIdx+1} de ${DISC_DATA.length}</div><div class="dq-prog"><div class="dq-fill" style="width:${pct}%"></div></div><div class="dq-text">${q.q}</div>${q.ops.map(o=>`<button class="dopt" onclick="respDisc('${o.p}')">${o.t}</button>`).join('')}</div>`;
-}
-window.respDisc=function(p){
-  ds.scores[p]++;ds.qIdx++;
-  if(ds.qIdx>=DISC_DATA.length){
-    const sc=ds.scores,tot=Object.values(sc).reduce((a,b)=>a+b,0);
-    const w=Object.entries(sc).sort((a,b)=>b[1]-a[1])[0][0];
-    const res={perfil:w,nome:DP[w].nome,scores:sc,total:tot};
-    save('disc',res);
-    renderDiscRes($('disc-content'),res);
-  }else renderDiscQ($('disc-content'));
-}
-function renderDiscRes(c,disc){
-  const p=DP[disc.perfil],tot=disc.total||12;
-  c.innerHTML=`
-    <div class="dr-card"><div class="dr-letter">${disc.perfil}</div><div class="dr-name">${p.nome}</div><div class="dr-desc">${p.desc}</div></div>
-    <div class="bars-card"><h3>Distribuição dos eixos</h3>${['D','I','S','C'].map(l=>`<div class="bar-row"><div class="bar-lbl">${l}</div><div class="bar-track"><div class="bar-fill" style="width:${Math.round((disc.scores[l]||0)/tot*100)}%"></div></div><div class="bar-pct">${Math.round((disc.scores[l]||0)/tot*100)}%</div></div>`).join('')}</div>
-    <div class="ins-card"><h3>Seu perfil em vendas</h3><div class="ins-item"><h4>💪 Pontos fortes</h4><p>${p.fortes.join(' · ')}</p></div><div class="ins-item"><h4>⚠️ Pontos de atenção</h4><p>${p.atencao.join(' · ')}</p></div><div class="ins-item"><h4>📚 Como você aprende melhor</h4><p>${p.aprende}</p></div></div>
-    <div style="padding:0 16px 16px"><button class="btn-s" onclick="window.refDisc()">Refazer o quiz</button></div>`;
-}
-window.refDisc=function(){save('disc',null);renderDisc();}
+window.authTab = function(t){
+  document.querySelectorAll('.atab').forEach(function(x){ x.classList.remove('on'); });
+  document.querySelectorAll('.aform').forEach(function(x){ x.classList.remove('on'); });
+  $('form-' + t).classList.add('on');
+  var tabs = document.querySelectorAll('.atab');
+  if(t === 'login') tabs[0].classList.add('on');
+  else tabs[1].classList.add('on');
+};
+window.fazerLogin = function(){
+  var email = $('l-email').value.trim().toLowerCase();
+  var senha = $('l-senha').value;
+  var err = $('l-err');
+  err.classList.remove('on');
+  if(!email || !senha){ err.textContent = 'Preencha e-mail e senha.'; err.classList.add('on'); return; }
+  var users = getUsuarios();
+  if(!users[email]){ err.textContent = 'E-mail não encontrado.'; err.classList.add('on'); return; }
+  if(users[email].hash !== hashSenha(senha)){ err.textContent = 'Senha incorreta.'; err.classList.add('on'); return; }
+  CU = {email: email, uid: email};
+  if($('rem-cb') && $('rem-cb').checked){
+    localStorage.setItem('hp_session', JSON.stringify({email: email}));
+  }
+  rotearUsuario();
+};
+window.esqueceuSenha = function(){
+  var email = $('l-email').value.trim().toLowerCase();
+  var err = $('l-err');
+  err.classList.remove('on');
+  if(!email){ err.textContent = 'Digite seu e-mail acima.'; err.classList.add('on'); return; }
+  var users = getUsuarios();
+  if(!users[email]){ err.textContent = 'E-mail não encontrado.'; err.classList.add('on'); return; }
+  var nova = prompt('Digite sua nova senha (mínimo 6 caracteres):');
+  if(!nova || nova.length < 6){ toast('Senha deve ter pelo menos 6 caracteres.'); return; }
+  users[email].hash = hashSenha(nova);
+  salvarUsuarios(users);
+  toast('✅ Senha alterada! Faça login com a nova senha.', 4000);
+};
+window.criarConta = function(){
+  var nome = $('c-nome').value.trim();
+  var email = $('c-email').value.trim().toLowerCase();
+  var senha = $('c-senha').value;
+  var err = $('c-err');
+  err.classList.remove('on');
+  if(!nome || !email || !senha){ err.textContent = 'Preencha todos os campos.'; err.classList.add('on'); return; }
+  if(senha.length < 6){ err.textContent = 'Senha deve ter pelo menos 6 caracteres.'; err.classList.add('on'); return; }
+  if(email.indexOf('@') < 0){ err.textContent = 'E-mail inválido.'; err.classList.add('on'); return; }
+  var users = getUsuarios();
+  if(users[email]){ err.textContent = 'E-mail já cadastrado.'; err.classList.add('on'); return; }
+  users[email] = {hash: hashSenha(senha), nome: nome, criado: new Date().toISOString()};
+  salvarUsuarios(users);
+  CU = {email: email, uid: email};
+  UD = {perfil: {nome: nome, email: email}};
+  localStorage.setItem(lsKey(), JSON.stringify(UD));
+  if($('rem-cb') && $('rem-cb').checked){
+    localStorage.setItem('hp_session', JSON.stringify({email: email}));
+  }
+  rotearUsuario();
+};
 
-// PILARES
-const PIL=[
-  {id:'mentalidade',icon:'🧠',nome:'Mentalidade',desc:'A base de tudo',insights:[{t:'Identidade de alta performance',c:'O corretor de alto desempenho não vende imóveis — ele resolve o maior sonho financeiro da vida das pessoas.',o:'Escreva em 3 linhas quem você é como profissional — não o que você faz, mas quem você é.'},{t:'Mentalidade de crescimento',c:'Cada objeção é um treino, não uma derrota. Cada "não" aproxima do "sim".',o:'Liste 3 situações recentes onde você errou e o que aprendeu com cada uma.'},{t:'Foco no que você controla',c:'Você não controla a Selic, o cliente, o mercado. Você controla seus horários, sua preparação e sua consistência.',o:'Faça duas listas: o que está fora do seu controle e o que está. Foque 100% na segunda.'},{t:'Ritual matinal do corretor',c:'Os 60 primeiros minutos do dia moldam toda a performance. Hidratação, movimento, revisão de metas e intenção clara.',o:'Defina seu ritual de 20 minutos pela manhã e execute por 7 dias seguidos.'}],disc:{D:'Dominante: transforme sua energia competitiva em intenção diária. Defina uma meta desafiadora toda manhã.',I:'Influente: use seu otimismo natural para criar rituais positivos. Visualize o melhor resultado possível antes de cada visita.',S:'Estável: construa consistência antes de velocidade. Um pequeno avanço por dia vence semanas de esforço irregular.',C:'Consciencioso: documente sua evolução. Ver os dados do seu crescimento é o maior motivador para você.'}},
-  {id:'processo',icon:'⚙️',nome:'Processo',desc:'Método que gera resultado',insights:[{t:'Pipeline de vendas ativo',c:'Sem pipeline visível, você trabalha no escuro. Mapeie quantos clientes estão em cada etapa.',o:'Coloque todos seus contatos ativos em uma planilha simples com a etapa de cada um.'},{t:'Cadência de follow-up',c:'80% das vendas acontecem após o 5º contato. A maioria dos corretores desiste no 2º.',o:'Crie uma cadência: D+1, D+3, D+7, D+14, D+30.'},{t:'Qualificação antes da visita',c:'Uma visita mal qualificada custa 3 horas do seu dia. Pergunte: orçamento, prazo, quem decide e motivação real.',o:'Crie sua checklist de qualificação com 5 perguntas obrigatórias antes de qualquer visita.'},{t:'Fechamento planejado',c:'O fechamento começa no primeiro contato. Cada interação deve avançar uma etapa.',o:'Identifique os 3 sinais de compra que seus clientes demonstram e pratique responder com um fechamento suave.'}],disc:{D:'Dominante: implemente um CRM simples agora. Seus resultados dependem de ter o processo fora da sua cabeça.',I:'Influente: use ferramentas visuais como Trello ou Kanban. Ver os cards avançando alimenta sua motivação.',S:'Estável: crie checklists para cada etapa. Saber o próximo passo reduz a ansiedade e aumenta a consistência.',C:'Consciencioso: meça tempo por etapa. Dados reais sobre onde você perde mais tempo são ouro para a melhoria.'}},
-  {id:'equipe',icon:'🤝',nome:'Equipe',desc:'Crescer junto é crescer mais',insights:[{t:'A força da imobiliária como marca',c:'Corretor Hub Litoral: a marca abre portas, gera confiança e traz leads que você nunca alcançaria sozinho.',o:'Liste 3 situações recentes onde você poderia ter usado melhor a marca Hub Litoral.'},{t:'Compartilhar é liderar',c:'Quando você compartilha um script que funcionou, você lidera. Corretores de alta performance elevam o time.',o:'Essa semana, compartilhe uma técnica ou insight com pelo menos um colega.'},{t:'Parceria estratégica',c:'No litoral SC, parcerias entre corretores de diferentes imobiliárias são comuns e lucrativas.',o:'Identifique 2 corretores de outras imobiliárias para ter como parceiros de referência.'},{t:'Feedback como combustível',c:'Peça feedback ao gestor, aos colegas e — especialmente — aos clientes que não compraram.',o:'Escolha um cliente que não fechou recentemente e peça 5 minutos de feedback honesto.'}],disc:{D:'Dominante: mentore alguém mais novo. Ensinar é a forma mais rápida de consolidar o que você já sabe.',I:'Influente: organize um almoço ou happy hour e fortaleça os vínculos do time.',S:'Estável: sua lealdade é um ativo para o time. Demonstre isso proativamente.',C:'Consciencioso: documente processos para o time. Criar um manual interno seria uma contribuição valiosa.'}},
-  {id:'cliente',icon:'👥',nome:'Cliente',desc:'Relacionamento que gera negócio',insights:[{t:'A jornada emocional da compra',c:'Comprar um imóvel é a maior decisão financeira da vida da maioria das pessoas. Antes de vender, entenda o medo e a esperança.',o:'Na próxima visita, faça 3 perguntas emocionais antes de mostrar o imóvel.'},{t:'Carteira ativa',c:'Clientes que compraram há 2 anos podem estar prontos para comprar de novo — ou indicar alguém.',o:'Hoje, entre em contato com 5 clientes antigos. Não para vender — para perguntar como estão.'},{t:'NPS pessoal do corretor',c:'Pergunte a cada cliente: "De 0 a 10, qual a chance de me indicar para um amigo?"',o:'Implemente o NPS: toda compra fechada → NPS + pedido de indicação.'},{t:'Persona do comprador no litoral SC',c:'O comprador é diverso: família gaúcha, investidor de SP, família local. Cada um tem gatilhos diferentes.',o:'Descreva seu cliente ideal: renda, origem, o que valoriza, qual o medo.'}],disc:{D:'Dominante: desacelere na escuta. Clientes indecisos fecham quando se sentem ouvidos.',I:'Influente: documente as histórias dos seus clientes. Elas são seu ativo mais valioso.',S:'Estável: seu cuidado natural é um diferencial raro. Verbalize: "Meu objetivo é garantir que você tome a melhor decisão."',C:'Consciencioso: crie um perfil detalhado de cada cliente.'}},
-  {id:'metricas',icon:'📊',nome:'Métricas',desc:'O que não se mede não melhora',insights:[{t:'Os 5 números essenciais',c:'Taxa de conversão, ticket médio, tempo de ciclo, custo por lead, taxa proposta→venda.',o:'Calcule hoje os 5 números para o seu mês atual.'},{t:'Meta reversa',c:'Se sua meta é R$20k e seu ticket médio é R$5k, você precisa de 4 vendas. Quantas visitas isso exige?',o:'Calcule sua meta diária de prospecções a partir da sua meta mensal.'},{t:'Dashboard semanal',c:'Uma planilha com 5 números, atualizada toda segunda-feira, muda o mês.',o:'Crie 5 colunas: Semana / Contatos / Visitas / Propostas / Vendas. Preencha toda semana.'},{t:'Revisão mensal',c:'Todo dia 1, olhe para o mês anterior. O que funcionou? Onde está o gargalo?',o:'Agende 30 minutos todo primeiro dia do mês para análise de performance.'}],disc:{D:'Dominante: crie um placar pessoal e atualize diariamente. Competição com você mesmo é seu maior motivador.',I:'Influente: transforme métricas em histórias. "Esse mês conversei com 40 pessoas" soa melhor que dados frios.',S:'Estável: métricas dão segurança. Saber que fez X contatos e Y visitas traz tranquilidade.',C:'Consciencioso: escolha os 3 números mais importantes e ignore o resto — senão você paralisa.'}},
-  {id:'mercado',icon:'🏙️',nome:'Mercado',desc:'Conhecimento que gera autoridade',insights:[{t:'A oportunidade do litoral SC',c:'SC é o estado com maior valorização imobiliária do Brasil nos últimos 5 anos. O litoral norte concentra infraestrutura e qualidade de vida.',o:'Memorize 3 estatísticas concretas sobre valorização imobiliária no litoral SC.'},{t:'Selic e o cliente',c:'Selic alta afeta quem financia, mas não a compra à vista nem o investidor. Aprenda a separar o argumento.',o:'Prepare 3 versões do argumento econômico: financiamento, à vista e investidor.'},{t:'FGTS no litoral',c:'Muitos compradores não sabem que podem usar o FGTS para imóveis de até R$1,5M pelo MCMV.',o:'Prepare um mini-roteiro explicativo sobre FGTS para clientes que perguntarem.'},{t:'Sazonalidade',c:'Verão gera desejo, outono/inverno gera negócio. Menos concorrência, proprietários mais dispostos.',o:'Identifique quem viu imóvel no verão e ainda não decidiu — essa é sua lista agora.'}],disc:{D:'Dominante: aprenda de cor os 3 argumentos mais poderosos do litoral SC como munição para fechar.',I:'Influente: conte histórias de valorização reais. Um cliente que comprou em Penha e valorizou 40% vale mais que qualquer dado.',S:'Estável: o conhecimento de mercado te dá segurança para recomendar com confiança.',C:'Consciencioso: crie um relatório mensal de mercado para compartilhar com sua carteira.'}}
+// ── LGPD ──
+window.toggleLgpd = function(){
+  var cb = $('lgpd-cb');
+  cb.checked = !cb.checked;
+  $('btn-lgpd').disabled = !cb.checked;
+};
+window.aceitarLgpd = function(){
+  save('lgpd', {ok: true, data: new Date().toISOString()});
+  if(!UD.perfil || !UD.perfil.nome) showScr('sonb');
+  else { showScr('shome'); renderHome(); }
+};
+window.showPriv = function(o){ privOrig = o || 'lgpd'; showScr('spriv'); };
+window.voltarPriv = function(){
+  if(privOrig === 'lgpd') showScr('slgpd');
+  else if(privOrig === 'perfil') goSec('perfil');
+  else goSec('home');
+};
+
+// ── ONBOARDING ──
+window.prevFoto = function(inp){
+  var f = inp.files && inp.files[0];
+  if(!f) return;
+  var r = new FileReader();
+  r.onload = function(e){
+    var av = $('onb-av');
+    if(av) av.style.backgroundImage = 'url(' + e.target.result + ')';
+    if(!UD.perfil) UD.perfil = {};
+    UD.perfil.foto = e.target.result;
+  };
+  r.readAsDataURL(f);
+};
+window.salvarOnb = function(){
+  var nome = $('onb-nome') && $('onb-nome').value.trim();
+  var cidade = $('onb-cidade') && $('onb-cidade').value.trim();
+  var tempo = $('onb-tempo') && $('onb-tempo').value;
+  var esp = $('onb-esp') && $('onb-esp').value;
+  if(!nome){ toast('Digite seu nome.'); return; }
+  var perfil = Object.assign({}, UD.perfil || {}, {
+    nome: nome, cidade: cidade, tempo: tempo, especialidade: esp,
+    email: CU ? CU.email : ''
+  });
+  save('perfil', perfil);
+  if(!UD.disc) showScr('sdisc-intro');
+  else { showScr('shome'); renderHome(); }
+};
+
+// ── DISC INTRO ──
+window.irParaDisc = function(){
+  document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
+  $('sdisc').classList.add('active');
+  renderDisc();
+};
+window.pularDisc = function(){
+  document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
+  $('shome').classList.add('active');
+  renderHome();
+};
+
+// ── HOME ──
+function renderHome(){
+  var p = UD.perfil || {};
+  var disc = UD.disc;
+  // Header
+  var av = $('hdr-av');
+  if(av){
+    if(p.foto) av.style.backgroundImage = 'url(' + p.foto + ')';
+    av.querySelector('span') && (av.querySelector('span').textContent = p.nome ? p.nome.charAt(0).toUpperCase() : 'C');
+  }
+  var hNome = $('hdr-nome');
+  if(hNome) hNome.textContent = p.nome ? 'Olá, ' + p.nome.split(' ')[0] + '!' : 'Olá!';
+  var hSub = $('hdr-sub');
+  if(hSub) hSub.textContent = p.cidade || 'Hub Litoral';
+
+  // Badge DISC
+  var discEl = $('hdr-disc');
+  if(discEl){
+    if(disc){
+      discEl.innerHTML = '<div class="disc-badge">' + disc.perfil + ' · ' + disc.nome.toUpperCase() + '</div>';
+    } else {
+      discEl.innerHTML = '<div class="disc-badge" onclick="goSec(\'disc\')" style="cursor:pointer;opacity:.7">Fazer DISC</div>';
+    }
+  }
+
+  // Meta da semana
+  var metas = UD.metas || [];
+  var hoje = new Date();
+  var dow = hoje.getDay();
+  var metaAtual = metas.length > 0 ? metas[metas.length - 1] : null;
+  var metaViva = metaAtual && (new Date(metaAtual.data) > new Date(hoje.getTime() - 7*24*60*60*1000));
+  var labelEl = $('home-meta-label');
+  var textEl = $('home-meta-text');
+  var hintEl = $('home-meta-hint');
+  if(labelEl) labelEl.textContent = 'SUA META DESTA SEMANA';
+  if(textEl) textEl.textContent = metaViva ? metaAtual.texto : 'Defina sua meta para esta semana';
+  if(hintEl) hintEl.textContent = metaViva ? '' : 'Toque para registrar';
+  var row = $('home-checkin-row');
+  if(row){
+    if(metaViva && !metaAtual.checkin && (dow === 5 || dow === 6 || dow === 0)){
+      row.innerHTML = '<div class="checkin-row">'
+        + '<button class="btn-sim" onclick="event.stopPropagation();window.checkinHome(\'sim\')" style="flex:1;padding:10px;font-size:.8rem">Sim, cheguei ✓</button>'
+        + '<button class="btn-nao" onclick="event.stopPropagation();window.checkinHome(\'nao\')" style="flex:1;padding:10px;font-size:.8rem;background:rgba(224,85,85,.1);border:1px solid var(--red);border-radius:8px;color:var(--red);font-family:var(--font);cursor:pointer">Não dessa vez</button>'
+        + '</div>';
+    } else {
+      row.innerHTML = '';
+    }
+  }
+
+  // Pergunta do dia
+  var pqs = [
+    'Qual é o seu maior medo ao abordar um novo cliente?',
+    'O que você faria diferente na última negociação que perdeu?',
+    'Como você descreveria seu estilo de atendimento em 3 palavras?',
+    'Qual hábito você precisa eliminar para ser mais produtivo?',
+    'O que te diferencia dos outros corretores da sua região?',
+    'Qual foi sua maior vitória como corretor este mês?',
+    'Como você reage quando um cliente diz não?',
+    'Qual parte do seu processo de vendas você evita inconscientemente?',
+    'O que seus clientes mais elogiam em você?',
+    'Como você se prepara mentalmente antes de uma visita importante?',
+    'Qual é o seu maior obstáculo para bater sua meta?',
+    'Você cuida da sua saúde como cuida dos seus clientes?',
+    'Qual foi a última vez que você pediu feedback a um cliente?',
+    'O que você aprendeu com sua última objeção não contornada?',
+    'Como você celebra suas conquistas?',
+    'Qual é o seu ritual matinal antes de trabalhar?',
+    'Você conhece bem o produto que vende?',
+    'O que te faz continuar quando as coisas ficam difíceis?',
+    'Como você lida com a comparação com outros corretores?',
+    'O que você faria com o dobro da sua renda atual?',
+    'Qual cliente marcou sua carreira e por quê?',
+    'Como você está investindo no seu desenvolvimento profissional?',
+    'O que você diria ao seu eu de 5 anos atrás?',
+    'Qual é o próximo passo concreto para chegar na sua meta?',
+    'Você tem um mentor ou referência na área? Quem?',
+    'O que você tem feito para ampliar sua rede de contatos?',
+    'Como você gerencia sua energia ao longo do dia?',
+    'O que te impede de pedir mais indicações aos clientes?',
+    'Qual é o seu maior diferencial competitivo?',
+    'O que você vai fazer diferente amanhã?'
+  ];
+  var dIdx = Math.floor(hoje.getTime() / 86400000) % pqs.length;
+  var pq = pqs[dIdx];
+  var pqEl = $('home-pq');
+  if(pqEl) pqEl.textContent = pq;
+  var regs = UD.registros || [];
+  var hojeStr = hoje.toDateString();
+  var respHoje = regs.find(function(r){ return r.tipo === 'pergunta' && new Date(r.data).toDateString() === hojeStr; });
+  var pqResp = $('home-pq-resp');
+  if(pqResp) pqResp.textContent = respHoje ? '✓ Respondida hoje' : 'Primeira conexão';
+
+  // Streak
+  var dots = $('streak-dots');
+  if(dots){
+    var dias = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+    var plano = UD.plano || {};
+    dots.innerHTML = '';
+    for(var i = 0; i < 7; i++){
+      var d = new Date(hoje);
+      d.setDate(hoje.getDate() - dow + i);
+      var done = plano['streak_' + d.toDateString()];
+      var el = document.createElement('div');
+      el.className = 'sd' + (done ? ' done' : '') + (i === dow ? ' today' : '');
+      el.textContent = done ? '✓' : dias[i].substring(0,3);
+      dots.appendChild(el);
+    }
+  }
+
+  // Plano progresso
+  var tasks = [];
+  PLANO.forEach(function(s){ s.tarefas.forEach(function(t){ tasks.push(t); }); });
+  var planoD = UD.plano || {};
+  var done = tasks.filter(function(t){ return planoD[t.id]; }).length;
+  var pct = tasks.length > 0 ? Math.round(done / tasks.length * 100) : 0;
+  var pctEl = $('home-plano-pct');
+  if(pctEl) pctEl.textContent = pct + '%';
+  var bar = $('home-plano-bar');
+  if(bar) bar.style.width = pct + '%';
+  var hint = $('home-plano-hint');
+  if(hint) hint.textContent = pct === 0 ? 'Toque para começar o dia 1' : pct === 100 ? '🏆 Plano concluído!' : done + ' de ' + tasks.length + ' tarefas';
+}
+
+window.checkinHome = function(r){
+  var metas = UD.metas || [];
+  if(metas.length > 0) metas[metas.length-1].checkin = r;
+  save('metas', metas);
+  toast(r === 'sim' ? '🏆 Meta alcançada! Parabéns!' : '💪 Continue firme na próxima semana!');
+  renderHome();
+};
+
+// ── DISC ──
+var DP = {
+  D: {nome:'Dominante', desc:'Direto, decidido e orientado a resultados.', fortes:['Fecha rápido','Foco no resultado','Não perde tempo'], atencao:['Pode pressionar demais','Pouco empático em negociações longas'], aprende:'Com desafios práticos e metas claras.'},
+  I: {nome:'Influente', desc:'Comunicativo, entusiasmado e persuasivo.', fortes:['Cria conexão rápida','Entusiasmo é contagiante','Excelente rapport'], atencao:['Pode prometer mais do que entregar','Perde foco nos detalhes'], aprende:'Com histórias, exemplos e interação.'},
+  S: {nome:'Estável', desc:'Paciente, confiável e excelente ouvinte.', fortes:['Gera confiança','Escuta o cliente de verdade','Relacionamento duradouro'], atencao:['Pode evitar conflito necessário','Demora para fechar'], aprende:'Com processos claros e ambiente seguro.'},
+  C: {nome:'Consciencioso', desc:'Analítico, preciso e orientado a dados.', fortes:['Domina informação técnica','Argumentos sólidos','Confiável nos dados'], atencao:['Pode paralisar por análise','Pouco espontâneo'], aprende:'Com dados, estudos e lógica.'}
+};
+var DISC_DATA = [
+  {q:'Quando enfrento uma objeção forte, minha primeira reação é:', opts:[{t:'Rebater com dados e argumentos diretos',p:'D'},{t:'Contar uma história de sucesso parecida',p:'I'},{t:'Ouvir com calma e entender o real motivo',p:'S'},{t:'Apresentar análise comparativa detalhada',p:'C'}]},
+  {q:'Minha maior força como corretor é:', opts:[{t:'Fechar negócios rapidamente',p:'D'},{t:'Criar conexões genuínas',p:'I'},{t:'Ser confiável e consistente',p:'S'},{t:'Dominar todos os detalhes técnicos',p:'C'}]},
+  {q:'Como prefiro iniciar uma abordagem com novo cliente?', opts:[{t:'Indo direto ao ponto e perguntando o que precisa',p:'D'},{t:'Quebrando o gelo com conversa leve e bom humor',p:'I'},{t:'Ouvindo primeiro para entender a situação',p:'S'},{t:'Apresentando dados do mercado para criar credibilidade',p:'C'}]},
+  {q:'Quando perco uma venda, minha reação é:', opts:[{t:'Analisar rapidamente o que deu errado e seguir em frente',p:'D'},{t:'Ligar para o cliente e entender o que aconteceu',p:'I'},{t:'Refletir com calma e ajustar a abordagem',p:'S'},{t:'Documentar tudo e criar um plano para não repetir',p:'C'}]},
+  {q:'Meu ambiente de trabalho ideal é:', opts:[{t:'Dinâmico, com metas desafiadoras e liberdade de ação',p:'D'},{t:'Colaborativo, com muita interação e energia positiva',p:'I'},{t:'Estável, com processos claros e equipe de confiança',p:'S'},{t:'Organizado, com dados e informações sempre disponíveis',p:'C'}]},
+  {q:'Quando preciso convencer um cliente indeciso, eu:', opts:[{t:'Apresento um prazo ou condição especial para decidir logo',p:'D'},{t:'Compartilho casos de outros clientes satisfeitos',p:'I'},{t:'Dou espaço e mostro que estou disponível quando precisar',p:'S'},{t:'Envio uma análise comparativa completa por escrito',p:'C'}]},
+  {q:'Como você prefere aprender coisas novas?', opts:[{t:'Testando na prática direto no campo',p:'D'},{t:'Em conversas, treinamentos em grupo e exemplos reais',p:'I'},{t:'Com tempo para assimilar, passo a passo',p:'S'},{t:'Lendo materiais técnicos e estudando a fundo',p:'C'}]},
+  {q:'Meu ponto de atenção como corretor é:', opts:[{t:'Às vezes sou direto demais e afasto clientes mais sensíveis',p:'D'},{t:'Posso ser entusiasmado demais e perder o foco',p:'I'},{t:'Tenho dificuldade em criar urgência e fechar mais rápido',p:'S'},{t:'Fico muito nos detalhes e demoro para agir',p:'C'}]},
+  {q:'Numa visita ao imóvel, meu foco principal é:', opts:[{t:'Conduzir para o fechamento o mais rápido possível',p:'D'},{t:'Criar uma experiência positiva e conexão emocional',p:'I'},{t:'Garantir que o cliente se sinta seguro e confortável',p:'S'},{t:'Apresentar todas as especificações técnicas com precisão',p:'C'}]},
+  {q:'Como você lida com clientes difíceis?', opts:[{t:'Enfrento diretamente e proponho soluções imediatas',p:'D'},{t:'Uso o humor e a empatia para aliviar a tensão',p:'I'},{t:'Escuto pacientemente até entender a raiz do problema',p:'S'},{t:'Busco dados e fatos para resolver com base em evidências',p:'C'}]},
+  {q:'O que mais te motiva no trabalho?', opts:[{t:'Superar metas e ser o número 1',p:'D'},{t:'Fazer parte da realização de um sonho do cliente',p:'I'},{t:'Construir relacionamentos de longo prazo',p:'S'},{t:'Dominar o produto e o mercado com profundidade',p:'C'}]},
+  {q:'Quando recebo um feedback crítico, minha reação é:', opts:[{t:'Aceito se fizer sentido e ajusto rápido',p:'D'},{t:'Fico um pouco abalado mas logo me animo de novo',p:'I'},{t:'Levo a sério e reflito bastante antes de mudar algo',p:'S'},{t:'Analiso criteriosamente e só mudo com base em dados',p:'C'}]}
 ];
-function renderPilares(){
-  $('pil-content').innerHTML=`<div class="pgrid">${PIL.map(p=>`<div class="pcrd" onclick="window.abrirPilar('${p.id}')"><div class="pi">${p.icon}</div><div class="pn">${p.nome}</div><div class="pd">${p.desc}</div></div>`).join('')}</div>`;
-}
-window.abrirPilar=function(id){
-  const p=PIL.find(x=>x.id===id);
-  const disc=UD.disc;
-  $('pil-content').innerHTML=`<div class="pdet">
-    <button class="btn-back" onclick="renderPilares()">← Voltar</button>
-    <div style="display:flex;align-items:center;gap:12px"><span style="font-size:2rem">${p.icon}</span><div><div style="font-size:1rem;font-weight:700;color:var(--gold)">${p.nome}</div><div style="font-size:.72rem;color:var(--dim);margin-top:2px">${p.desc}</div></div></div>
-    ${p.insights.map(ins=>`<div class="ins-acc"><div class="ins-acc-h" onclick="window.togAcc(this)"><span>${ins.t}</span><span class="chv">▼</span></div><div class="ins-acc-b"><p>${ins.c}</p><p class="ori">→ ${ins.o}</p></div></div>`).join('')}
-    <div class="disc-tip"><div class="tip-lbl">💡 Dica para o perfil ${disc?disc.perfil:'DISC'}</div><p>${disc?p.disc[disc.perfil]:'Faça o Quiz DISC para receber dicas personalizadas.'}</p></div>
-    <div style="height:8px"></div>
-  </div>`;
-}
-window.togAcc=function(h){const b=h.nextElementSibling;h.classList.toggle('open');b.classList.toggle('open');}
+var ds = {qIdx:0, scores:{D:0,I:0,S:0,C:0}};
 
-// PLANO
-const PLANO=[
-  {semana:1,titulo:'Semana 1 — Consciência e Identidade',sub:'Entenda quem você é e onde está',tarefas:[
+function renderDisc(){
+  ds = {qIdx:0, scores:{D:0,I:0,S:0,C:0}};
+  renderDiscQ();
+}
+function renderDiscQ(){
+  var q = DISC_DATA[ds.qIdx];
+  $('disc-content').innerHTML = '<div class="dq-wrap">'
+    + '<div class="dq-num">Pergunta ' + (ds.qIdx+1) + ' de ' + DISC_DATA.length + '</div>'
+    + '<div class="dq-prog"><div class="dq-fill" style="width:' + Math.round(ds.qIdx/DISC_DATA.length*100) + '%"></div></div>'
+    + '<div class="dq-q">' + q.q + '</div>'
+    + '<div class="dq-opts">' + q.opts.map(function(o,i){
+        return '<button class="dq-opt" onclick="window.respDisc(\'' + o.p + '\')">' + o.t + '</button>';
+      }).join('') + '</div>'
+    + '</div>';
+}
+window.respDisc = function(p){
+  ds.scores[p]++;
+  ds.qIdx++;
+  if(ds.qIdx < DISC_DATA.length){ renderDiscQ(); return; }
+  // Resultado
+  var max = 0, perfil = 'D';
+  Object.keys(ds.scores).forEach(function(k){ if(ds.scores[k] > max){ max = ds.scores[k]; perfil = k; } });
+  var total = DISC_DATA.length;
+  var disc = {perfil:perfil, nome:DP[perfil].nome, scores:ds.scores, total:total};
+  save('disc', disc);
+  var p2 = DP[perfil];
+  $('disc-content').innerHTML = '<div class="dr-wrap">'
+    + '<div class="dr-card"><div class="dr-letter">' + perfil + '</div><div class="dr-name">' + p2.nome + '</div><div class="dr-desc">' + p2.desc + '</div></div>'
+    + '<div class="bars-card"><h3>Distribuição dos eixos</h3>'
+    + ['D','I','S','C'].map(function(l){
+        var pct = Math.round(ds.scores[l]/total*100);
+        return '<div class="bar-row"><div class="bar-lbl">' + l + '</div>'
+          + '<div class="bar-track"><div class="bar-fill' + (l===perfil?' hi':'') + '" style="width:' + pct + '%"></div></div>'
+          + '<div class="bar-pct">' + pct + '%</div></div>';
+      }).join('') + '</div>'
+    + '<div class="ins-card"><h3>Seu perfil em vendas</h3>'
+    + '<div class="ins-item"><h4>💪 Pontos fortes</h4><p>' + p2.fortes.join(' · ') + '</p></div>'
+    + '<div class="ins-item"><h4>⚠️ Pontos de atenção</h4><p>' + p2.atencao.join(' · ') + '</p></div>'
+    + '<div class="ins-item"><h4>📖 Como você aprende melhor</h4><p>' + p2.aprende + '</p></div></div>'
+    + '<button class="btn-s" style="margin:0 16px 8px" onclick="window.refDisc()">Refazer o quiz</button>'
+    + '<button class="btn-p" style="margin:0 16px 16px" onclick="goSec(\'home\')">Ir para a home →</button>'
+    + '</div>';
+};
+window.refDisc = function(){ save('disc', null); renderDisc(); };
+
+// ── PILARES ──
+var PIL = [
+  {id:'ment',icon:'🧠',title:'Mentalidade',sub:'A base de tudo',
+   insights:[
+    {t:'Identidade antes de metas',d:'Você não fecha mais porque ainda não se vê como um corretor de alto nível. A mudança começa na identidade.'},
+    {t:'Rejeição é redirecionamento',d:'Cada não é um filtro. Corretores de elite agradecem os nãos porque selecionam os clientes certos.'},
+    {t:'Rituais criam consistência',d:'Performance não é inspiração — é rotina. Defina um ritual matinal e mantenha por 21 dias.'},
+    {t:'Você é seu maior produto',d:'Antes de vender imóveis, você vende confiança. Invista em você primeiro.'}
+   ],
+   disc:{D:'Use sua ambição como combustível, não como pressão excessiva.',I:'Sua energia positiva é um ativo. Canalize para resultados concretos.',S:'Sua consistência é ouro. Confie no processo.',C:'Seus dados te dão segurança. Use isso como base para agir.'}},
+  {id:'proc',icon:'⚙️',title:'Processo',sub:'Método gera resultado',
+   insights:[
+    {t:'Pipeline limpo, mente clara',d:'Mantenha no máximo 20 clientes ativos no seu funil. Qualidade sobre quantidade.'},
+    {t:'Qualifique antes de visitar',d:'A visita sem qualificação é perda de tempo. 3 perguntas certas valem mais que 3 horas de visita errada.'},
+    {t:'Follow-up sistemático',d:'80% das vendas fecham após o 5º contato. A maioria desiste no 2º.'},
+    {t:'Métricas revelam padrões',d:'Rastreie: leads, visitas, propostas, fechamentos. O número que você não monitora, você não melhora.'}
+   ],
+   disc:{D:'Crie um processo enxuto com marcos claros de avanço.',I:'Use o CRM para não depender só da sua memória.',S:'Seu processo já é bom — acelere os pontos de decisão.',C:'Seus processos são detalhados demais? Simplifique para agir mais rápido.'}},
+  {id:'equi',icon:'🤝',title:'Equipe',sub:'Ninguém cresce sozinho',
+   insights:[
+    {t:'Parcerias multiplicam resultados',d:'Um corretor com 3 parceiros estratégicos fecha 40% mais. Quem são os seus?'},
+    {t:'Aprenda com quem está na frente',d:'Identifique o top performer da sua imobiliária e observe como ele trabalha. Copie o que funciona.'},
+    {t:'Compartilhe para receber',d:'Corretores que compartilham conhecimento recebem mais indicações e oportunidades.'},
+    {t:'Gestor como aliado',d:'Seu gestor quer que você feche. Use as reuniões para pedir feedback real, não só para reportar.'}
+   ],
+   disc:{D:'Lidere pelo exemplo — sua equipe te observa.',I:'Use sua habilidade de criar conexões para construir uma rede forte.',S:'Você é o elo que une a equipe. Valorize isso.',C:'Compartilhe sua análise com colegas — você tem insights que eles não têm.'}},
+  {id:'clie',icon:'❤️',title:'Cliente',sub:'O centro de tudo',
+   insights:[
+    {t:'Escuta ativa é superpoder',d:'O corretor que ouve mais do que fala descobre o real motivador da compra.'},
+    {t:'Venda a transformação',d:'Ninguém compra um imóvel. Compram segurança, status, família, investimento. Venda o que está por trás.'},
+    {t:'Pós-venda gera pré-venda',d:'Uma ligação 30 dias após a entrega das chaves vale mais que 10 panfletos. Faça isso.'},
+    {t:'Perfil DISC do cliente',d:'Observe como o cliente fala e decide. Um C quer dados; um I quer entusiasmo. Adapte sua linguagem.'}
+   ],
+   disc:{D:'Reduza a velocidade com clientes S e C — eles precisam de mais tempo.',I:'Use sua empatia natural para descobrir o real motivador do cliente.',S:'Sua paciência fideliza. Use isso para pós-venda.',C:'Prepare argumentos técnicos mas não se esqueça do lado emocional.'}},
+  {id:'metr',icon:'📊',title:'Métricas',sub:'O que se mede, melhora',
+   insights:[
+    {t:'Os 5 números que importam',d:'Taxa de conversão, ticket médio, ciclo de venda, custo por lead, NPS. Conheça os seus.'},
+    {t:'Meta mensal não é a única meta',d:'Quebre sua meta em semanas, dias e atividades. O que você faz hoje determina o resultado do mês.'},
+    {t:'Diagnóstico antes de solução',d:'Fechamentos caindo? Analise: é falta de lead, de visita, de proposta ou de fechamento? Cada problema tem uma solução diferente.'},
+    {t:'Celebre as métricas de processo',d:'Não só o resultado final. Celebre a ligação difícil que você fez, a visita extra, o follow-up consistente.'}
+   ],
+   disc:{D:'Você já é orientado a resultados. Adicione métricas de processo para não sacrificar qualidade.',I:'Números te entediam? Escolha só 3 e monitore semanalmente.',S:'Use suas métricas para mostrar consistência — isso te diferencia.',C:'Você já monitora tudo. Garanta que está agindo com base nos dados.'}},
+  {id:'merc',icon:'🏖️',title:'Mercado',sub:'Conheça seu território',
+   insights:[
+    {t:'Litoral SC — mercado estrutural',d:'SC tem demanda contínua de gaúchos, paranaenses e paulistas. Não é moda — é migração permanente.'},
+    {t:'Selic em queda favorece',d:'Com Selic em 14,75% e tendência de corte, o crédito imobiliário fica mais acessível. Argumento concreto.'},
+    {t:'Barra Velha e Porto Belo',d:'Valorização acima de 25% ao ano. Janela de compra antes da consolidação do mercado.'},
+    {t:'Especialização vale mais',d:'Corretor especialista em um produto ou bairro fecha 60% mais rápido que o generalista. Escolha seu nicho.'}
+   ],
+   disc:{D:'Use os dados de mercado para criar urgência legítima.',I:'Conte histórias de valorização — números com emoção convencem mais.',S:'Seu conhecimento profundo de mercado é sua segurança.',C:'Você já tem os dados. Agora treine apresentá-los com impacto.'}}
+];
+
+function renderPilares(){
+  if($('pil-content').dataset.detalhe){
+    delete $('pil-content').dataset.detalhe;
+  }
+  $('pil-content').innerHTML = '<div class="pgrid">'
+    + PIL.map(function(p){
+        return '<div class="pcrd" onclick="window.abrirPilar(\'' + p.id + '\')">'
+          + '<div class="pi">' + p.icon + '</div>'
+          + '<div class="pt">' + p.title + '</div>'
+          + '<div class="ps">' + p.sub + '</div>'
+          + '</div>';
+      }).join('')
+    + '</div>';
+}
+window.abrirPilar = function(id){
+  var p = PIL.find(function(x){ return x.id === id; });
+  if(!p) return;
+  var disc = UD.disc;
+  $('pil-content').innerHTML = '<div class="pdet">'
+    + '<button class="btn-back" onclick="renderPilares()">← Voltar</button>'
+    + '<h2>' + p.icon + ' ' + p.title + '</h2>'
+    + p.insights.map(function(ins){
+        return '<div class="ins-acc">'
+          + '<div class="ins-acc-h" onclick="window.togAcc(this)"><span>' + ins.t + '</span><span class="chv">▼</span></div>'
+          + '<div class="ins-acc-b">' + ins.d + '</div>'
+          + '</div>';
+      }).join('')
+    + '<div class="disc-tip"><div class="tip-lbl">💡 Dica para o perfil ' + (disc ? disc.perfil : 'DISC') + '</div>'
+    + '<p>' + (disc ? p.disc[disc.perfil] : 'Faça o Quiz DISC para receber uma dica personalizada.') + '</p></div>'
+    + '</div>';
+};
+window.togAcc = function(h){
+  h.nextElementSibling.classList.toggle('open');
+  var chv = h.querySelector('.chv');
+  if(chv) chv.style.transform = h.nextElementSibling.classList.contains('open') ? 'rotate(180deg)' : '';
+};
+
+// ── PLANO ──
+var PLANO = [
+  {semana:1,titulo:'Semana 1 — Consciência e Identidade',sub:'Entenda quem você é',tarefas:[
     {id:'s1t1',t:'Complete o Quiz DISC e leia seu resultado completo'},
-    {id:'s1t2',t:'Escreva sua Declaração de Identidade — quem você é como corretor, não o que você faz'},
+    {id:'s1t2',t:'Escreva sua Declaração de Identidade como corretor'},
     {id:'s1t3',t:'Liste os 3 maiores obstáculos que te impedem de fechar mais'},
-    {id:'s1t4',t:'Calcule seus 5 números de performance (conversão, ticket, ciclo, custo por lead, taxa proposta→venda)'},
-    {id:'s1t5',t:'🎤 Oratória: grave um áudio de 2 minutos se apresentando como corretor e se escute criticamente'},
-    {id:'s1t6',t:'🏋️ Exercício físico: 30 minutos de caminhada ou academia para descompressão — anote como se sentiu depois'},
-    {id:'s1t7',t:'📖 Leitura dinâmica: leia 10 páginas de um livro sobre vendas ou comportamento humano'}
+    {id:'s1t4',t:'Calcule seus 5 números de performance'},
+    {id:'s1t5',t:'🎤 Oratória: grave 2 minutos se apresentando e se escute'},
+    {id:'s1t6',t:'🏋️ Exercício físico: 30 minutos — anote como se sentiu depois'},
+    {id:'s1t7',t:'📖 Leitura dinâmica: 10 páginas de livro sobre vendas ou comportamento'}
   ]},
-  {semana:2,titulo:'Semana 2 — Comunicação e Branding',sub:'Construa sua presença e voz',tarefas:[
-    {id:'s2t1',t:'🎙️ Dicção: pratique trava-línguas por 5 minutos ao dia durante 5 dias — registre sua evolução'},
-    {id:'s2t2',t:'📱 Branding pessoal: atualize sua bio no WhatsApp, Instagram e LinkedIn com sua proposta de valor real'},
-    {id:'s2t3',t:'Grave um vídeo de 60 segundos sobre um imóvel ou o mercado da sua cidade — poste ou guarde para análise'},
-    {id:'s2t4',t:'Pratique 3 scripts de objeção em voz alta na frente do espelho — observe sua linguagem corporal'},
-    {id:'s2t5',t:'Entre em contato com 5 clientes antigos da carteira — não para vender, para gerar conexão'},
-    {id:'s2t6',t:'🏋️ Exercício físico: 3 sessões de 30 minutos — note o impacto na sua energia e foco'},
-    {id:'s2t7',t:'📖 Leitura dinâmica: leia um capítulo completo e anote 3 insights aplicáveis à sua rotina de corretor'}
+  {semana:2,titulo:'Semana 2 — Comunicação e Branding',sub:'Construa sua presença',tarefas:[
+    {id:'s2t1',t:'🎙️ Dicção: pratique trava-línguas 5 minutos por dia — 5 dias'},
+    {id:'s2t2',t:'📱 Branding: atualize sua bio no WhatsApp, Instagram e LinkedIn'},
+    {id:'s2t3',t:'Grave um vídeo de 60s sobre um imóvel ou o mercado da sua cidade'},
+    {id:'s2t4',t:'Pratique 3 scripts de objeção em voz alta na frente do espelho'},
+    {id:'s2t5',t:'Entre em contato com 5 clientes antigos — não para vender, para conectar'},
+    {id:'s2t6',t:'🏋️ Exercício físico: 3 sessões — observe o impacto na sua energia'},
+    {id:'s2t7',t:'📖 Leitura dinâmica: anote 3 insights aplicáveis à sua rotina'}
   ]},
   {semana:3,titulo:'Semana 3 — PNL e Matemática Financeira',sub:'Domine mente e números',tarefas:[
-    {id:'s3t1',t:'🧠 PNL: pratique ancoragem positiva — defina um gesto ou palavra que ativa seu estado de alta performance antes de visitas'},
-    {id:'s3t2',t:'🧠 PNL: técnica do espelho — passe 5 minutos se comunicando com confiança com seu reflexo antes de cada ligação importante'},
-    {id:'s3t3',t:'📊 Matemática financeira: aprenda a calcular porcentagem de comissão, desconto e valorização — resolva 10 exercícios práticos'},
-    {id:'s3t4',t:'📊 Calcule: se um imóvel vale R$500k e valoriza 12% ao ano, quanto vale em 3 anos? Treine apresentar esse raciocínio ao cliente'},
-    {id:'s3t5',t:'Faça 10 contatos de prospecção em um único dia — use técnicas de PNL para criar rapport rápido'},
-    {id:'s3t6',t:'🏋️ Exercício físico: 3 sessões — relacione sua disciplina física com sua disciplina comercial'},
+    {id:'s3t1',t:'🧠 PNL: pratique ancoragem positiva antes de cada visita'},
+    {id:'s3t2',t:'🧠 PNL: técnica do espelho — 5 minutos antes de cada ligação importante'},
+    {id:'s3t3',t:'📊 Matemática: calcule porcentagem de comissão, desconto e valorização — 10 exercícios'},
+    {id:'s3t4',t:'📊 Treine: imóvel de R$500k com valorização de 12% ao ano vale quanto em 3 anos?'},
+    {id:'s3t5',t:'Faça 10 contatos de prospecção em um único dia usando técnicas de rapport'},
+    {id:'s3t6',t:'🏋️ Exercício físico: 3 sessões — relacione disciplina física com disciplina comercial'},
     {id:'s3t7',t:'Qualifique 100% das visitas da semana com checklist — sem exceção'}
   ]},
   {semana:4,titulo:'Semana 4 — Produto, Mercado e Consolidação',sub:'Especialista que fecha mais',tarefas:[
-    {id:'s4t1',t:'🏠 Produto novo: visite ou estude detalhadamente um lançamento ou empreendimento que você ainda não conhece bem'},
-    {id:'s4t2',t:'Prepare uma apresentação de 3 minutos sobre esse produto — com diferenciais, público-alvo e argumentos de venda'},
-    {id:'s4t3',t:'Estude os dados do Mercado SC e memorize 5 argumentos concretos com números reais'},
-    {id:'s4t4',t:'🧠 PNL: pratique ressignificação — escolha uma objeção que te trava e reformule mentalmente como oportunidade'},
-    {id:'s4t5',t:'📖 Leitura dinâmica: leia um artigo ou capítulo sobre psicologia do consumidor — anote 3 gatilhos que você vai usar'},
-    {id:'s4t6',t:'🏋️ Exercício físico: comprometa-se com uma rotina de 3x por semana para os próximos 30 dias — registre aqui'},
-    {id:'s4t7',t:'Celebre: liste 5 conquistas reais deste mês e defina sua meta desafiadora para os próximos 30 dias'}
+    {id:'s4t1',t:'🏠 Produto novo: visite ou estude detalhadamente um lançamento novo'},
+    {id:'s4t2',t:'Prepare uma apresentação de 3 minutos sobre esse produto'},
+    {id:'s4t3',t:'Estude os dados do Mercado SC e memorize 5 argumentos com números'},
+    {id:'s4t4',t:'🧠 PNL: ressignifique uma objeção que te trava como oportunidade'},
+    {id:'s4t5',t:'📖 Leitura dinâmica: leia sobre psicologia do consumidor — anote 3 gatilhos'},
+    {id:'s4t6',t:'🏋️ Exercício físico: comprometa-se com 3x por semana pelos próximos 30 dias'},
+    {id:'s4t7',t:'Celebre: liste 5 conquistas reais do mês e defina sua meta para os próximos 30 dias'}
   ]}
 ];
+
 function renderPlano(){
-  const pd=UD.plano||{};
-  $('plano-content').innerHTML=`<div class="sem-list">${PLANO.map(sem=>{
-    const done=sem.tarefas.filter(t=>pd[t.id]).length,tot=sem.tarefas.length,pct=Math.round(done/tot*100);
-    return `<div class="sem-crd"><div class="sem-h" onclick="window.togSem(this)"><div class="sem-num">${sem.semana}</div><div class="sem-ht"><h3>${sem.titulo}</h3><p>${sem.sub} · ${done}/${tot} tarefas · ${pct}%</p></div></div><div class="sem-body">${sem.tarefas.map(t=>`<div class="trf" onclick="window.togTrf('${t.id}',${sem.semana})"><div class="trf-chk ${pd[t.id]?'done':''}"></div><div class="trf-txt ${pd[t.id]?'done':''}">${t.t}</div></div>`).join('')}</div></div>`;
-  }).join('')}</div>`;
+  var pd = UD.plano || {};
+  $('plano-content').innerHTML = '<div class="sem-list">'
+    + PLANO.map(function(sem){
+        var done = sem.tarefas.filter(function(t){ return pd[t.id]; }).length;
+        var tot = sem.tarefas.length;
+        var pct = Math.round(done/tot*100);
+        return '<div class="sem-crd">'
+          + '<div class="sem-h" onclick="window.togSem(this)">'
+          + '<div class="sem-num">' + sem.semana + '</div>'
+          + '<div class="sem-ht"><h3>' + sem.titulo + '</h3><p>' + sem.sub + ' · ' + done + '/' + tot + ' tarefas · ' + pct + '%</p></div>'
+          + '</div>'
+          + '<div class="sem-body">'
+          + sem.tarefas.map(function(t){
+              return '<div class="trf" onclick="window.togTrf(\'' + t.id + '\',' + sem.semana + ')">'
+                + '<div class="trf-chk ' + (pd[t.id] ? 'done' : '') + '"></div>'
+                + '<div class="trf-txt ' + (pd[t.id] ? 'done' : '') + '">' + t.t + '</div>'
+                + '</div>';
+            }).join('')
+          + '</div></div>';
+      }).join('')
+    + '</div>';
 }
-window.togSem=function(h){h.nextElementSibling.classList.toggle('open');}; 
-window.togTrf=function(id,sem){
-  // Guarda quais semanas estavam abertas antes de re-renderizar
-  const abertasAntes=[];
-  document.querySelectorAll('.sem-body.open').forEach(b=>{
-    const card=b.closest('.sem-crd');
-    if(card){const idx=[...card.parentNode.children].indexOf(card);abertasAntes.push(idx);}
+window.togSem = function(h){ h.nextElementSibling.classList.toggle('open'); };
+window.togTrf = function(id, sem){
+  var abertas = [];
+  document.querySelectorAll('.sem-body.open').forEach(function(b){
+    var card = b.closest('.sem-crd');
+    if(card){
+      var idx = Array.from(card.parentNode.children).indexOf(card);
+      abertas.push(idx);
+    }
   });
-  const pd={...(UD.plano||{})};pd[id]=!pd[id];
-  pd[`streak_${new Date().toDateString()}`]=true;
-  save('plano',pd);
-  const s=PLANO.find(x=>x.semana===sem);
-  if(s&&s.tarefas.every(t=>pd[t.id])&&pd[id]){
-    $('celeb-titulo').textContent=`🏆 Semana ${sem} concluída!`;
-    $('celeb-msg').textContent=`Você concluiu a "${s.titulo}". Sua consistência é o que separa corretores mediocres de alto desempenho.`;
+  var pd = Object.assign({}, UD.plano || {});
+  pd[id] = !pd[id];
+  pd['streak_' + new Date().toDateString()] = true;
+  save('plano', pd);
+  var s = PLANO.find(function(x){ return x.semana === sem; });
+  if(s && s.tarefas.every(function(t){ return pd[t.id]; }) && pd[id]){
+    $('celeb-titulo').textContent = '🏆 Semana ' + sem + ' concluída!';
+    $('celeb-msg').textContent = 'Você concluiu a "' + s.titulo + '". Consistência é o que separa corretores mediocres dos de alto desempenho.';
     $('celeb').classList.add('on');
   }
   renderPlano();
-  // Restaura abas abertas
-  const cards=document.querySelectorAll('.sem-crd');
-  abertasAntes.forEach(idx=>{if(cards[idx])cards[idx].querySelector('.sem-body').classList.add('open');});
-}
+  var cards = document.querySelectorAll('.sem-crd');
+  abertas.forEach(function(idx){
+    if(cards[idx]) cards[idx].querySelector('.sem-body').classList.add('open');
+  });
+};
 
-// PERGUNTAS
-const PERGUNTAS=["O que você faria diferente hoje se soubesse que amanhã tudo muda?","Qual é o maior medo que ainda te impede de prospectar mais?","O que os seus clientes mais satisfeitos têm em comum?","Se você pudesse dar um conselho ao seu eu de 1 ano atrás, qual seria?","Qual hábito, se mantido por 30 dias, mudaria seus resultados?","Você está trabalhando duro ou trabalhando certo?","O que você aprende com cada cliente que não fecha?","Qual é o maior obstáculo entre você e sua meta mensal?","Você conhece profundamente o que motiva cada cliente do seu pipeline?","O que você está postergando que, se feito agora, mudaria seu mês?","Como você está usando a sua identidade como corretor Hub Litoral?","Você está cobrando o valor que merece ou competindo por preço?","Qual a última vez que você pediu uma indicação ativamente?","O que te diferencia de todos os outros corretores da região?","Você está tratando seu negócio como um negócio ou como um emprego?","Qual é o cliente ideal que você ainda não está buscando?","O que você está fazendo hoje que te levará onde quer chegar em 1 ano?","Como você vai comemorar quando bater sua meta este mês?","Qual visita você poderia qualificar melhor antes de realizá-la?","Você está investindo no seu desenvolvimento tanto quanto no seu trabalho?","O que as pessoas falam de você quando você não está presente?","Qual script de objeção você ainda precisa dominar?","Você tem clareza do seu custo de vida e quanto precisa vender para cobri-lo?","Qual cliente do seu pipeline merece mais atenção esta semana?","O que você faria se soubesse que não poderia falhar?","Qual a história mais poderosa de transformação que você viveu com um cliente?","Você está presente na vida dos seus clientes após a venda?","O que te rouba mais energia desnecessariamente no seu trabalho?","Como você está cuidando da sua saúde mental em meio à pressão por resultados?","Se sua carreira fosse um imóvel, o que precisaria de reforma urgente?"];
+// ── PERGUNTA DO DIA ──
+var PQS = [
+  'Qual é o seu maior medo ao abordar um novo cliente?',
+  'O que você faria diferente na última negociação que perdeu?',
+  'Como você descreveria seu estilo de atendimento em 3 palavras?',
+  'Qual hábito você precisa eliminar para ser mais produtivo?',
+  'O que te diferencia dos outros corretores da sua região?',
+  'Qual foi sua maior vitória como corretor este mês?',
+  'Como você reage quando um cliente diz não?',
+  'Qual parte do seu processo de vendas você evita inconscientemente?',
+  'O que seus clientes mais elogiam em você?',
+  'Como você se prepara mentalmente antes de uma visita importante?',
+  'Qual é o seu maior obstáculo para bater sua meta?',
+  'Você cuida da sua saúde como cuida dos seus clientes?',
+  'Qual foi a última vez que você pediu feedback a um cliente?',
+  'O que você aprendeu com sua última objeção não contornada?',
+  'Como você celebra suas conquistas?',
+  'Qual é o seu ritual matinal antes de trabalhar?',
+  'Você conhece bem o produto que vende?',
+  'O que te faz continuar quando as coisas ficam difíceis?',
+  'Como você lida com a comparação com outros corretores?',
+  'O que você faria com o dobro da sua renda atual?',
+  'Qual cliente marcou sua carreira e por quê?',
+  'Como você está investindo no seu desenvolvimento profissional?',
+  'O que você diria ao seu eu de 5 anos atrás?',
+  'Qual é o próximo passo concreto para chegar na sua meta?',
+  'Você tem um mentor ou referência na área? Quem?',
+  'O que você tem feito para ampliar sua rede de contatos?',
+  'Como você gerencia sua energia ao longo do dia?',
+  'O que te impede de pedir mais indicações aos clientes?',
+  'Qual é o seu maior diferencial competitivo?',
+  'O que você vai fazer diferente amanhã?'
+];
 
 function renderPergunta(){
-  const idx=new Date().getDate()%PERGUNTAS.length;
-  const pq=PERGUNTAS[idx];
-  const regs=UD.registros||[],hoje=new Date().toDateString();
-  const resp=regs.find(r=>r.tipo==='pergunta'&&new Date(r.data).toDateString()===hoje);
-  $('pq-content').innerHTML=`
-    <div class="pq-full"><div class="pq-lbl">REFLEXÃO DE HOJE · ${new Date().toLocaleDateString('pt-BR',{day:'numeric',month:'long'})}</div><div class="pq-q">${pq}</div></div>
-    <div class="fl"><label>Sua resposta</label><textarea class="ta" id="pq-resp" placeholder="Escreva sua reflexão aqui...">${resp?resp.texto:''}</textarea></div>
-    <button class="btn-p" onclick="window.salvarPQ('${pq.replace(/'/g,"\\'")}')">Salvar reflexão</button>
-    <div style="height:8px"></div>`;
+  var hoje = new Date();
+  var dIdx = Math.floor(hoje.getTime() / 86400000) % PQS.length;
+  var pq = PQS[dIdx];
+  var regs = UD.registros || [];
+  var hojeStr = hoje.toDateString();
+  var resp = regs.find(function(r){ return r.tipo === 'pergunta' && new Date(r.data).toDateString() === hojeStr; });
+  $('perg-content').innerHTML = '<div class="pq-full">'
+    + '<div class="pq-lbl">REFLEXÃO DE HOJE · ' + hoje.toLocaleDateString('pt-BR', {day:'numeric',month:'long'}) + '</div>'
+    + '<div class="pq-q">' + pq + '</div>'
+    + '</div>'
+    + '<div class="fl"><label>Sua resposta</label>'
+    + '<textarea class="ta" id="pq-resp" placeholder="Escreva sua reflexão aqui...">' + (resp ? resp.texto : '') + '</textarea>'
+    + '</div>'
+    + '<button class="btn-p" onclick="window.salvarPQ()">Salvar reflexão</button>'
+    + '<div style="height:8px"></div>';
 }
-window.salvarPQ=function(pq){
-  const txt=$('pq-resp').value.trim();
-  if(!txt){toast('Escreva sua reflexão primeiro.');return;}
-  const regs=UD.registros||[],hoje=new Date().toDateString();
-  const idx=regs.findIndex(r=>r.tipo==='pergunta'&&new Date(r.data).toDateString()===hoje);
-  const reg={tipo:'pergunta',pergunta:pq,texto:txt,data:new Date().toISOString()};
-  if(idx>=0)regs[idx]=reg;else regs.push(reg);
-  save('registros',regs);toast('Reflexão salva! ✅');
-}
+window.salvarPQ = function(){
+  var txt = $('pq-resp') && $('pq-resp').value.trim();
+  if(!txt){ toast('Escreva sua reflexão primeiro.'); return; }
+  var hoje = new Date();
+  var hojeStr = hoje.toDateString();
+  var pq = PQS[Math.floor(hoje.getTime() / 86400000) % PQS.length];
+  var regs = UD.registros || [];
+  var idx = regs.findIndex(function(r){ return r.tipo === 'pergunta' && new Date(r.data).toDateString() === hojeStr; });
+  var reg = {tipo:'pergunta', pergunta:pq, texto:txt, data:new Date().toISOString()};
+  if(idx >= 0) regs[idx] = reg; else regs.push(reg);
+  save('registros', regs);
+  toast('Reflexão salva! ✅');
+};
 
-// META
-function buildMetaCard(m,editMode){
-  // editMode = which section is open: null | 'texto' | 'resultado'
-  const cor=m.checkin==='sim'?'var(--green)':m.checkin==='parcial'?'var(--gold)':m.checkin==='nao'?'var(--red)':'var(--dim)';
-  const corTxt=m.checkin==='sim'?'✅ Alcançada':m.checkin==='parcial'?'📝 Parcialmente':m.checkin==='nao'?'❌ Não alcançada':'Pendente';
-  return `<div style="background:var(--navy3);border:1px solid rgba(184,154,79,.25);border-radius:10px;padding:14px">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-      <div style="font-size:.6rem;font-weight:700;color:var(--gold);letter-spacing:2px;text-transform:uppercase">META DESTA SEMANA</div>
-      <button onclick="window.abrirEdicaoMeta('texto')" style="background:rgba(184,154,79,.12);border:1px solid rgba(184,154,79,.35);border-radius:5px;padding:4px 10px;font-size:.65rem;font-weight:600;color:var(--gold);font-family:var(--font);cursor:pointer">✏️ Editar</button>
-    </div>
-    ${editMode==='texto'?`
-      <textarea class="ta" id="meta-edit-texto" style="min-height:70px;margin-bottom:8px">${m.texto}</textarea>
-      <div style="display:flex;gap:8px">
-        <button class="btn-p" style="flex:1;padding:10px;font-size:.8rem" onclick="window.salvarTextoMeta()">Salvar</button>
-        <button class="btn-s" style="flex:1;padding:10px;font-size:.8rem" onclick="window.renderMeta()">Cancelar</button>
-      </div>`:`<div style="font-size:.85rem;color:var(--white);line-height:1.5;margin-bottom:10px">${m.texto}</div>`}
-    ${m.checkin?`
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;padding-top:8px;border-top:1px solid rgba(184,154,79,.1)">
-        <div style="font-size:.78rem;font-weight:600;color:${cor}">${corTxt}</div>
-        <button onclick="window.abrirEdicaoMeta('resultado')" style="background:rgba(184,154,79,.1);border:1px solid rgba(184,154,79,.3);border-radius:5px;padding:3px 9px;font-size:.62rem;font-weight:600;color:var(--gold);font-family:var(--font);cursor:pointer">✏️ Alterar</button>
-      </div>
-      ${editMode==='resultado'?`
-        <div style="margin-top:10px">
-          <div style="font-size:.65rem;font-weight:700;color:var(--gold);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">Alterar resultado:</div>
-          <div style="display:flex;gap:8px;flex-wrap:wrap">
-            <button onclick="window.salvarCheckinMeta('sim')" style="background:rgba(76,175,125,.15);border:1px solid var(--green);border-radius:6px;padding:9px 12px;font-size:.78rem;font-weight:700;color:var(--green);font-family:var(--font);cursor:pointer;flex:1">✅ Alcancei</button>
-            <button onclick="window.salvarCheckinMeta('parcial')" style="background:rgba(184,154,79,.1);border:1px solid var(--gold);border-radius:6px;padding:9px 12px;font-size:.78rem;font-weight:700;color:var(--gold);font-family:var(--font);cursor:pointer;flex:1">📝 Parcial</button>
-            <button onclick="window.salvarCheckinMeta('nao')" style="background:rgba(224,85,85,.1);border:1px solid var(--red);border-radius:6px;padding:9px 12px;font-size:.78rem;font-weight:700;color:var(--red);font-family:var(--font);cursor:pointer;flex:1">❌ Não</button>
-          </div>
-        </div>`:''
-      }
-      ${(m.checkin==='nao'||m.checkin==='parcial')?`
-        <div style="margin-top:10px;padding-top:8px;border-top:1px solid rgba(184,154,79,.08)">
-          <div style="font-size:.65rem;font-weight:700;color:var(--dim);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px">💭 O que acredita que aconteceu?</div>
-          ${m.reflexao?`<div style="font-size:.8rem;color:var(--dim);line-height:1.6;font-style:italic">"${m.reflexao}"</div><button onclick="window.abrirEdicaoMeta('reflexao')" style="margin-top:6px;background:transparent;border:none;font-size:.68rem;color:var(--gold);font-family:var(--font);cursor:pointer;text-decoration:underline">✏️ Editar reflexão</button>`:
-            editMode==='reflexao'?`
-              <textarea class="ta" id="meta-edit-reflexao" style="min-height:80px;margin-bottom:8px" placeholder="O que você acredita que impediu de alcançar? O que faria diferente?">${m.reflexao||''}</textarea>
-              <div style="display:flex;gap:8px">
-                <button class="btn-p" style="flex:1;padding:9px;font-size:.78rem" onclick="window.salvarReflexaoMeta()">Salvar reflexão</button>
-                <button class="btn-s" style="flex:1;padding:9px;font-size:.78rem" onclick="window.renderMeta()">Cancelar</button>
-              </div>`:
-            `<textarea class="ta" id="meta-edit-reflexao" style="min-height:80px;margin-bottom:8px" placeholder="O que você acredita que impediu de alcançar? O que faria diferente?"></textarea>
-             <button class="btn-p" style="padding:9px;font-size:.78rem;width:100%" onclick="window.salvarReflexaoMeta()">Salvar reflexão</button>`
-          }
-        </div>`:''
-      }
-    `:`<div style="font-size:.72rem;color:var(--dim);font-style:italic">Check-in disponível na sexta-feira.</div>`}
-  </div>`;
-}
+// ── META SEMANAL ──
+window.renderMeta = function(){
+  var metas = UD.metas || [];
+  var hoje = new Date();
+  var dow = hoje.getDay();
+  var metaAtual = metas.length > 0 ? metas[metas.length-1] : null;
+  var metaViva = metaAtual && (new Date(metaAtual.data) > new Date(hoje.getTime() - 7*24*60*60*1000));
+  var h = '<h2>🎯 Meta da Semana</h2>';
 
-let _metaEditMode=null;
-window.renderMeta=function renderMeta(){
-  const metas=UD.metas||[],agora=new Date(),dow=agora.getDay();
-  const metaAtual=metas.length>0?metas[metas.length-1]:null;
-  const metaViva=metaAtual&&(new Date(metaAtual.data)>new Date(agora.getTime()-7*24*60*60*1000));
-  let h=`<h2>🎯 Meta da Semana</h2>`;
-  if(dow===1||!metaViva){
-    h+=`<p>Qual é a sua meta para esta semana? Seja específico — uma meta clara vale mais que dez vagas.</p>
-    <div class="fl"><label>Sua meta</label><textarea class="ta" id="meta-inp" placeholder="Ex: Realizar 5 visitas qualificadas e converter 2 em proposta..."></textarea></div>
-    <button class="btn-p" onclick="window.salvarMeta()">Definir meta</button>`;
-  }else if(metaViva&&!metaAtual.checkin&&(dow===5||dow===6||dow===0)){
-    h+=buildMetaCard(metaAtual,null);
-    h+=`<div style="margin-top:12px">
-      <p style="font-size:.83rem;color:var(--dim);margin-bottom:10px">Chegou a sexta — você chegou lá?</p>
-      <div style="display:flex;gap:8px">
-        <button class="btn-sim" onclick="window.salvarCheckinMeta('sim')" style="flex:1;padding:12px;font-size:.82rem">✅ Sim, alcancei!</button>
-        <button onclick="window.salvarCheckinMeta('parcial')" style="flex:1;background:rgba(184,154,79,.1);border:1px solid var(--gold);border-radius:8px;padding:12px;font-size:.82rem;font-weight:700;color:var(--gold);font-family:var(--font);cursor:pointer">📝 Parcialmente</button>
-      </div>
-      <button class="btn-s" style="margin-top:8px;width:100%" onclick="window.salvarCheckinMeta('nao')">❌ Não alcancei dessa vez</button>
-    </div>`;
-  }else if(metaViva){
-    h+=buildMetaCard(metaAtual,_metaEditMode);
+  if(dow === 1 || !metaViva){
+    h += '<p>Qual é a sua meta para esta semana? Seja específico.</p>'
+      + '<div class="fl"><label>Sua meta</label><textarea class="ta" id="meta-inp" placeholder="Ex: Realizar 5 visitas qualificadas e converter 2 em proposta..."></textarea></div>'
+      + '<button class="btn-p" onclick="window.salvarMeta()">Definir meta</button>';
+  } else if(metaViva && !metaAtual.checkin && (dow === 5 || dow === 6 || dow === 0)){
+    h += buildMetaCard(metaAtual, null)
+      + '<div style="margin-top:12px">'
+      + '<p style="font-size:.83rem;color:var(--dim);margin-bottom:10px">Chegou a sexta — você chegou lá?</p>'
+      + '<div style="display:flex;gap:8px">'
+      + '<button class="btn-sim" onclick="window.salvarCheckinMeta(\'sim\')" style="flex:1;padding:12px;font-size:.82rem">✅ Sim, alcancei!</button>'
+      + '<button onclick="window.salvarCheckinMeta(\'parcial\')" style="flex:1;background:rgba(184,154,79,.1);border:1px solid var(--gold);border-radius:8px;padding:12px;font-size:.82rem;font-weight:700;color:var(--gold);font-family:var(--font);cursor:pointer">📝 Parcialmente</button>'
+      + '</div>'
+      + '<button class="btn-s" style="margin-top:8px;width:100%" onclick="window.salvarCheckinMeta(\'nao\')">❌ Não alcancei dessa vez</button>'
+      + '</div>';
+  } else if(metaViva){
+    h += buildMetaCard(metaAtual, _metaEditMode);
   }
-  if(metas.length>1){
-    h+=`<div class="meta-hist"><h3>Histórico</h3>${[...metas].reverse().slice(0,5).map(m=>{
-      const cor=m.checkin==='sim'?'var(--green)':m.checkin==='parcial'?'var(--gold)':m.checkin==='nao'?'var(--red)':'var(--dim)';
-      return `<div class="mhi"><div class="mhi-d">${new Date(m.data).toLocaleDateString('pt-BR',{day:'2-digit',month:'short'})}</div><div class="mhi-t">${m.texto}</div>${m.checkin?`<div class="mhi-c" style="color:${cor}">${m.checkin==='sim'?'✅ Alcançada':m.checkin==='parcial'?'📝 Parcial':'❌ Não alcançada'}</div>`:''}${m.reflexao?`<div style="font-size:.72rem;color:var(--dim);margin-top:3px;font-style:italic">"${m.reflexao.substring(0,60)}${m.reflexao.length>60?'...':''}"</div>`:''}</div>`;
-    }).join('')}</div>`;
-  }
-  $('meta-content').innerHTML=h;
-}
-window.abrirEdicaoMeta=function(modo){_metaEditMode=modo;renderMeta();setTimeout(()=>{const el=$('meta-edit-'+modo);if(el)el.focus();},50);}
-window.salvarTextoMeta=function(){
-  const txt=$('meta-edit-texto').value.trim();
-  if(!txt){toast('Escreva sua meta.');return;}
-  const metas=UD.metas||[];
-  if(metas.length>0)metas[metas.length-1].texto=txt;
-  save('metas',metas);_metaEditMode=null;toast('Meta atualizada! ✅');renderMeta();
-}
-window.salvarCheckinMeta=function(r){
-  const metas=UD.metas||[];
-  if(metas.length>0)metas[metas.length-1].checkin=r;
-  save('metas',metas);_metaEditMode=null;
-  toast(r==='sim'?'🏆 Meta alcançada! Parabéns!':r==='parcial'?'📈 Progresso é progresso!':'💪 Aprenda e ajuste na próxima');
-  renderMeta();
-}
-window.salvarReflexaoMeta=function(){
-  const txt=$('meta-edit-reflexao').value.trim();
-  if(!txt){toast('Escreva sua reflexão.');return;}
-  const metas=UD.metas||[];
-  if(metas.length>0)metas[metas.length-1].reflexao=txt;
-  save('metas',metas);_metaEditMode=null;toast('Reflexão salva! ✅');renderMeta();
-}
-window.salvarMeta=function(){
-  const txt=$('meta-inp').value.trim();
-  if(!txt){toast('Escreva sua meta primeiro.');return;}
-  const metas=UD.metas||[];metas.push({texto:txt,data:new Date().toISOString()});
-  save('metas',metas);toast('Meta definida! 💪');renderMeta();
-}
-window.checkinMeta=window.salvarCheckinMeta;
 
-// SCRIPTS
-const OBJ=[
+  if(metas.length > 1){
+    h += '<div class="meta-hist"><h3>Histórico</h3>'
+      + metas.slice().reverse().slice(0,5).map(function(m){
+          var cor = m.checkin === 'sim' ? 'var(--green)' : m.checkin === 'parcial' ? 'var(--gold)' : m.checkin === 'nao' ? 'var(--red)' : 'var(--dim)';
+          var label = m.checkin === 'sim' ? '✅ Alcançada' : m.checkin === 'parcial' ? '📝 Parcial' : m.checkin === 'nao' ? '❌ Não alcançada' : '';
+          return '<div class="mhi">'
+            + '<div class="mhi-d">' + new Date(m.data).toLocaleDateString('pt-BR',{day:'2-digit',month:'short'}) + '</div>'
+            + '<div class="mhi-t">' + m.texto + '</div>'
+            + (label ? '<div class="mhi-c" style="color:' + cor + '">' + label + '</div>' : '')
+            + (m.reflexao ? '<div style="font-size:.72rem;color:var(--dim);margin-top:3px;font-style:italic">"' + m.reflexao.substring(0,60) + (m.reflexao.length>60?'...':'') + '"</div>' : '')
+            + '</div>';
+        }).join('')
+      + '</div>';
+  }
+  $('meta-content').innerHTML = h;
+};
+
+function buildMetaCard(m, editMode){
+  var cor = m.checkin === 'sim' ? 'var(--green)' : m.checkin === 'parcial' ? 'var(--gold)' : m.checkin === 'nao' ? 'var(--red)' : 'var(--dim)';
+  var corTxt = m.checkin === 'sim' ? '✅ Alcançada' : m.checkin === 'parcial' ? '📝 Parcialmente' : m.checkin === 'nao' ? '❌ Não alcançada' : 'Pendente';
+  var out = '<div style="background:var(--navy3);border:1px solid rgba(184,154,79,.25);border-radius:10px;padding:14px">'
+    + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">'
+    + '<div style="font-size:.6rem;font-weight:700;color:var(--gold);letter-spacing:2px;text-transform:uppercase">META DESTA SEMANA</div>'
+    + '<button onclick="window.abrirEdicaoMeta(\'texto\')" style="background:rgba(184,154,79,.12);border:1px solid rgba(184,154,79,.35);border-radius:5px;padding:4px 10px;font-size:.65rem;font-weight:600;color:var(--gold);font-family:var(--font);cursor:pointer">✏️ Editar</button>'
+    + '</div>';
+
+  if(editMode === 'texto'){
+    out += '<textarea class="ta" id="meta-edit-texto" style="min-height:70px;margin-bottom:8px">' + m.texto + '</textarea>'
+      + '<div style="display:flex;gap:8px">'
+      + '<button class="btn-p" style="flex:1;padding:10px;font-size:.8rem" onclick="window.salvarTextoMeta()">Salvar</button>'
+      + '<button class="btn-s" style="flex:1;padding:10px;font-size:.8rem" onclick="window.renderMeta()">Cancelar</button>'
+      + '</div>';
+  } else {
+    out += '<div style="font-size:.85rem;color:var(--white);line-height:1.5;margin-bottom:10px">' + m.texto + '</div>';
+  }
+
+  if(m.checkin){
+    out += '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;padding-top:8px;border-top:1px solid rgba(184,154,79,.1)">'
+      + '<div style="font-size:.78rem;font-weight:600;color:' + cor + '">' + corTxt + '</div>'
+      + '<button onclick="window.abrirEdicaoMeta(\'resultado\')" style="background:rgba(184,154,79,.1);border:1px solid rgba(184,154,79,.3);border-radius:5px;padding:3px 9px;font-size:.62rem;font-weight:600;color:var(--gold);font-family:var(--font);cursor:pointer">✏️ Alterar</button>'
+      + '</div>';
+
+    if(editMode === 'resultado'){
+      out += '<div style="margin-top:10px">'
+        + '<div style="font-size:.65rem;font-weight:700;color:var(--gold);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">Alterar resultado:</div>'
+        + '<div style="display:flex;gap:8px;flex-wrap:wrap">'
+        + '<button onclick="window.salvarCheckinMeta(\'sim\')" style="background:rgba(76,175,125,.15);border:1px solid var(--green);border-radius:6px;padding:9px 12px;font-size:.78rem;font-weight:700;color:var(--green);font-family:var(--font);cursor:pointer;flex:1">✅ Alcancei</button>'
+        + '<button onclick="window.salvarCheckinMeta(\'parcial\')" style="background:rgba(184,154,79,.1);border:1px solid var(--gold);border-radius:6px;padding:9px 12px;font-size:.78rem;font-weight:700;color:var(--gold);font-family:var(--font);cursor:pointer;flex:1">📝 Parcial</button>'
+        + '<button onclick="window.salvarCheckinMeta(\'nao\')" style="background:rgba(224,85,85,.1);border:1px solid var(--red);border-radius:6px;padding:9px 12px;font-size:.78rem;font-weight:700;color:var(--red);font-family:var(--font);cursor:pointer;flex:1">❌ Não</button>'
+        + '</div></div>';
+    }
+
+    if(m.checkin === 'nao' || m.checkin === 'parcial'){
+      out += '<div style="margin-top:10px;padding-top:8px;border-top:1px solid rgba(184,154,79,.08)">'
+        + '<div style="font-size:.65rem;font-weight:700;color:var(--dim);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px">💭 O que acredita que aconteceu?</div>';
+      if(m.reflexao && editMode !== 'reflexao'){
+        out += '<div style="font-size:.8rem;color:var(--dim);line-height:1.6;font-style:italic">"' + m.reflexao + '"</div>'
+          + '<button onclick="window.abrirEdicaoMeta(\'reflexao\')" style="margin-top:6px;background:transparent;border:none;font-size:.68rem;color:var(--gold);font-family:var(--font);cursor:pointer;text-decoration:underline">✏️ Editar reflexão</button>';
+      } else {
+        out += '<textarea class="ta" id="meta-edit-reflexao" style="min-height:80px;margin-bottom:8px" placeholder="O que você acredita que impediu de alcançar?">' + (m.reflexao||'') + '</textarea>'
+          + '<button class="btn-p" style="padding:9px;font-size:.78rem;width:100%" onclick="window.salvarReflexaoMeta()">Salvar reflexão</button>';
+      }
+      out += '</div>';
+    }
+  } else {
+    out += '<div style="font-size:.72rem;color:var(--dim);font-style:italic;margin-top:6px">Check-in disponível na sexta-feira.</div>';
+  }
+
+  out += '</div>';
+  return out;
+}
+
+window.abrirEdicaoMeta = function(modo){
+  _metaEditMode = modo;
+  window.renderMeta();
+  setTimeout(function(){
+    var el = $('meta-edit-' + modo);
+    if(el) el.focus();
+  }, 50);
+};
+window.salvarTextoMeta = function(){
+  var txt = $('meta-edit-texto') && $('meta-edit-texto').value.trim();
+  if(!txt){ toast('Escreva sua meta.'); return; }
+  var metas = UD.metas || [];
+  if(metas.length > 0) metas[metas.length-1].texto = txt;
+  save('metas', metas);
+  _metaEditMode = null;
+  toast('Meta atualizada! ✅');
+  window.renderMeta();
+};
+window.salvarCheckinMeta = function(r){
+  var metas = UD.metas || [];
+  if(metas.length > 0) metas[metas.length-1].checkin = r;
+  save('metas', metas);
+  _metaEditMode = null;
+  toast(r === 'sim' ? '🏆 Meta alcançada! Parabéns!' : r === 'parcial' ? '📈 Progresso é progresso!' : '💪 Aprenda e ajuste na próxima');
+  window.renderMeta();
+};
+window.salvarReflexaoMeta = function(){
+  var txt = $('meta-edit-reflexao') && $('meta-edit-reflexao').value.trim();
+  if(!txt){ toast('Escreva sua reflexão.'); return; }
+  var metas = UD.metas || [];
+  if(metas.length > 0) metas[metas.length-1].reflexao = txt;
+  save('metas', metas);
+  _metaEditMode = null;
+  toast('Reflexão salva! ✅');
+  window.renderMeta();
+};
+window.salvarMeta = function(){
+  var txt = $('meta-inp') && $('meta-inp').value.trim();
+  if(!txt){ toast('Escreva sua meta primeiro.'); return; }
+  var metas = UD.metas || [];
+  metas.push({texto:txt, data:new Date().toISOString()});
+  save('metas', metas);
+  toast('Meta definida! 💪');
+  window.renderMeta();
+};
+window.checkinMeta = window.salvarCheckinMeta;
+
+// ── SCRIPTS DE OBJEÇÃO ──
+var OBJ = [
   {titulo:'Preço está alto demais',scripts:{D:'Nessa região, imóveis similares valorizaram acima de 15% nos últimos 12 meses. O preço de hoje é o melhor negócio que você vai fazer — amanhã vai custar mais.',I:'Sabe que eu entendo essa sensação? Mas olha o que aconteceu com o Carlos, que achava o mesmo — ele comprou, e 2 anos depois me ligou agradecendo porque o imóvel valorizou muito.',S:'Vamos sentar juntos e analisar: o que você está comparando? Cada imóvel tem um contexto diferente, e quero garantir que você tome a melhor decisão.',C:'Vou te mandar uma comparação: 5 imóveis similares na região, com preço por m², tempo no mercado e histórico de valorização. Com esses dados, você avalia com precisão.'}},
   {titulo:'Os juros estão muito altos',scripts:{D:'A Selic caiu para 14,75% em março — tendência de queda. Quem compra agora trava o preço do imóvel. Quando os juros baixarem mais, pode refinanciar.',I:'Os compradores espertos aproveitaram agora porque tinham menos concorrência. Quando os juros caírem de vez, o preço sobe e vai ter fila.',S:'Vamos fazer juntos uma simulação real de financiamento para o seu caso? Assim você vê exatamente quanto seria a parcela e decide com segurança.',C:'Vou te mostrar: custo total do financiamento hoje vs histórico de valorização do imóvel vs rendimento de renda fixa. Os números falam por si.'}},
-  {titulo:'Preciso falar com meu cônjuge',scripts:{D:'Quando você consegue agendar para vocês dois virem juntos? Posso segurar o imóvel por 48 horas.',I:'Que tal vocês dois virem tomar um café comigo? Quando o casal decide junto é mais especial e respondo todas as dúvidas ao mesmo tempo.',S:'Quais são as principais preocupações que ele ou ela pode ter? Assim eu me preparo para responder da melhor forma quando vocês vierem.',C:'Vou preparar uma apresentação com todos os dados técnicos e simulações para que vocês analisem juntos com calma.'}},
+  {titulo:'Preciso falar com meu cônjuge',scripts:{D:'Quando você consegue agendar para vocês dois virem juntos? Posso segurar o imóvel por 48 horas.',I:'Que tal vocês dois virem tomar um café comigo? Quando o casal decide junto é mais especial e respondo todas as dúvidas ao mesmo tempo.',S:'Quais são as principais preocupações que ele ou ela pode ter? Assim me preparo para responder da melhor forma quando vocês vierem.',C:'Vou preparar uma apresentação com todos os dados técnicos e simulações para que vocês analisem juntos com calma.'}},
   {titulo:'Preciso pensar melhor',scripts:{D:'O que especificamente está travando a decisão? Às vezes é uma dúvida concreta que consigo resolver agora mesmo.',I:'O que te encantou no imóvel? E o que está dando aquela sensação de hesitação? Quero entender para te ajudar a se sentir seguro.',S:'Em uma escala de 1 a 10, quanto esse imóvel atende ao que você procura? Isso me ajuda a entender onde focar.',C:'Posso te enviar um documento com especificações técnicas, documentação do imóvel e análise de mercado comparativa.'}},
   {titulo:'Não é o momento certo',scripts:{D:'Qual seria o momento certo? Porque enquanto você espera, outros compradores estão agindo e o preço continua subindo.',I:'Eu ouço isso com frequência — e depois me ligam dizendo que queriam ter comprado antes. O que está travando o timing?',S:'Qual seria o cenário ideal para você se sentir confortável em avançar? Quero entender o que faria o momento ficar certo.',C:'Quais critérios precisariam estar atendidos? Taxa de juros, entrada, situação profissional? Me diz e te aviso quando esse cenário se aproximar.'}},
   {titulo:'Tem outro corretor me atendendo',scripts:{D:'Posso mostrar algo específico que talvez ainda não tenha visto? Se preferir seguir com o outro, sem problema — quero garantir que você viu as melhores opções.',I:'O que mais você está buscando que ainda não encontrou? Porque a conexão com o corretor certo faz toda a diferença. Me dá 15 minutos?',S:'A confiança no corretor é fundamental. Só quero garantir que você está comparando imóveis equivalentes. Posso te mandar uma seleção?',C:'Se quiser um segundo olhar técnico — documentação, vistoria, análise de mercado — estou disponível para complementar o atendimento.'}},
   {titulo:'O mercado vai cair — melhor esperar',scripts:{D:'Quem esperou o melhor momento em 2023 pagou 30% a mais em 2025. O litoral SC acumula valorização acima de 10% ao ano historicamente.',I:'Eu ouço isso há 5 anos e o mercado continua subindo aqui. Os dados do litoral SC mostram o contrário — e tenho como te provar.',S:'O litoral SC tem demanda estrutural — paulistas, gaúchos, paranaenses buscando qualidade de vida. Isso não para independente do ciclo econômico.',C:'Vou te enviar um estudo de 5 anos de valorização do m² no litoral SC. Mesmo nos momentos de crise, a queda aqui foi menor que no restante do país.'}},
-  {titulo:'O imóvel está muito longe da praia',scripts:{D:'A 800m da praia você tem imóvel 40% mais barato, sem engarrafamento de verão e com potencial de valorização maior no médio prazo.',I:'Os clientes mais satisfeitos que tenho são os que compraram "longe" e hoje valorizam por estar fora do barulho. Qualidade de vida não é só vista para o mar.',S:'O que você mais valoriza: estar na areia ou ter o mar como parte da vida com conforto e custo acessível? Às vezes eles não são a mesma coisa.',C:'A valorização de imóveis a 500m–1km da orla em Penha e Barra Velha foi superior a imóveis de frente para o mar nos últimos 3 anos. Contra-intuitivo, mas verdadeiro.'}},
+  {titulo:'O imóvel está muito longe da praia',scripts:{D:'A 800m da praia você tem imóvel 40% mais barato, sem engarrafamento de verão e com potencial de valorização maior no médio prazo.',I:'Os clientes mais satisfeitos que tenho são os que compraram a distância da orla e hoje valorizam por estar fora do barulho. Qualidade de vida não é só vista para o mar.',S:'O que você mais valoriza: estar na areia ou ter o mar como parte da vida com conforto e custo acessível? Às vezes eles não são a mesma coisa.',C:'A valorização de imóveis a 500m da orla em Penha e Barra Velha foi superior a imóveis de frente para o mar nos últimos 3 anos. Contra-intuitivo, mas verdadeiro.'}},
   {titulo:'Já tenho uma proposta melhor de outra imobiliária',scripts:{D:'Me diz o que a proposta oferece e vejo o que posso fazer. Mas antes: você está comparando o mesmo padrão? Localização, acabamento, documentação?',I:'Que bom para você! Mas o que a outra proposta tem que essa não tem? Às vezes o melhor está nos detalhes que a gente não percebe de primeira.',S:'Me conta os detalhes para eu entender se estão realmente comparando coisas equivalentes — quero te ajudar a tomar a melhor decisão.',C:'Me passe os dados da outra proposta para uma análise comparativa objetiva: m², localização, histórico de valorização e documentação.'}},
   {titulo:'Tenho medo de não conseguir pagar',scripts:{D:'Esse medo é sinal de responsabilidade. Vamos fazer uma análise real de capacidade de pagamento antes de qualquer compromisso?',I:'Todo mundo sente isso. Mas quando você vê os números reais na sua frente, fica muito mais claro. Vamos fazer a simulação juntos agora — sem compromisso?',S:'Vamos calcular juntos: renda, comprometimento máximo e as opções disponíveis dentro da sua realidade.',C:'Preciso de três dados: renda bruta, valor de entrada disponível e prazo desejado. Com isso, faço a análise completa para você.'}},
   {titulo:'Não tenho entrada suficiente',scripts:{D:'Existem opções com entrada parcelada direto com a construtora, uso de FGTS e consórcio. Vamos mapear o que se encaixa no seu momento?',I:'Você seria surpreendido com quantas pessoas compraram sem ter a entrada pronta. O FGTS pode ser um aliado incrível — você tem conta ativa há mais de 3 anos?',S:'Há imóveis com entrada facilitada pelo incorporador, e o FGTS pode cobrir parte ou toda a entrada. Qual é sua situação com o FGTS?',C:'Há pelo menos 4 caminhos: FGTS como entrada, consórcio, parcelamento direto com construtora e permuta. Me diz sua situação e faço um mapa completo.'}},
@@ -1220,344 +1496,412 @@ const OBJ=[
 ];
 
 function renderScripts(){
-  if(UD.scripts_score)scriptsScore={...scriptsScore,...UD.scripts_score};
-  const disc=UD.disc?.perfil;
-  let h='';
-  if(disc)h+=`<div style="padding:14px 16px 0"><div class="disc-top">✦ Seu perfil DISC: ${disc} — ${DP[disc].nome} · Seu script está destacado em cada objeção</div></div>`;
-  if(scriptsScore.vistos.length>0){
-    h+=`<div class="score-wrap"><h3>📚 Progresso de Estudo</h3><div class="score-nums"><div class="score-item ok"><div class="sn">${scriptsScore.acertos}</div><div class="sl">estudadas</div></div><div class="score-item"><div class="sn" style="color:var(--gold)">${OBJ.length}</div><div class="sl">total</div></div><div class="score-item"><div class="sn" style="color:var(--dim)">${OBJ.length-scriptsScore.acertos}</div><div class="sl">restam</div></div></div><div style="margin-top:10px"><button class="btn-s" onclick="window.resetScripts()" style="padding:8px 16px;font-size:.75rem;width:auto">↺ Reiniciar contagem</button></div></div>`;
+  if(UD.scripts_score) scriptsScore = Object.assign({}, scriptsScore, UD.scripts_score);
+  var disc = UD.disc && UD.disc.perfil;
+  var h = '';
+  if(disc){
+    h += '<div style="padding:14px 16px 0"><div class="disc-top">✦ Seu perfil DISC: ' + disc + ' — ' + DP[disc].nome + ' · Seu script está destacado em cada objeção</div></div>';
   }
-  h+=`<div class="obj-list">`;
-  OBJ.forEach((ob,i)=>{
-    const visto=scriptsScore.vistos.includes(i);
-    h+=`<div class="obj-crd" style="${visto?'border-color:rgba(76,175,125,.35)':''}">
-      <div class="obj-h" onclick="window.togObj(this,${i})">
-        <span style="${visto?'color:var(--green)':''}">${ob.titulo}</span>
-        <div style="display:flex;align-items:center;gap:8px">${visto?'<span style="font-size:.65rem;color:var(--green)">✓</span>':''}<span style="color:var(--gold);transition:.3s">▼</span></div>
-      </div>
-      <div class="obj-b">
-        <div class="disc-top" style="font-size:.7rem;margin-bottom:10px">💡 Estude as 4 abordagens — a do seu perfil está destacada</div>
-        ${['D','I','S','C'].map(p=>`<div class="scr ${disc===p?'hl':''}"><div class="scr-lbl">${p} — ${DP[p].nome}${disc===p?' ✦ Seu perfil':''}</div><div class="scr-txt">${ob.scripts[p]}</div></div>`).join('')}
-        ${!visto?`<button class="btn-p" style="margin-top:12px;font-size:.78rem;padding:10px" onclick="window.marcarEstudado(${i})">✓ Estudei esta objeção</button>`:'<div style="font-size:.72rem;color:var(--green);margin-top:10px;text-align:center;padding:8px;background:rgba(76,175,125,.1);border-radius:6px">✓ Objeção estudada — continue praticando!</div>'}
-      </div>
-    </div>`;
+  if(scriptsScore.vistos.length > 0){
+    h += '<div class="score-wrap"><h3>📚 Progresso de Estudo</h3>'
+      + '<div class="score-nums">'
+      + '<div class="score-item ok"><div class="sn">' + scriptsScore.acertos + '</div><div class="sl">estudadas</div></div>'
+      + '<div class="score-item"><div class="sn" style="color:var(--gold)">' + OBJ.length + '</div><div class="sl">total</div></div>'
+      + '<div class="score-item"><div class="sn" style="color:var(--dim)">' + (OBJ.length - scriptsScore.acertos) + '</div><div class="sl">restam</div></div>'
+      + '</div>'
+      + '<div style="margin-top:10px"><button class="btn-s" onclick="window.resetScripts()" style="padding:8px 16px;font-size:.75rem;width:auto">↺ Reiniciar contagem</button></div>'
+      + '</div>';
+  }
+  h += '<div class="obj-list">';
+  OBJ.forEach(function(ob, i){
+    var visto = scriptsScore.vistos.indexOf(i) >= 0;
+    h += '<div class="obj-crd" style="' + (visto ? 'border-color:rgba(76,175,125,.35)' : '') + '">'
+      + '<div class="obj-h" onclick="window.togObj(this,' + i + ')">'
+      + '<span style="' + (visto ? 'color:var(--green)' : '') + '">' + ob.titulo + '</span>'
+      + '<div style="display:flex;align-items:center;gap:8px">' + (visto ? '<span style="font-size:.65rem;color:var(--green)">✓</span>' : '') + '<span style="color:var(--gold);transition:.3s">▼</span></div>'
+      + '</div>'
+      + '<div class="obj-b">'
+      + '<div class="disc-top" style="font-size:.7rem;margin-bottom:10px">💡 Estude as 4 abordagens — a do seu perfil está destacada</div>'
+      + ['D','I','S','C'].map(function(p){
+          return '<div class="scr ' + (disc === p ? 'hl' : '') + '">'
+            + '<div class="scr-lbl">' + p + ' — ' + DP[p].nome + (disc === p ? ' ✦ Seu perfil' : '') + '</div>'
+            + '<div class="scr-txt">' + ob.scripts[p] + '</div>'
+            + '</div>';
+        }).join('')
+      + (!visto
+          ? '<button class="btn-p" style="margin-top:12px;font-size:.78rem;padding:10px" onclick="window.marcarEstudado(' + i + ')">✓ Estudei esta objeção</button>'
+          : '<div style="font-size:.72rem;color:var(--green);margin-top:10px;text-align:center;padding:8px;background:rgba(76,175,125,.1);border-radius:6px">✓ Objeção estudada!</div>')
+      + '</div></div>';
   });
-  h+=`</div>`;
-  $('scripts-content').innerHTML=h;
+  h += '</div>';
+  $('scripts-content').innerHTML = h;
 }
-window.togObj=function(h,idx){const b=h.nextElementSibling;b.classList.toggle('open');const chv=h.querySelector('span:last-child');chv.style.transform=b.classList.contains('open')?'rotate(180deg)':'';chv.style.transition='.3s';}
-window.marcarEstudado=function(idx){
-  if(!scriptsScore.vistos.includes(idx)){scriptsScore.vistos.push(idx);scriptsScore.acertos++;}
-  save('scripts_score',scriptsScore);renderScripts();
-  toast(`✅ ${scriptsScore.acertos}/${OBJ.length} objeções estudadas!`);
-}
-window.resetScripts=function(){scriptsScore={acertos:0,erros:0,vistos:[]};save('scripts_score',scriptsScore);renderScripts();toast('Contagem reiniciada!');}
+window.togObj = function(h, idx){
+  var b = h.nextElementSibling;
+  b.classList.toggle('open');
+  var chv = h.querySelector('span:last-child');
+  if(chv){ chv.style.transform = b.classList.contains('open') ? 'rotate(180deg)' : ''; chv.style.transition = '.3s'; }
+};
+window.marcarEstudado = function(idx){
+  if(scriptsScore.vistos.indexOf(idx) < 0){ scriptsScore.vistos.push(idx); scriptsScore.acertos++; }
+  save('scripts_score', scriptsScore);
+  renderScripts();
+  toast('✅ ' + scriptsScore.acertos + '/' + OBJ.length + ' objeções estudadas!');
+};
+window.resetScripts = function(){
+  scriptsScore = {acertos:0, erros:0, vistos:[]};
+  save('scripts_score', scriptsScore);
+  renderScripts();
+  toast('Contagem reiniciada!');
+};
 
-// SIMULADOR
-const CENS=[
-  {nivel:'★★★',titulo:'Cliente quer esperar os juros baixarem',desc:'Um comprador qualificado, com entrada disponível, diz: "Prefiro esperar a Selic cair mais. Assim o financiamento fica mais barato." Como você responde sem perder a venda?',opts:[
-    {t:'Concordar e dizer que ligará quando os juros melhorarem mais',c:false,fb:'❌ Você abdicou da venda. O cliente vai comprar com outro corretor assim que os juros caírem — ou o preço do imóvel vai subir antes disso.'},
-    {t:'Mostrar que o preço do imóvel sobe enquanto ele espera, e que pode refinanciar quando os juros caírem',c:true,fb:'✅ Raciocínio financeiro completo: o custo de esperar é a valorização perdida. Quem compra agora trava o preço; quando os juros caírem, pode refinanciar. Argumento técnico e difícil de rebater.'},
-    {t:'Dizer que os juros não vão cair tão cedo',c:false,fb:'❌ Você não pode prever o futuro — e o cliente sabe disso. Perda de credibilidade imediata.'}
-  ]},
-  {nivel:'★★★',titulo:'Casal indeciso após 4 visitas — cônjuge não compareceu',desc:'Um cliente veio sozinho 4 vezes. Está apaixonado pelo imóvel, mas diz que a esposa ainda não viu e ela é quem decide. Você tem apenas mais uma janela de oportunidade. O que você faz?',opts:[
-    {t:'Enviar fotos e vídeos para o cliente encaminhar à esposa',c:false,fb:'❌ Delegar a apresentação para o cliente é a forma mais rápida de perder o controle da negociação. Ele vai apresentar mal e a esposa vai dizer não.'},
-    {t:'Propor uma visita exclusiva à esposa com experiência personalizada — flores, carta, café — e tratar ela como a compradora real',c:true,fb:'✅ A esposa é a tomadora de decisão real. Criar uma experiência personalizada para ela transforma a dinâmica. Corretores de alto nível vendem para quem decide.'},
-    {t:'Pressionar o cliente a fechar antes sem a esposa e depois convencê-la',c:false,fb:'❌ Venda sem o cônjuge quase sempre gera cancelamento ou conflito. Você perde a venda e a indicação futura.'}
-  ]},
-  {nivel:'★★★',titulo:'Cliente com proposta 20% abaixo — proprietário inflexível',desc:'Um cliente fez uma proposta 20% abaixo do preço. O proprietário disse que não sai por menos de 5% de desconto. A negociação está travada. O que você faz?',opts:[
-    {t:'Dizer ao cliente que o proprietário não aceita e encerrar a negociação',c:false,fb:'❌ Você desistiu antes de tentar. Corretores de elite encontram saídas criativas — é isso que justifica a comissão.'},
-    {t:'Trabalhar dos dois lados: ajudar o cliente a entender o valor real do imóvel e o proprietário a entender o custo de perder um comprador qualificado agora',c:true,fb:'✅ Negociação bilateral é a essência do trabalho do corretor. Apresente ao proprietário o custo de tempo no mercado; ao cliente, os dados de valorização. Encontre o ponto de equilíbrio.'},
-    {t:'Dizer ao proprietário que vai perder a venda e aceitar a proposta do cliente',c:false,fb:'❌ Forçar o proprietário viola sua relação de confiança com ele. Além disso, você pode perder o mandato de venda.'}
-  ]},
-  {nivel:'★★★★',titulo:'Investidor comparando retorno com renda fixa',desc:'Um investidor diz: "Com a Selic em 14,75%, meu dinheiro rende mais na renda fixa do que em imóvel. Por que eu compraria agora?" Como você responde tecnicamente?',opts:[
-    {t:'Dizer que imóvel sempre valoriza e que renda fixa é arriscada',c:false,fb:'❌ Mentira técnica. Renda fixa com Selic em 14,75% é segura e líquida. Investidor experiente vai saber que você está equivocado.'},
-    {t:'Apresentar o retorno combinado: aluguel por temporada (12-18% a.a. no litoral SC) + valorização histórica (10-15% a.a.) vs Selic real (14,75% menos IR menos inflação de 4,14%)',c:true,fb:'✅ Resposta técnica correta. O retorno real da Selic após IR (22,5%) e inflação é de ~7,3% a.a. O imóvel no litoral SC com aluguel de temporada pode superar isso — além de ser ativo real e proteção patrimonial.'},
-    {t:'Concordar que renda fixa é melhor agora e sugerir que ele espere os juros caírem',c:false,fb:'❌ Você perdeu a venda sem lutar. E o cliente vai comprar com outro corretor quando os juros caírem — e o preço já vai estar mais alto.'}
-  ]},
-  {nivel:'★★★★',titulo:'Cliente que foi mal atendido por outro corretor da sua imobiliária',desc:'Um cliente chega até você dizendo que foi mal atendido por um colega seu na mesma imobiliária. Ele está irritado e desconfiante com a marca. Como você conduz?',opts:[
-    {t:'Criticar o colega para ganhar a confiança do cliente',c:false,fb:'❌ Nunca critique um colega de trabalho para o cliente. Isso passa deslealdade — e o cliente vai se perguntar o que você fala dele para outros.'},
-    {t:'Assumir a responsabilidade como membro da equipe, pedir desculpas genuínas, ouvir o cliente sem interromper e mostrar por ações (não palavras) que sua experiência será diferente',c:true,fb:'✅ Gestão de crise de relacionamento correta. Empatia genuína + responsabilidade + ação concreta. O cliente que foi mal atendido e depois foi bem tratado tem alto potencial de indicação.'},
-    {t:'Dizer que não tem nada a ver com o que aconteceu antes e focar em vender',c:false,fb:'❌ O cliente não quer ouvir isso. Ele quer se sentir ouvido. Ignorar o problema é a segunda decepção seguida — e a última.'}
-  ]},
-  {nivel:'★★★★',titulo:'Visita técnica — cliente com conhecimento de engenharia',desc:'Durante uma visita, um cliente com formação em engenharia começa a questionar tecnicamente: padrão construtivo, espessura de laje, tipo de revestimento, instalações elétricas. Você não sabe responder com precisão. O que você faz?',opts:[
-    {t:'Improvisar respostas técnicas para não parecer despreparado',c:false,fb:'❌ Um engenheiro vai identificar a imprecisão imediatamente. Você perde credibilidade de forma irreparável.'},
-    {t:'Reconhecer honestamente que não é o especialista técnico, valorizar o conhecimento do cliente, e comprometer-se a trazer as respostas precisas do engenheiro da construtora em até 24h',c:true,fb:'✅ Honestidade inteligente. Ninguém espera que o corretor seja engenheiro. O que o cliente quer é confiar em você. Assumir os limites e entregar a resposta certa cria mais confiança do que improvisar.'},
-    {t:'Mudar de assunto e falar dos diferenciais de localização e valorização',c:false,fb:'❌ Esquivar da pergunta técnica sem responder é percebido como desvio intencional. O cliente vai ficar ainda mais desconfiado.'}
-  ]},
-  {nivel:'★★★★',titulo:'Cliente quer comprar mas tem nome negativado',desc:'Um cliente qualificado, com renda compatível, confessa que tem o nome negativado e não sabe se consegue financiar. Como você ajuda sem perder a venda?',opts:[
-    {t:'Dizer que infelizmente não pode ajudar e indicar que limpe o nome antes de voltar',c:false,fb:'❌ Você perdeu um cliente qualificado sem explorar alternativas. Corretores de elite sabem que há caminhos mesmo com restrições.'},
-    {t:'Mapear as alternativas: consórcio contemplado, compra com cônjuge sem restrição, imóvel direto com incorporador, ou ajudá-lo a regularizar a situação com um plano de 3-6 meses',c:true,fb:'✅ Solução consultiva de alto nível. O cliente que tem restrição mas é ajudado a resolver vira cliente fiel para vida. Você se torna um consultor de vida, não só um vendedor de imóveis.'},
-    {t:'Tentar vender um imóvel mais barato para evitar financiamento bancário',c:false,fb:'❌ Forçar uma solução sem entender o caso completo pode criar problema jurídico e frustração. Diagnostique antes de prescrever.'}
-  ]},
-  {nivel:'★★★★★',titulo:'Branding pessoal — cliente pesquisou você antes da visita',desc:'No início de uma visita, o cliente diz: "Pesquisei você antes de vir. Vi que você tem poucas avaliações online e não encontrei muito sobre você." Como você responde?',opts:[
-    {t:'Ficar desconfortável, pedir desculpas e tentar mudar de assunto',c:false,fb:'❌ Defensividade sinaliza insegurança. O cliente já estava com dúvida — você confirmou a dúvida dele.'},
-    {t:'Transformar o momento em oportunidade: "Você tem razão, estou construindo minha presença digital — mas minha reputação está nos resultados dos meus clientes. Posso te conectar com 3 deles agora pelo WhatsApp?"',c:true,fb:'✅ Resposta de alta performance. Reconhece a verdade, redireciona para o que importa (prova social real) e cria ação concreta imediata. Confiança é construída com transparência + demonstração.'},
-    {t:'Inventar que tem muitos clientes satisfeitos mas prefere manter discrição',c:false,fb:'❌ Mentira verificável. Se o cliente tentar checar depois, você perde a confiança completamente.'}
-  ]},
-  {nivel:'★★★★★',titulo:'Oratória na apresentação — cliente distante e no celular',desc:'Você está fazendo a apresentação do imóvel. O cliente está claramente distraído, olhando o celular e respondendo com monossílabos. O que você faz para reconquistar a atenção?',opts:[
-    {t:'Continuar a apresentação normalmente e esperar que ele preste atenção',c:false,fb:'❌ Você está falando para si mesmo. Apresentação sem audiência ativa é tempo e energia desperdiçados.'},
-    {t:'Parar a apresentação, fazer uma pergunta direta e pessoal que exige reflexão ("Imagina sua família aqui num domingo — como seria a manhã de vocês?") e criar engajamento emocional',c:true,fb:'✅ Técnica de PNL e oratória aplicada. Perguntas que ativam a imaginação desligam a distração. O silêncio estratégico e a pergunta certa valem mais do que 10 minutos de apresentação técnica.'},
-    {t:'Perguntar se ele quer remarcar a visita para outro momento',c:false,fb:'❌ Você perdeu a oportunidade. O cliente vai ir embora e provavelmente não vai remarcar.'}
-  ]},
-  {nivel:'★★★★★',titulo:'PNL — cliente que diz "não" de forma categórica',desc:'Você faz uma proposta clara. O cliente responde: "Não. Definitivamente não. Não é o que eu procuro." Linguagem corporal fechada. Como você reage?',opts:[
-    {t:'Aceitar o não e encerrar a conversa educadamente',c:false,fb:'❌ Um não categórico quase sempre esconde uma objeção real não revelada. O corretor de elite vai descobrir o que está por trás antes de aceitar.'},
-    {t:'Fazer a pergunta de PNL: "Entendo. Me ajuda a entender — o que exatamente não se encaixa? Porque quero garantir que, se existir algo certo para você, eu vá atrás." — e ouvir sem interromper',c:true,fb:'✅ Técnica avançada de PNL: o "não" é uma porta, não uma parede. A pergunta certa, feita com calma, abre o canal para a objeção real. Frequentemente o cliente revela o verdadeiro bloqueio depois dessa pergunta.'},
-    {t:'Tentar fazer uma nova proposta imediatamente para mostrar alternativas',c:false,fb:'❌ Antes de entender o "porquê" do não, qualquer nova proposta vai ser rejeitada também. Diagnóstico antes de prescrição.'}
-  ]},
-  {nivel:'★★★★★',titulo:'Matemática financeira — cliente questiona o valor do m²',desc:'O cliente diz: "Esse imóvel tem 85m² e custa R$765.000. O m² está em R$9.000. Mas vi online que a média da cidade é R$7.500/m². Você está me cobrando caro." Como você responde com dados?',opts:[
-    {t:'Dizer que o preço está correto e que o cliente deve estar comparando imóveis diferentes',c:false,fb:'❌ Resposta vaga sem argumentação técnica. O cliente vai embora convicto de que você tentou enganá-lo.'},
-    {t:'Calcular ao vivo com o cliente: mostrar que a média de R$7.500/m² considera imóveis antigos e sem acabamento premium — e que o diferencial de localização, andar e acabamento deste imóvel justifica o ágio de 20%',c:true,fb:'✅ Matemática financeira aplicada à venda. Você precisa saber calcular: preço médio por faixa de acabamento, impacto de andar (1-2% por andar em prédios), localização premium. Cliente que faz conta precisa de corretor que também sabe fazer conta.'},
-    {t:'Oferecer um desconto para igualar o preço à média do mercado',c:false,fb:'❌ Você desvalorizou o produto sem defender o preço. Se não acredita no valor do imóvel, o cliente também não vai acreditar.'}
-  ]},
-  {nivel:'★★★★★',titulo:'Ética profissional — colega pede para omitir informação do cliente',desc:'Um colega corretor te pede para não mencionar ao cliente que o imóvel vizinho tem um processo de demolição previsto. "Ele não vai descobrir antes de fechar", diz o colega. O que você faz?',opts:[
-    {t:'Concordar para não criar conflito com o colega e manter o bom relacionamento de equipe',c:false,fb:'❌ Omissão de informação relevante é crime. Você pode responder judicialmente junto com o colega. Além disso, quando o cliente descobrir, você perde credibilidade para sempre.'},
-    {t:'Recusar com firmeza, informar o cliente sobre o processo de demolição e conversar com o gestor sobre a conduta do colega',c:true,fb:'✅ Ética é inegociável. O corretor de alto nível sabe que reputação é construída ao longo de anos e destruída em um caso. Transparência gera confiança duradoura — e clientes para a vida toda.'},
-    {t:'Não mencionar ativamente, mas não mentir se o cliente perguntar',c:false,fb:'❌ Omissão ativa de informação relevante para a decisão de compra é equiparada juridicamente à falsa declaração. Não há zona cinza aqui.'}
-  ]},
-  {nivel:'★★★★★',titulo:'Gestão de crise — imóvel entregue com problemas graves',desc:'Um cliente que comprou com você há 8 meses liga furioso: o imóvel foi entregue com infiltrações graves, elétrica deficiente e acabamento muito abaixo do prometido. Ele quer seu dinheiro de volta e ameaça processar. Como você age?',opts:[
-    {t:'Dizer que sua responsabilidade encerrou com a venda e indicar o cliente a procurar a construtora',c:false,fb:'❌ Tecnicamente pode ser verdade, mas praticamente é a destruição da sua reputação. Esse cliente vai contar para 50 pessoas a experiência negativa.'},
-    {t:'Assumir o papel de intermediário ativo: acompanhar o cliente na reunião com a construtora, documentar os problemas, cobrar soluções e não sair de cena até a resolução',c:true,fb:'✅ Pós-venda é onde os grandes corretores se diferenciam. O cliente que viveu um problema sério e foi amparado pelo corretor até a resolução se torna o defensor mais fiel da sua carreira.'},
-    {t:'Pedir para o cliente aguardar e não fazer nada enquanto espera a construtora resolver',c:false,fb:'❌ Passividade em crise é conivência com o problema. O cliente vai processar você junto com a construtora.'}
-  ]},
-  {nivel:'★★★★★',titulo:'Fechamento — silêncio pós-proposta',desc:'Você fez a proposta. Apresentou preço, condições, documentação. O cliente ficou em silêncio por 30 segundos. Sua tentação é preencher o silêncio com mais argumentos. O que você deve fazer?',opts:[
-    {t:'Começar a falar novamente sobre os benefícios do imóvel para não deixar o silêncio durar',c:false,fb:'❌ O silêncio após a proposta é sagrado. Quem fala primeiro depois da proposta, cede. Você vai diluir a proposta com informação desnecessária — ou pior, oferecer desconto sem precisar.'},
-    {t:'Manter o silêncio com postura tranquila e confiante — e esperar o cliente falar',c:true,fb:'✅ Técnica clássica de fechamento: silêncio pós-proposta. O desconforto do silêncio é real para os dois lados, mas quem cede primeiro perde vantagem de negociação. Postura calma e confiante comunica certeza no valor do que você está oferecendo.'},
-    {t:'Perguntar "O que você acha?" para quebrar o silêncio',c:false,fb:'❌ Pergunta aberta após proposta abre espaço para objeção sem necessidade. O cliente já sabe o que acha — está processando. Deixe-o processar.'}
-  ]},
-  {nivel:'★★★★★',titulo:'Gestão de carteira — cliente sumiu após 3 visitas',desc:'Um cliente fez 3 visitas animadas. Depois, simplesmente sumiu. Não responde WhatsApp, não atende ligação. Faz 3 semanas. Qual é a abordagem certa?',opts:[
-    {t:'Tentar ligar mais uma vez e, se não atender, desistir',c:false,fb:'❌ Você desistiu cedo demais. Estudos de vendas mostram que 80% das vendas fecham após o 5º contato. Um cliente que sumiu quase sempre tem um motivo — muitas vezes contornável.'},
-    {t:'Mudar o canal e o tom: enviar uma mensagem de texto curta, direta e sem pressão ("Oi [nome], tudo bem? Não quero insistir — só queria saber se posso te ajudar com algo ou se encontrou o que procurava.") e aguardar',c:true,fb:'✅ Mudança de canal + tom sem pressão é a técnica certa. Mensagem curta, humana e sem julgamento. Muitos clientes sumidos voltam porque se sentiram bem-tratados mesmo no silêncio. É a semente de uma indicação futura.'},
-    {t:'Enviar uma lista de novos imóveis disponíveis para mostrar que você continua ativo',c:false,fb:'❌ Parece spam para quem está evitando contato. O cliente vai ignorar e se sentir perseguido.'}
-  ]}
+// ── SIMULADOR ──
+var CENS = [
+  {nivel:'★★★',titulo:'Cliente quer esperar os juros baixarem',desc:'Um comprador qualificado, com entrada disponível, diz que prefere esperar a Selic cair antes de financiar. Como você responde sem perder a venda?',opts:[{t:'Concordar e dizer que vai entrar em contato quando os juros melhorarem mais',c:false,fb:'Você abdicou da venda. O cliente vai comprar com outro corretor assim que os juros caírem — ou o preço do imóvel vai subir antes disso.'},{t:'Mostrar que o preço do imóvel sobe enquanto ele espera, e que pode refinanciar quando os juros caírem',c:true,fb:'Raciocínio financeiro completo: o custo de esperar é a valorização perdida. Quem compra agora trava o preço; quando os juros caírem, pode refinanciar.'},{t:'Dizer que os juros não vão cair tão cedo',c:false,fb:'Você não pode prever o futuro — e o cliente sabe disso. Perda de credibilidade imediata.'}]},
+  {nivel:'★★★',titulo:'Casal indeciso — cônjuge não compareceu',desc:'Um cliente veio sozinho 4 vezes. Está apaixonado pelo imóvel, mas a esposa ainda não viu e é ela quem decide. Você tem apenas mais uma janela. O que você faz?',opts:[{t:'Enviar fotos e vídeos para o cliente encaminhar à esposa',c:false,fb:'Delegar a apresentação para o cliente é a forma mais rápida de perder o controle da negociação.'},{t:'Propor uma visita exclusiva à esposa com experiência personalizada',c:true,fb:'A esposa é a tomadora de decisão real. Criar uma experiência personalizada para ela transforma a dinâmica.'},{t:'Pressionar o cliente a fechar antes sem a esposa',c:false,fb:'Venda sem o cônjuge quase sempre gera cancelamento ou conflito.'}]},
+  {nivel:'★★★',titulo:'Cliente com proposta 20% abaixo — proprietário inflexível',desc:'Um cliente fez uma proposta 20% abaixo do preço. O proprietário disse que não sai por menos de 5% de desconto. A negociação está travada. O que você faz?',opts:[{t:'Dizer ao cliente que o proprietário não aceita e encerrar a negociação',c:false,fb:'Você desistiu antes de tentar. Corretores de elite encontram saídas criativas.'},{t:'Trabalhar dos dois lados: ajudar o cliente a entender o valor real do imóvel e o proprietário a entender o custo de perder um comprador qualificado agora',c:true,fb:'Negociação bilateral é a essência do trabalho do corretor.'},{t:'Dizer ao proprietário que vai perder a venda e aceitar a proposta do cliente',c:false,fb:'Forçar o proprietário viola sua relação de confiança com ele.'}]},
+  {nivel:'★★★★',titulo:'Investidor comparando retorno com renda fixa',desc:'Um investidor diz: Com a Selic em 14,75%, meu dinheiro rende mais na renda fixa do que em imóvel. Por que eu compraria agora? Como você responde tecnicamente?',opts:[{t:'Dizer que imóvel sempre valoriza e que renda fixa é arriscada',c:false,fb:'Mentira técnica. Renda fixa com Selic em 14,75% é segura e líquida. Investidor experiente vai saber.'},{t:'Apresentar o retorno combinado: aluguel por temporada (12-18% a.a.) mais valorização histórica (10-15% a.a.) vs Selic real após IR e inflação',c:true,fb:'O retorno real da Selic após IR (22,5%) e inflação é de ~7,3% a.a. O imóvel no litoral SC com aluguel de temporada pode superar isso.'},{t:'Concordar que renda fixa é melhor agora e sugerir que ele espere os juros caírem',c:false,fb:'Você perdeu a venda sem lutar.'}]},
+  {nivel:'★★★★',titulo:'Cliente que foi mal atendido por outro corretor',desc:'Um cliente chega até você dizendo que foi mal atendido por um colega da mesma imobiliária. Ele está irritado e desconfiante. Como você conduz?',opts:[{t:'Criticar o colega para ganhar a confiança do cliente',c:false,fb:'Nunca critique um colega de trabalho para o cliente. O cliente vai se perguntar o que você fala dele para outros.'},{t:'Assumir a responsabilidade como membro da equipe, pedir desculpas genuínas e mostrar por ações que sua experiência será diferente',c:true,fb:'Gestão de crise de relacionamento correta. Empatia genuína mais responsabilidade mais ação concreta.'},{t:'Dizer que não tem nada a ver com o que aconteceu antes e focar em vender',c:false,fb:'O cliente não quer ouvir isso. Ele quer se sentir ouvido.'}]},
+  {nivel:'★★★★',titulo:'Visita técnica — cliente engenheiro',desc:'Durante uma visita, um cliente com formação em engenharia questiona tecnicamente: padrão construtivo, espessura de laje, tipo de revestimento, instalações elétricas. Você não sabe responder com precisão. O que você faz?',opts:[{t:'Improvisar respostas técnicas para não parecer despreparado',c:false,fb:'Um engenheiro vai identificar a imprecisão imediatamente. Você perde credibilidade de forma irreparável.'},{t:'Reconhecer honestamente que não é o especialista técnico e comprometer-se a trazer as respostas do engenheiro da construtora em até 24h',c:true,fb:'Honestidade inteligente. Assumir os limites e entregar a resposta certa cria mais confiança do que improvisar.'},{t:'Mudar de assunto e falar dos diferenciais de localização e valorização',c:false,fb:'Esquivar da pergunta técnica sem responder é percebido como desvio intencional.'}]},
+  {nivel:'★★★★',titulo:'Cliente com nome negativado',desc:'Um cliente qualificado, com renda compatível, confessa que tem o nome negativado e não sabe se consegue financiar. Como você ajuda sem perder a venda?',opts:[{t:'Dizer que infelizmente não pode ajudar e indicar que limpe o nome antes de voltar',c:false,fb:'Você perdeu um cliente qualificado sem explorar alternativas.'},{t:'Mapear as alternativas: consórcio contemplado, compra com cônjuge sem restrição, imóvel direto com incorporador, ou plano de regularização em 3-6 meses',c:true,fb:'Solução consultiva de alto nível. O cliente que tem restrição mas é ajudado a resolver vira cliente fiel para vida.'},{t:'Tentar vender um imóvel mais barato para evitar financiamento bancário',c:false,fb:'Forçar uma solução sem entender o caso completo pode criar problema jurídico e frustração.'}]},
+  {nivel:'★★★★★',titulo:'Branding pessoal — cliente pesquisou você',desc:'No início de uma visita, o cliente diz que pesquisou você antes de vir e que você tem poucas avaliações online. Como você responde?',opts:[{t:'Ficar desconfortável, pedir desculpas e tentar mudar de assunto',c:false,fb:'Defensividade sinaliza insegurança. O cliente já estava com dúvida — você confirmou a dúvida dele.'},{t:'Transformar em oportunidade: reconhecer a verdade, redirecionar para resultados reais e oferecer conectar o cliente com clientes anteriores pelo WhatsApp',c:true,fb:'Resposta de alta performance. Transparência mais demonstração concreta constroem confiança real.'},{t:'Inventar que tem muitos clientes satisfeitos mas prefere manter discrição',c:false,fb:'Mentira verificável. Se o cliente tentar checar depois, você perde a confiança completamente.'}]},
+  {nivel:'★★★★★',titulo:'Oratória na apresentação — cliente no celular',desc:'Você está fazendo a apresentação do imóvel. O cliente está claramente distraído, olhando o celular e respondendo com monossílabos. O que você faz?',opts:[{t:'Continuar a apresentação normalmente e esperar que ele preste atenção',c:false,fb:'Você está falando para si mesmo. Apresentação sem audiência ativa é tempo e energia desperdiçados.'},{t:'Parar a apresentação, fazer uma pergunta pessoal que exige reflexão e criar engajamento emocional',c:true,fb:'Técnica de PNL e oratória aplicada. Perguntas que ativam a imaginação desligam a distração.'},{t:'Perguntar se ele quer remarcar a visita para outro momento',c:false,fb:'Você perdeu a oportunidade. O cliente vai ir embora e provavelmente não vai remarcar.'}]},
+  {nivel:'★★★★★',titulo:'PNL — cliente que diz não de forma categórica',desc:'Você faz uma proposta clara. O cliente responde: Não. Definitivamente não. Não é o que eu procuro. Linguagem corporal fechada. Como você reage?',opts:[{t:'Aceitar o não e encerrar a conversa educadamente',c:false,fb:'Um não categórico quase sempre esconde uma objeção real não revelada.'},{t:'Fazer a pergunta de PNL: Entendo. Me ajuda a entender o que exatamente não se encaixa? Porque quero garantir que se existir algo certo para você, eu vá atrás. — e ouvir sem interromper',c:true,fb:'Técnica avançada de PNL: o não é uma porta, não uma parede. A pergunta certa, feita com calma, abre o canal para a objeção real.'},{t:'Tentar fazer uma nova proposta imediatamente para mostrar alternativas',c:false,fb:'Antes de entender o porquê do não, qualquer nova proposta vai ser rejeitada também.'}]},
+  {nivel:'★★★★★',titulo:'Matemática financeira — cliente questiona o m²',desc:'O cliente diz: Esse imóvel tem 85m² e custa R$765.000. O m² está em R$9.000. A média da cidade é R$7.500/m². Você está me cobrando caro. Como você responde com dados?',opts:[{t:'Dizer que o preço está correto e que o cliente deve estar comparando imóveis diferentes',c:false,fb:'Resposta vaga sem argumentação técnica. O cliente vai embora convicto de que você tentou enganá-lo.'},{t:'Calcular ao vivo com o cliente: mostrar que a média considera imóveis antigos e sem acabamento premium e que o diferencial de localização, andar e acabamento justifica o ágio de 20%',c:true,fb:'Matemática financeira aplicada à venda. Cliente que faz conta precisa de corretor que também sabe fazer conta.'},{t:'Oferecer um desconto para igualar o preço à média do mercado',c:false,fb:'Você desvalorizou o produto sem defender o preço.'}]},
+  {nivel:'★★★★★',titulo:'Ética — colega pede para omitir informação',desc:'Um colega pede para você não mencionar ao cliente que o imóvel vizinho tem um processo de demolição previsto. Ele não vai descobrir antes de fechar, diz o colega. O que você faz?',opts:[{t:'Concordar para não criar conflito com o colega',c:false,fb:'Omissão de informação relevante é crime. Você pode responder judicialmente junto com o colega.'},{t:'Recusar com firmeza, informar o cliente e conversar com o gestor sobre a conduta do colega',c:true,fb:'Ética é inegociável. O corretor de alto nível sabe que reputação é construída ao longo de anos e destruída em um caso.'},{t:'Não mencionar ativamente, mas não mentir se o cliente perguntar',c:false,fb:'Omissão ativa de informação relevante é equiparada juridicamente à falsa declaração.'}]},
+  {nivel:'★★★★★',titulo:'Gestão de crise — imóvel entregue com problemas',desc:'Um cliente que comprou com você há 8 meses liga furioso: o imóvel foi entregue com infiltrações graves, elétrica deficiente e acabamento abaixo do prometido. Ele quer seu dinheiro de volta. Como você age?',opts:[{t:'Dizer que sua responsabilidade encerrou com a venda e indicar o cliente a procurar a construtora',c:false,fb:'Tecnicamente pode ser verdade, mas praticamente é a destruição da sua reputação.'},{t:'Assumir o papel de intermediário ativo: acompanhar o cliente, documentar os problemas e cobrar soluções até a resolução',c:true,fb:'Pós-venda é onde os grandes corretores se diferenciam. O cliente que viveu um problema e foi amparado vira o maior defensor da sua carreira.'},{t:'Pedir para o cliente aguardar e não fazer nada enquanto espera a construtora resolver',c:false,fb:'Passividade em crise é conivência com o problema.'}]},
+  {nivel:'★★★★★',titulo:'Fechamento — silêncio pós-proposta',desc:'Você fez a proposta. Apresentou preço, condições, documentação. O cliente ficou em silêncio por 30 segundos. Sua tentação é preencher o silêncio com mais argumentos. O que você deve fazer?',opts:[{t:'Começar a falar novamente sobre os benefícios do imóvel',c:false,fb:'O silêncio após a proposta é sagrado. Quem fala primeiro depois da proposta, cede.'},{t:'Manter o silêncio com postura tranquila e confiante — e esperar o cliente falar',c:true,fb:'Técnica clássica de fechamento: silêncio pós-proposta. Postura calma e confiante comunica certeza no valor do que você está oferecendo.'},{t:'Perguntar O que você acha? para quebrar o silêncio',c:false,fb:'Pergunta aberta após proposta abre espaço para objeção sem necessidade.'}]},
+  {nivel:'★★★★★',titulo:'Gestão de carteira — cliente que sumiu',desc:'Um cliente fez 3 visitas animadas. Depois simplesmente sumiu. Não responde WhatsApp, não atende ligação. Faz 3 semanas. Qual é a abordagem certa?',opts:[{t:'Tentar ligar mais uma vez e se não atender desistir',c:false,fb:'Você desistiu cedo demais. 80% das vendas fecham após o 5º contato.'},{t:'Mudar o canal e o tom: enviar uma mensagem curta, direta e sem pressão e aguardar',c:true,fb:'Mudança de canal mais tom sem pressão é a técnica certa. Mensagem curta, humana e sem julgamento. Muitos clientes sumidos voltam porque se sentiram bem-tratados mesmo no silêncio.'},{t:'Enviar uma lista de novos imóveis disponíveis para mostrar que você continua ativo',c:false,fb:'Parece spam para quem está evitando contato.'}]}
 ];
-let simAt=null,simScore={acertos:0,erros:0,total:0};
-window.resetSimScore=function(){simScore={acertos:0,erros:0,total:0};renderSim();};
+
 function renderSim(){
-  const c=$('sim-content');
-  if(simAt!==null){renderSimAt(c);return;}
-  const scoreHtml=simScore.total>0?`<div class="score-wrap" style="margin:14px 16px 0"><h3>🎯 Seu Desempenho</h3><div class="score-nums"><div class="score-item ok"><div class="sn">${simScore.acertos}</div><div class="sl">acertos</div></div><div class="score-item err"><div class="sn">${simScore.erros}</div><div class="sl">erros</div></div><div class="score-item"><div class="sn" style="color:var(--gold)">${simScore.total}</div><div class="sl">feitos</div></div></div><div style="margin-top:10px"><button class="btn-s" onclick="window.resetSimScore()" style="padding:8px 16px;font-size:.75rem;width:auto">↺ Reiniciar pontuação</button></div></div>`:'';
-  c.innerHTML=scoreHtml+`<div class="sim-list">${CENS.map((cn,i)=>`<div class="sim-crd" onclick="window.abrirSim(${i})"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><div class="sim-num">CENÁRIO ${i+1}</div><div style="font-size:.75rem;color:${cn.nivel.length>=4?'var(--red)':cn.nivel.length===3?'var(--gold)':'var(--green)'}">${cn.nivel}</div></div><div class="sim-title">${cn.titulo}</div><div class="sim-desc">${cn.desc.substring(0,80)}...</div></div>`).join('')}</div>`;
+  var c = $('sim-content');
+  if(simAt !== null){ renderSimAt(c); return; }
+  var scoreHtml = '';
+  if(simScore.total > 0){
+    scoreHtml = '<div class="score-wrap" style="margin:14px 16px 0"><h3>🎯 Seu Desempenho</h3>'
+      + '<div class="score-nums">'
+      + '<div class="score-item ok"><div class="sn">' + simScore.acertos + '</div><div class="sl">acertos</div></div>'
+      + '<div class="score-item err"><div class="sn">' + simScore.erros + '</div><div class="sl">erros</div></div>'
+      + '<div class="score-item"><div class="sn" style="color:var(--gold)">' + simScore.total + '</div><div class="sl">feitos</div></div>'
+      + '</div>'
+      + '<div style="margin-top:10px"><button class="btn-s" onclick="window.resetSimScore()" style="padding:8px 16px;font-size:.75rem;width:auto">↺ Reiniciar pontuação</button></div>'
+      + '</div>';
+  }
+  c.innerHTML = scoreHtml + '<div class="sim-list">'
+    + CENS.map(function(cn, i){
+        var nivColor = cn.nivel.length >= 9 ? 'var(--red)' : cn.nivel.length >= 7 ? 'var(--red)' : 'var(--gold)';
+        return '<div class="sim-crd" onclick="window.abrirSim(' + i + ')">'
+          + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">'
+          + '<div class="sim-num">CENÁRIO ' + (i+1) + '</div>'
+          + '<div style="font-size:.75rem;color:' + nivColor + '">' + cn.nivel + '</div>'
+          + '</div>'
+          + '<div class="sim-title">' + cn.titulo + '</div>'
+          + '<div class="sim-desc">' + cn.desc.substring(0,80) + '...</div>'
+          + '</div>';
+      }).join('')
+    + '</div>';
 }
-window.abrirSim=function(i){simAt={idx:i,resp:false};renderSimAt($('sim-content'));}
-window.voltarSim=function(){simAt=null;renderSim();}
+window.abrirSim = function(i){ simAt = {idx:i, resp:false}; renderSimAt($('sim-content')); };
+window.voltarSim = function(){ simAt = null; renderSim(); };
+window.resetSimScore = function(){ simScore = {acertos:0, erros:0, total:0}; renderSim(); };
+
 function renderSimAt(c){
-  const cn=CENS[simAt.idx];
-  const niv=cn.nivel;
-  const nivColor=niv.length>=9?'var(--red)':niv.length>=7?'var(--red)':niv.length>=5?'var(--gold)':'var(--green)';
-  c.innerHTML=`<div class="sim-active">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-      <button class="btn-back" onclick="window.voltarSim()">← Voltar</button>
-      <div style="font-size:.75rem;color:${nivColor}">${cn.nivel}</div>
-    </div>
-    <div class="sim-num">CENÁRIO ${simAt.idx+1} DE ${CENS.length}</div>
-    <div style="font-size:.88rem;font-weight:600;color:var(--gold);margin:6px 0 10px;line-height:1.4">${cn.titulo}</div>
-    <div class="sim-scenario">${cn.desc}</div>
-    <div style="font-size:.65rem;font-weight:700;color:var(--dim);letter-spacing:2px;text-transform:uppercase;margin:12px 0 8px">Escolha a melhor resposta:</div>
-    <div class="sim-opts">${cn.opts.map((o,i)=>`<button class="sim-opt" id="so${i}" onclick="window.respSim(${i})"><span style="font-weight:700;color:var(--gold);margin-right:8px">${i+1}.</span>${o.t}</button>`).join('')}</div>
-    <div class="sim-fb" id="sim-fb"></div>
-  </div>`;
+  var cn = CENS[simAt.idx];
+  var nivColor = cn.nivel.length >= 9 ? 'var(--red)' : cn.nivel.length >= 7 ? 'var(--red)' : 'var(--gold)';
+  c.innerHTML = '<div class="sim-active">'
+    + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">'
+    + '<button class="btn-back" onclick="window.voltarSim()">← Voltar</button>'
+    + '<div style="font-size:.75rem;color:' + nivColor + '">' + cn.nivel + '</div>'
+    + '</div>'
+    + '<div class="sim-num">CENÁRIO ' + (simAt.idx+1) + ' DE ' + CENS.length + '</div>'
+    + '<div style="font-size:.88rem;font-weight:600;color:var(--gold);margin:6px 0 10px;line-height:1.4">' + cn.titulo + '</div>'
+    + '<div class="sim-scenario">' + cn.desc + '</div>'
+    + '<div style="font-size:.65rem;font-weight:700;color:var(--dim);letter-spacing:2px;text-transform:uppercase;margin:12px 0 8px">Escolha a melhor resposta:</div>'
+    + '<div class="sim-opts">'
+    + cn.opts.map(function(o, i){
+        return '<button class="sim-opt" id="so' + i + '" onclick="window.respSim(' + i + ')">'
+          + '<span style="font-weight:700;color:var(--gold);margin-right:8px">' + (i+1) + '.</span>' + o.t
+          + '</button>';
+      }).join('')
+    + '</div>'
+    + '<div class="sim-fb" id="sim-fb"></div>'
+    + '</div>';
 }
-window.respSim=function(i){
-  if(simAt.resp)return;simAt.resp=true;
-  const o=CENS[simAt.idx].opts[i];
-  document.getElementById('so'+i).classList.add(o.c?'ok':'err');
-  const fb=$('sim-fb');fb.classList.add('on',o.c?'ok-fb':'err-fb');
-  fb.innerHTML=`<div class="fbl">${o.c?'✅ Resposta correta!':'❌ Não é a melhor abordagem'}</div>${o.fb}`;
+window.respSim = function(i){
+  if(simAt.resp) return;
+  simAt.resp = true;
+  var o = CENS[simAt.idx].opts[i];
+  var btn = document.getElementById('so' + i);
+  if(btn) btn.classList.add(o.c ? 'ok' : 'err');
+  var fb = $('sim-fb');
+  fb.classList.add('on', o.c ? 'ok-fb' : 'err-fb');
+  fb.innerHTML = '<div class="fbl">' + (o.c ? '✅ Resposta correta!' : '❌ Não é a melhor abordagem') + '</div>' + o.fb;
   simScore.total++;
-  if(o.c)simScore.acertos++;else simScore.erros++;
-  const nxt=document.createElement('button');nxt.className='btn-p';nxt.style.marginTop='10px';
-  nxt.textContent=simAt.idx<CENS.length-1?'Próximo cenário →':'↩ Ver todos os cenários';
-  nxt.onclick=()=>{if(simAt.idx<CENS.length-1)simAt={idx:simAt.idx+1,resp:false};else simAt=null;renderSim();};
+  if(o.c) simScore.acertos++; else simScore.erros++;
+  var nxt = document.createElement('button');
+  nxt.className = 'btn-p';
+  nxt.style.marginTop = '10px';
+  nxt.textContent = simAt.idx < CENS.length-1 ? 'Próximo cenário →' : '↩ Ver todos os cenários';
+  nxt.onclick = function(){
+    if(simAt.idx < CENS.length-1) simAt = {idx: simAt.idx+1, resp:false};
+    else simAt = null;
+    renderSim();
+  };
   document.querySelector('.sim-active').appendChild(nxt);
-}
+};
 
-// MERCADO
+// ── MERCADO SC ──
 function renderMkt(){
-  $('mkt-content').innerHTML=`<div class="mkt-sec">
+  var cidades = [
+    {c:'Balneário Camboriú', e:'🏆', t:'Alto Padrão / Luxo', cor:'var(--gold)', p:'Metro quadrado mais caro do Brasil. Perfil: alto padrão, luxo e superluxo. Alta liquidez e alta demanda de compradores nacionais e internacionais. Mercado vertical consolidado.'},
+    {c:'Itapema', e:'⭐', t:'Alto / Médio-Alto', cor:'var(--gold)', p:'Segundo metro quadrado mais caro do litoral SC. Crescimento acelerado de empreendimentos de alto padrão. Forte demanda de Curitiba e SP.'},
+    {c:'Itajaí', e:'🏭', t:'Médio-Alto / Comercial', cor:'var(--white)', p:'Maior PIB de SC. Polo logístico e náutico. Forte demanda de executivos e famílias. Mercado misto com residencial, comercial e industrial.'},
+    {c:'Balneário Piçarras', e:'📈', t:'Médio Padrão', cor:'var(--white)', p:'Mercado em expansão com preços mais acessíveis que BC e Itapema. Orla com potencial de valorização. Demanda crescente de gaúchos e paranaenses.'},
+    {c:'Navegantes', e:'✈️', t:'Médio Padrão', cor:'var(--white)', p:'Proximidade do aeroporto internacional. Perfil industrial e logístico. Crescimento habitacional acelerado. Boa relação custo-benefício para moradia.'},
+    {c:'Barra Velha', e:'🌱', t:'Médio / Expansão', cor:'var(--green)', p:'Maior crescimento populacional do litoral norte SC. Praias preservadas. Incorporadoras chegando. Estimativa de valorização acima de 25% ao ano.'},
+    {c:'Porto Belo', e:'⛵', t:'Médio / Expansão', cor:'var(--green)', p:'Destino turístico consolidado com Bombinhas ao lado. Boom imobiliário recente com empreendimentos verticais chegando. Forte potencial de valorização.'},
+    {c:'Bombinhas', e:'🐠', t:'Alto Padrão / Escasso', cor:'var(--gold)', p:'Área de preservação ambiental limita novos lançamentos. Oferta escassa gera alta valorização. Imóveis com alta liquidez. Demanda por qualidade de vida e natureza preservada.'}
+  ];
+  $('mkt-content').innerHTML = '<div class="mkt-sec">'
+    + '<div class="mkt-crd">'
+    + '<h3>📍 Preço do m² — Litoral SC</h3>'
+    + '<p style="font-size:.78rem;color:var(--dim);line-height:1.7;margin-bottom:14px">O valor do metro quadrado varia por cidade, bairro, andar e acabamento. Consulte o FipeZap para dados atualizados por cidade.</p>'
+    + '<button onclick="window.open(\'https://www.fipe.org.br/pt-br/indices/fipezap\',\'_blank\')" style="background:rgba(184,154,79,.12);border:1px solid rgba(184,154,79,.4);border-radius:8px;padding:13px 16px;font-size:.82rem;font-weight:600;color:var(--gold);font-family:var(--font);cursor:pointer;text-align:left;width:100%">🔗 FipeZap — Índice de Preços Imobiliários<br><span style="font-size:.65rem;font-weight:400;color:var(--dim)">fipe.org.br · Atualizado mensalmente</span></button>'
+    + '</div>'
 
-    <div class="mkt-crd">
-      <h3>📍 Preço do m² — Litoral SC</h3>
-      <p style="font-size:.78rem;color:var(--dim);line-height:1.7;margin-bottom:14px">O valor do metro quadrado varia por cidade, bairro, andar e acabamento. Consulte o FipeZap para dados atualizados por cidade.</p>
-      <button onclick="window.open('https://www.fipe.org.br/pt-br/indices/fipezap','_blank')" style="background:rgba(184,154,79,.12);border:1px solid rgba(184,154,79,.4);border-radius:8px;padding:13px 16px;font-size:.82rem;font-weight:600;color:var(--gold);font-family:var(--font);cursor:pointer;text-align:left;width:100%;display:flex;align-items:center;gap:10px"><span style="font-size:1.2rem">🔗</span><div><div>FipeZap — Índice de Preços Imobiliários</div><div style="font-size:.65rem;font-weight:400;color:var(--dim);margin-top:2px">fipe.org.br · Atualizado mensalmente</div></div></button>
-    </div>
+    + '<div class="mkt-crd"><h3>🏗️ Indicadores de Custo de Construção</h3>'
+    + '<div style="display:flex;flex-direction:column;gap:10px">'
+    + '<div style="background:var(--navy);border-radius:8px;padding:12px">'
+    + '<div style="font-size:.7rem;font-weight:700;color:var(--gold);margin-bottom:6px">CUB/SC — Custo Unitário Básico</div>'
+    + '<div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:.8rem;color:var(--dim)">Março/2026 (Sinduscon BC)</span><span style="font-size:.82rem;font-weight:700;color:var(--white)">R$ 3.028,45/m²</span></div>'
+    + '<div style="font-size:.68rem;color:var(--green)">▲ +0,30% em março · +1,49% no ano</div>'
+    + '<div style="font-size:.7rem;color:var(--dim);margin-top:6px;line-height:1.6">O CUB é o índice oficial de reajuste de contratos de incorporação imobiliária.</div>'
+    + '</div>'
+    + '<div style="background:var(--navy);border-radius:8px;padding:12px">'
+    + '<div style="font-size:.7rem;font-weight:700;color:var(--gold);margin-bottom:6px">SINAPI SC — Fevereiro/2026</div>'
+    + '<div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:.8rem;color:var(--dim)">IBGE/Caixa</span><span style="font-size:.82rem;font-weight:700;color:var(--white)">R$ 2.174,12/m²</span></div>'
+    + '<div style="font-size:.68rem;color:var(--green)">▲ SC lidera o ranking nacional · +6,71% em 12 meses</div>'
+    + '</div>'
+    + '<div style="background:var(--navy);border-radius:8px;padding:12px">'
+    + '<div style="font-size:.7rem;font-weight:700;color:var(--gold);margin-bottom:6px">INCC — Índice Nacional de Custo da Construção</div>'
+    + '<div style="font-size:.7rem;color:var(--dim);line-height:1.6">Usado em contratos de imóveis na planta. Quando o INCC sobe, as parcelas do imóvel na planta sobem junto.</div>'
+    + '<div style="font-size:.68rem;color:var(--gold);margin-top:6px">💡 Argumento: comprar pronto evita o risco de reajuste pelo INCC.</div>'
+    + '</div></div></div>'
 
-    <div class="mkt-crd">
-      <h3>🏗️ Indicadores de Custo de Construção</h3>
-      <div style="display:flex;flex-direction:column;gap:10px">
-        <div style="background:var(--navy);border-radius:8px;padding:12px">
-          <div style="font-size:.7rem;font-weight:700;color:var(--gold);margin-bottom:6px">CUB/SC — Custo Unitário Básico</div>
-          <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:.8rem;color:var(--dim)">Março/2026 (Sinduscon BC)</span><span style="font-size:.82rem;font-weight:700;color:var(--white)">R$ 3.028,45/m²</span></div>
-          <div style="font-size:.68rem;color:var(--green)">▲ +0,30% em março · +1,49% no ano</div>
-          <div style="font-size:.7rem;color:var(--dim);margin-top:6px;line-height:1.6">O CUB é o índice oficial de reajuste de contratos de incorporação imobiliária. Reflete o custo de construir 1m² residencial padrão normal em SC, incluindo materiais, mão de obra e encargos.</div>
-        </div>
-        <div style="background:var(--navy);border-radius:8px;padding:12px">
-          <div style="font-size:.7rem;font-weight:700;color:var(--gold);margin-bottom:6px">SINAPI — Sistema Nacional de Pesquisa de Custos</div>
-          <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:.8rem;color:var(--dim)">SC — Fevereiro/2026 (IBGE/Caixa)</span><span style="font-size:.82rem;font-weight:700;color:var(--white)">R$ 2.174,12/m²</span></div>
-          <div style="font-size:.68rem;color:var(--green)">▲ SC lidera o ranking nacional · +6,71% em 12 meses</div>
-          <div style="font-size:.7rem;color:var(--dim);margin-top:6px;line-height:1.6">Referência obrigatória em obras com recursos federais. Mede custo de materiais, mão de obra e equipamentos por estado. SC é o estado mais caro do Brasil para construir.</div>
-        </div>
-        <div style="background:var(--navy);border-radius:8px;padding:12px">
-          <div style="font-size:.7rem;font-weight:700;color:var(--gold);margin-bottom:6px">INCC — Índice Nacional de Custo da Construção</div>
-          <div style="font-size:.7rem;color:var(--dim);line-height:1.6">Mede a variação de custos da construção civil em todo o Brasil. É amplamente usado em contratos de imóveis na planta para reajuste das parcelas durante a obra. Quando o INCC sobe, as parcelas do imóvel na planta sobem junto.</div>
-          <div style="font-size:.68rem;color:var(--gold);margin-top:6px">💡 Argumento para cliente: comprar pronto evita o risco de reajuste pelo INCC.</div>
-        </div>
-      </div>
-    </div>
+    + '<div class="mkt-crd"><h3>🏙️ Perfil das Cidades — Litoral Norte SC</h3>'
+    + '<div style="display:flex;flex-direction:column;gap:12px">'
+    + cidades.map(function(x){
+        return '<div style="background:var(--navy);border-radius:8px;padding:12px">'
+          + '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">'
+          + '<div style="font-size:.82rem;font-weight:700;color:var(--white)">' + x.e + ' ' + x.c + '</div>'
+          + '<div style="font-size:.62rem;font-weight:600;color:' + x.cor + ';background:rgba(255,255,255,.05);padding:2px 8px;border-radius:10px;white-space:nowrap;margin-left:6px">' + x.t + '</div>'
+          + '</div>'
+          + '<div style="font-size:.75rem;color:var(--dim);line-height:1.6">' + x.p + '</div>'
+          + '</div>';
+      }).join('')
+    + '</div></div>'
 
-    <div class="mkt-crd">
-      <h3>🏙️ Perfil das Cidades — Litoral Norte SC</h3>
-      <div style="display:flex;flex-direction:column;gap:12px">
-        ${[
-          {c:'Balneário Camboriú',e:'🏆',p:'Metro quadrado mais caro do Brasil. Perfil: alto padrão, luxo e superluxo. Alta liquidez e alta demanda de compradores nacionais e internacionais. Mercado vertical consolidado.',t:'Alto Padrão / Luxo',cor:'var(--gold)'},
-          {c:'Itapema',e:'⭐',p:'Segundo metro quadrado mais caro do litoral SC. Crescimento acelerado de empreendimentos de alto padrão. Praias preservadas e qualidade de vida. Forte demanda de Curitiba e SP.',t:'Alto / Médio-Alto Padrão',cor:'var(--gold)'},
-          {c:'Itajaí',e:'🏭',p:'Maior PIB de SC. Polo logístico e náutico. Forte demanda de executivos e famílias. Mercado misto com residencial, comercial e industrial. Valorização sustentada.',t:'Médio-Alto / Comercial',cor:'var(--white)'},
-          {c:'Balneário Piçarras',e:'📈',p:'Mercado em expansão com preços mais acessíveis que BC e Itapema. Orla com potencial de valorização. Demanda crescente de gaúchos e paranaenses.',t:'Médio Padrão',cor:'var(--white)'},
-          {c:'Navegantes',e:'✈️',p:'Proximidade do aeroporto internacional. Perfil industrial e logístico. Crescimento habitacional acelerado. Boa relação custo-benefício para moradia.',t:'Médio Padrão',cor:'var(--white)'},
-          {c:'Barra Velha',e:'🌱',p:'Maior crescimento populacional do litoral norte SC nos últimos 3 anos. Praias preservadas. Incorporadoras chegando. Janela de compra antes da valorização consolidada. Estimativa de valorização acima de 25% a.a.',t:'Médio Padrão / Expansão',cor:'var(--green)'},
-          {c:'Porto Belo',e:'⛵',p:'Destino turístico consolidado com Bombinhas ao lado. Boom imobiliário recente com empreendimentos verticais chegando. Mercado ainda em desenvolvimento com forte potencial.',t:'Médio / Expansão',cor:'var(--green)'},
-          {c:'Bombinhas',e:'🐠',p:'Área de preservação ambiental limita novos lançamentos. Oferta escassa gera alta valorização. Demanda por qualidade de vida e natureza preservada. Imóveis com alta liquidez.',t:'Alto Padrão / Escasso',cor:'var(--gold)'},
-        ].map(x=>`<div style="background:var(--navy);border-radius:8px;padding:12px"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px"><div style="font-size:.82rem;font-weight:700;color:var(--white)">${x.e} ${x.c}</div><div style="font-size:.62rem;font-weight:600;color:${x.cor};background:rgba(255,255,255,.05);padding:2px 8px;border-radius:10px;white-space:nowrap;margin-left:6px">${x.t}</div></div><div style="font-size:.75rem;color:var(--dim);line-height:1.6">${x.p}</div></div>`).join('')}
-      </div>
-    </div>
-
-    <div class="mkt-crd">
-      <h3>📈 Indicadores econômicos — Abril/2026</h3>
-      ${[
+    + '<div class="mkt-crd"><h3>📈 Indicadores Econômicos — Abril/2026</h3>'
+    + [
         ['Selic (Copom mar/2026)','14,75% a.a.','↓ Queda de 0,25pp em março'],
         ['Próxima reunião Copom','28-29/abr/2026','Expectativa: novo corte'],
         ['IPCA acumulado 12m','4,14%','IBGE — março/2026'],
         ['FGTS — teto MCMV','R$ 1,5 milhão','Habitação popular'],
-        ['Financiamento Caixa','a partir de 10,99% a.a.','Pré-fixado — abril/2026'],
         ['CUB SC (mar/2026)','R$ 3.028,45/m²','Sinduscon BC · +0,30%'],
-        ['SINAPI SC (fev/2026)','R$ 2.174,12/m²','IBGE/Caixa · +6,71% a.a.'],
-      ].map(([l,v,d])=>`<div class="macro-row" style="flex-direction:column;align-items:flex-start;padding:10px 0"><div style="display:flex;justify-content:space-between;width:100%"><div class="macro-l">${l}</div><div class="macro-v">${v}</div></div>${d?`<div style="font-size:.65rem;color:var(--gold);margin-top:2px">${d}</div>`:''}</div>`).join('')}
-    </div>
+        ['SINAPI SC (fev/2026)','R$ 2.174,12/m²','IBGE/Caixa · +6,71% a.a.']
+      ].map(function(row){
+        return '<div class="macro-row" style="flex-direction:column;align-items:flex-start;padding:10px 0">'
+          + '<div style="display:flex;justify-content:space-between;width:100%">'
+          + '<div class="macro-l">' + row[0] + '</div>'
+          + '<div class="macro-v">' + row[1] + '</div>'
+          + '</div>'
+          + '<div style="font-size:.65rem;color:var(--gold);margin-top:2px">' + row[2] + '</div>'
+          + '</div>';
+      }).join('')
+    + '</div>'
 
-    <div class="mkt-crd">
-      <h3>🌊 Sazonalidade e Estratégia</h3>
-      <p style="font-size:.78rem;color:var(--dim);line-height:1.7">Dez–Fev concentra visitantes e gera intenção de compra. As melhores negociações acontecem de Mar–Out: menos concorrência, proprietários mais dispostos, clientes mais racionais.</p>
-      <p style="font-size:.78rem;color:var(--gold);margin-top:8px">💡 Agora (abr/2026) é o momento ideal: captar quem viu no verão e ainda não decidiu.</p>
-    </div>
+    + '<div class="mkt-crd"><h3>🌊 Sazonalidade e Estratégia</h3>'
+    + '<p style="font-size:.78rem;color:var(--dim);line-height:1.7">Dez-Fev concentra visitantes e gera intenção de compra. As melhores negociações acontecem de Mar-Out: menos concorrência, proprietários mais dispostos, clientes mais racionais.</p>'
+    + '<p style="font-size:.78rem;color:var(--gold);margin-top:8px">💡 Agora (abr/2026) é o momento ideal: captar quem viu no verão e ainda não decidiu.</p>'
+    + '</div>'
 
-    <div style="height:8px"></div>
-  </div>\`;
+    + '<div class="mkt-crd"><h3>📰 Notícias da Região</h3>'
+    + [
+        {d:'08/04/2026',s:'ND Mais',t:'Barra Velha e Balneário Barra do Sul com valorização acima de 25% ao ano no radar dos investidores em 2026',u:'https://ndmais.com.br/economia/e-possivel-comprar-apartamento-pe-na-areia-em-sc/'},
+        {d:'09/04/2026',s:'Notisul',t:'Litoral SC deixa de ser destino sazonal e atrai moradores fixos e investidores o ano todo',u:'https://www.notisul.com.br/mercado-imobiliario-laguna-investimentos-sc/'},
+        {d:'19/03/2026',s:'Exame',t:'SC lidera o Sul: mercado imobiliário avança 14,4% no VGV e 8,5% em unidades em 2025',u:'https://exame.com/mercado-imobiliario/mercado-imobiliario-bate-recorde-movimenta-r-264-bi-e-sc-lidera-no-sul/'},
+        {d:'07/04/2026',s:'Terra Brasil',t:'Senna Tower em BC ultrapassa R$ 2,2 bi em vendas — será o prédio residencial mais alto do mundo',u:'https://terrabrasilnoticias.com/2026/04/nova-torre-residencial-em-santa-catarina-vai-se-tornar-a-mais-alta-do-mundo-ja-ultrapassa-r-22-bilhoes-em-vendas-e-inclui-apartamentos-mansoes-suspensas-e-coberturas-de-alto-padrao'}
+      ].map(function(n){
+        return '<div class="news-card" onclick="window.open(\'' + n.u + '\',\'_blank\')" style="margin-bottom:8px">'
+          + '<div class="nc-label"><span class="nc-dot"></span>' + n.d + ' · ' + n.s + '</div>'
+          + '<div class="nc-title">' + n.t + '</div>'
+          + '<div class="nc-source">Toque para abrir no navegador</div>'
+          + '</div>';
+      }).join('')
+    + '</div>'
+
+    + '<div style="height:8px"></div></div>';
 }
-// REGISTROS
+
+// ── REGISTROS ──
 function renderReg(){
-  const regs=UD.registros||[],metas=UD.metas||[];
-  if(!regs.length&&!metas.length){$('reg-content').innerHTML=`<div class="empty">Nenhum registro ainda.<br>Comece respondendo a Pergunta do Dia!</div>`;return;}
-  $('reg-content').innerHTML=`<div class="reg-list">
-    ${[...regs].reverse().map(r=>`<div class="reg-it"><div class="reg-tipo">💭 Pergunta do dia</div><div class="reg-data">${new Date(r.data).toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'})}</div>${r.pergunta?`<div style="font-size:.7rem;color:var(--gold);margin-bottom:4px;font-style:italic">${r.pergunta}</div>`:''}<div class="reg-txt">${r.texto}</div></div>`).join('')}
-    ${[...metas].reverse().map(m=>`<div class="reg-it"><div class="reg-tipo">🎯 Meta semanal</div><div class="reg-data">${new Date(m.data).toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'})}</div><div class="reg-txt">${m.texto}</div>${m.checkin?`<div style="font-size:.7rem;margin-top:5px;color:${m.checkin==='sim'?'var(--green)':m.checkin==='parcial'?'var(--gold)':'var(--red)'}">${m.checkin==='sim'?'✅ Alcançada':m.checkin==='parcial'?'📝 Parcial':'❌ Não alcançada'}</div>`:''}</div>`).join('')}
-  </div>`;
+  var regs = UD.registros || [];
+  var metas = UD.metas || [];
+  if(!regs.length && !metas.length){
+    $('reg-content').innerHTML = '<div class="empty">Nenhum registro ainda.<br>Comece respondendo a Pergunta do Dia!</div>';
+    return;
+  }
+  var h = '<div class="reg-list">'
+    + regs.slice().reverse().map(function(r){
+        return '<div class="reg-it">'
+          + '<div class="reg-tipo">💭 Pergunta do dia</div>'
+          + '<div class="reg-data">' + new Date(r.data).toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'}) + '</div>'
+          + (r.pergunta ? '<div style="font-size:.7rem;color:var(--gold);margin-bottom:4px;font-style:italic">' + r.pergunta + '</div>' : '')
+          + '<div class="reg-txt">' + r.texto + '</div>'
+          + '</div>';
+      }).join('')
+    + metas.slice().reverse().map(function(m){
+        var cor = m.checkin === 'sim' ? 'var(--green)' : m.checkin === 'parcial' ? 'var(--gold)' : m.checkin === 'nao' ? 'var(--red)' : '';
+        var label = m.checkin === 'sim' ? '✅ Alcançada' : m.checkin === 'parcial' ? '📝 Parcial' : m.checkin === 'nao' ? '❌ Não alcançada' : '';
+        return '<div class="reg-it">'
+          + '<div class="reg-tipo">🎯 Meta semanal</div>'
+          + '<div class="reg-data">' + new Date(m.data).toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'}) + '</div>'
+          + '<div class="reg-txt">' + m.texto + '</div>'
+          + (label ? '<div style="font-size:.7rem;margin-top:5px;color:' + cor + '">' + label + '</div>' : '')
+          + (m.reflexao ? '<div style="font-size:.7rem;margin-top:4px;color:var(--dim);font-style:italic">"' + m.reflexao + '"</div>' : '')
+          + '</div>';
+      }).join('')
+    + '</div>';
+  $('reg-content').innerHTML = h;
 }
 
-// PERFIL
+// ── PERFIL ──
 function renderPerf(){
-  const p=UD.perfil||{},disc=UD.disc;
-  $('perf-content').innerHTML=`<div class="perf-screen">
-    <div class="perf-top">
-      <div class="perf-av" id="perf-av-el">${p.foto?`<img src="${p.foto}" alt="foto">`:`<span>${(p.nome||'U').charAt(0).toUpperCase()}</span>`}</div>
-      <input type="file" id="pf-galeria" accept="image/*" style="display:none" onchange="atualizarFoto(this)">
-      <input type="file" id="pf-camera" accept="image/*" capture="user" style="display:none" onchange="atualizarFoto(this)">
-      <div style="display:flex;gap:8px;justify-content:center;margin-bottom:8px">
-        <button onclick="document.getElementById('pf-galeria').click()" style="background:var(--navy3);border:1px solid rgba(184,154,79,.3);border-radius:6px;padding:6px 12px;font-size:.7rem;font-weight:600;color:var(--gold);cursor:pointer;font-family:var(--font)">🖼️ Galeria</button>
-        <button onclick="document.getElementById('pf-camera').click()" style="background:var(--navy3);border:1px solid rgba(184,154,79,.3);border-radius:6px;padding:6px 12px;font-size:.7rem;font-weight:600;color:var(--gold);cursor:pointer;font-family:var(--font)">📸 Câmera</button>
-      </div>
-      <div class="perf-nome">${p.nome||'Corretor'}</div>
-      ${disc?`<div class="perf-disc">DISC ${disc.perfil} — ${disc.nome}</div>`:`<div style="font-size:.72rem;color:var(--dim);margin-top:4px">Faça o Quiz DISC</div>`}
-    </div>
-    <div class="perf-sec"><h3>Informações</h3>
-      <div class="pf"><label>Nome</label><input type="text" id="pf-nome" value="${p.nome||''}" autocapitalize="words"></div>
-      <div class="pf"><label>Cidade</label><input type="text" id="pf-cidade" value="${p.cidade||''}" autocapitalize="words" list="cidades-pf"><datalist id="cidades-pf"><option value="Balneário Camboriú"><option value="Balneário Piçarras"><option value="Itajaí"><option value="Camboriú"><option value="Navegantes"><option value="Penha"><option value="Barra Velha"><option value="Florianópolis"></datalist></div>
-      <div class="pf"><label>Especialidade</label><select id="pf-esp" style="background:var(--navy);border:1px solid rgba(184,154,79,.18);border-radius:6px;padding:10px 12px;font-size:.83rem;font-family:var(--font);color:var(--white);outline:none;width:100%"><option value="">Selecione</option><option ${p.especialidade==='Locação'?'selected':''}>Locação</option><option ${p.especialidade==='Alto Padrão'?'selected':''}>Alto Padrão</option><option ${p.especialidade==='Luxo'?'selected':''}>Luxo</option><option ${p.especialidade==='Médio Padrão'?'selected':''}>Médio Padrão</option><option ${p.especialidade==='Terrenos e Lotes'?'selected':''}>Terrenos e Lotes</option><option ${p.especialidade==='Minha Casa Minha Vida'?'selected':''}>Minha Casa Minha Vida</option><option ${p.especialidade==='Imóveis Rurais'?'selected':''}>Imóveis Rurais</option><option ${p.especialidade==='Imóveis Comerciais'?'selected':''}>Imóveis Comerciais</option></select></div>
-      <div class="pf"><label>Tempo como corretor</label><select id="pf-tempo" style="background:var(--navy);border:1px solid rgba(184,154,79,.18);border-radius:6px;padding:10px 12px;font-size:.83rem;font-family:var(--font);color:var(--white);outline:none;width:100%"><option value="">Selecione</option><option ${p.tempo==='Menos de 1 ano'?'selected':''}>Menos de 1 ano</option><option ${p.tempo==='1 a 3 anos'?'selected':''}>1 a 3 anos</option><option ${p.tempo==='3 a 5 anos'?'selected':''}>3 a 5 anos</option><option ${p.tempo==='5 a 10 anos'?'selected':''}>5 a 10 anos</option><option ${p.tempo==='Mais de 10 anos'?'selected':''}>Mais de 10 anos</option></select></div>
-      <button class="btn-p" style="margin-top:6px" onclick="salvarPerf()">Salvar alterações</button>
-    </div>
-    <div class="perf-sec"><h3>Conta</h3>
-      <p style="font-size:.75rem;color:var(--dim);margin-bottom:12px">E-mail: ${CU?.email||'—'}</p>
-      <button class="btn-s" onclick="showPriv('perfil')">📄 Política de Privacidade</button>
-      <button class="btn-s" style="margin-top:8px" onclick="logout()">Sair da conta</button>
-      <button class="btn-danger" style="margin-top:8px" onclick="delConta()">Excluir minha conta e dados</button>
-    </div>
-    <div style="height:16px"></div>
-  </div>`;
+  var p = UD.perfil || {};
+  var disc = UD.disc;
+  $('perf-content').innerHTML = '<div class="perf-screen">'
+    + '<div class="perf-top">'
+    + '<div class="perf-av" id="perf-av-el">' + (p.foto ? '<img src="' + p.foto + '" alt="foto">' : '<span>' + ((p.nome||'U').charAt(0).toUpperCase()) + '</span>') + '</div>'
+    + '<div style="display:flex;gap:8px;margin-top:8px">'
+    + '<label style="background:rgba(184,154,79,.15);border:1px solid rgba(184,154,79,.4);border-radius:6px;padding:7px 14px;font-size:.75rem;font-weight:600;color:var(--gold);cursor:pointer">🖼️ Galeria<input type="file" accept="image/*" onchange="window.atualizarFoto(this)" style="display:none"></label>'
+    + '<label style="background:rgba(184,154,79,.15);border:1px solid rgba(184,154,79,.4);border-radius:6px;padding:7px 14px;font-size:.75rem;font-weight:600;color:var(--gold);cursor:pointer">📸 Câmera<input type="file" accept="image/*" capture="environment" onchange="window.atualizarFoto(this)" style="display:none"></label>'
+    + '</div>'
+    + '<div class="perf-nome">' + (p.nome||'Corretor') + '</div>'
+    + (disc ? '<div class="perf-disc">DISC ' + disc.perfil + ' — ' + disc.nome + '</div>' : '<div style="font-size:.72rem;color:var(--dim);margin-top:4px">Faça o Quiz DISC</div>')
+    + '</div>'
+    + '<div class="perf-sec"><h3>Informações</h3>'
+    + '<div class="pf"><label>Nome</label><input type="text" id="pf-nome" value="' + (p.nome||'') + '" autocapitalize="words"></div>'
+    + '<div class="pf"><label>Cidade</label><input type="text" id="pf-cidade" value="' + (p.cidade||'') + '" autocapitalize="words" list="cidades-pf"><datalist id="cidades-pf"><option value="Balneário Camboriú"><option value="Balneário Piçarras"><option value="Itajaí"><option value="Camboriú"><option value="Navegantes"><option value="Penha"><option value="Barra Velha"><option value="Florianópolis"></datalist></div>'
+    + '<div class="pf"><label>Especialidade</label><select id="pf-esp" style="background:var(--navy);border:1px solid rgba(184,154,79,.18);border-radius:6px;padding:10px 12px;font-size:.83rem;font-family:var(--font);color:var(--white);outline:none;width:100%"><option value="">Selecione</option>'
+    + ['Locação','Alto Padrão','Luxo','Médio Padrão','Terrenos e Lotes','Minha Casa Minha Vida','Imóveis Rurais','Imóveis Comerciais'].map(function(e){ return '<option ' + (p.especialidade===e?'selected':'') + '>' + e + '</option>'; }).join('')
+    + '</select></div>'
+    + '<div class="pf"><label>Tempo como corretor</label><select id="pf-tempo" style="background:var(--navy);border:1px solid rgba(184,154,79,.18);border-radius:6px;padding:10px 12px;font-size:.83rem;font-family:var(--font);color:var(--white);outline:none;width:100%"><option value="">Selecione</option>'
+    + ['Menos de 1 ano','1 a 3 anos','3 a 5 anos','5 a 10 anos','Mais de 10 anos'].map(function(e){ return '<option ' + (p.tempo===e?'selected':'') + '>' + e + '</option>'; }).join('')
+    + '</select></div>'
+    + '<button class="btn-p" style="margin-top:6px" onclick="window.salvarPerf()">Salvar alterações</button>'
+    + '</div>'
+    + '<div class="perf-sec"><h3>Conta</h3>'
+    + '<p style="font-size:.75rem;color:var(--dim);margin-bottom:12px">E-mail: ' + (CU && CU.email ? CU.email : '—') + '</p>'
+    + '<button class="btn-s" onclick="window.showPriv(\'perfil\')">📄 Política de Privacidade</button>'
+    + '<button class="btn-s" style="margin-top:8px" onclick="window.logout()">Sair da conta</button>'
+    + '<button class="btn-danger" style="margin-top:8px" onclick="window.delConta()">Excluir minha conta e dados</button>'
+    + '</div>'
+    + '<div style="height:16px"></div></div>';
 }
-window.atualizarFoto=function(inp){
-  const f=inp.files[0];if(!f)return;
-  const r=new FileReader();
-  r.onload=e=>{const p={...(UD.perfil||{}),foto:e.target.result};save('perfil',p);toast('Foto atualizada! 📷');renderPerf();};
+window.atualizarFoto = function(inp){
+  var f = inp.files && inp.files[0];
+  if(!f) return;
+  var r = new FileReader();
+  r.onload = function(e){ var p = Object.assign({}, UD.perfil||{}, {foto:e.target.result}); save('perfil',p); toast('Foto atualizada! 📷'); renderPerf(); };
   r.readAsDataURL(f);
-}
-window.salvarPerf=function(){
-  const p={...(UD.perfil||{}),nome:$('pf-nome').value.trim(),cidade:$('pf-cidade').value.trim(),especialidade:$('pf-esp').value,tempo:$('pf-tempo').value};
-  save('perfil',p);toast('Perfil atualizado! ✅');renderPerf();
-}
-window.logout=function(){
+};
+window.salvarPerf = function(){
+  var p = Object.assign({}, UD.perfil||{}, {
+    nome: $('pf-nome').value.trim(),
+    cidade: $('pf-cidade').value.trim(),
+    especialidade: $('pf-esp').value,
+    tempo: $('pf-tempo').value
+  });
+  save('perfil', p);
+  toast('Perfil atualizado! ✅');
+  renderPerf();
+};
+window.logout = function(){
   localStorage.removeItem('hp_session');
-  CU=null;UD={};
+  CU = null; UD = {};
   showScr('sa');
   toast('Logout realizado.');
-}
-window.delConta=function(){
+};
+window.delConta = function(){
   if(confirm('Tem certeza? Todos os seus dados serão permanentemente excluídos.')){
-    const email=CU?.email;
+    var email = CU && CU.email;
     if(email){
       localStorage.removeItem(lsKey());
       localStorage.removeItem('hp_session');
-      const users=getUsuarios();
+      var users = getUsuarios();
       delete users[email];
       salvarUsuarios(users);
     }
-    CU=null;UD={};
+    CU = null; UD = {};
     showScr('sa');
     toast('Conta excluída.');
   }
-}
-
-// INIT
-window.abrirNoticia=function(url){window.open(url,'_blank');}
-window.pularDisc=function(){
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  $('shome').classList.add('active');
-  renderHome();
-}
-window.irParaDisc=function(){
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  $('sdisc').classList.add('active');
-  renderDisc();
-}
+};
 
 // ── SWIPE NAVIGATION ──
 (function(){
-  let tx=0,ty=0,hist=[];
-  document.addEventListener('touchstart',e=>{tx=e.touches[0].clientX;ty=e.touches[0].clientY;},{passive:true});
-  document.addEventListener('touchend',e=>{
-    const dx=e.changedTouches[0].clientX-tx;
-    const dy=e.changedTouches[0].clientY-ty;
-    if(Math.abs(dx)>70&&Math.abs(dx)>Math.abs(dy)*1.5){
-      if(dx>0&&hist.length>0){
-        const prev=hist.pop();
-        document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  var tx = 0, ty = 0, hist = [];
+  document.addEventListener('touchstart', function(e){ tx = e.touches[0].clientX; ty = e.touches[0].clientY; }, {passive:true});
+  document.addEventListener('touchend', function(e){
+    var dx = e.changedTouches[0].clientX - tx;
+    var dy = e.changedTouches[0].clientY - ty;
+    if(Math.abs(dx) > 70 && Math.abs(dx) > Math.abs(dy) * 1.5){
+      if(dx > 0 && hist.length > 0){
+        var prev = hist.pop();
+        document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
         document.getElementById(prev).classList.add('active');
       }
     }
-  },{passive:true});
-  const orig=window.goSec;
-  window.goSec=function(s){
-    const cur=document.querySelector('.screen.active');
-    if(cur&&cur.id!=='s'+s){hist.push(cur.id);if(hist.length>15)hist.shift();}
-    orig(s);
+  }, {passive:true});
+  var origGoSec = window.goSec;
+  window.goSec = function(s){
+    var cur = document.querySelector('.screen.active');
+    if(cur && cur.id !== 's' + s){ hist.push(cur.id); if(hist.length > 15) hist.shift(); }
+    origGoSec(s);
   };
 })();
 
-window.addEventListener('load',()=>{
-  // Garante que loading nunca fica preso — libera em 5s no máximo
-  setTimeout(()=>{ hideLoad(); },5000);
-  // Clique no loading overlay libera (escape de emergência)
-  document.getElementById('loading').addEventListener('click',()=>{ hideLoad(); });
+window.abrirNoticia = function(url){ window.open(url, '_blank'); };
+window.irParaDisc = function(){
+  document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
+  $('sdisc').classList.add('active');
+  renderDisc();
+};
+window.pularDisc = function(){
+  document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
+  $('shome').classList.add('active');
+  renderHome();
+};
+
+// ── INIT ──
+(function(){
+  try{
+    var sess = localStorage.getItem('hp_session');
+    if(sess){
+      var u = JSON.parse(sess);
+      var users = getUsuarios();
+      if(users[u.email]){ CU = {email:u.email, uid:u.email}; rotearUsuario(); return; }
+    }
+  }catch(e){}
+  showScr('sa');
+})();
+
+window.addEventListener('load', function(){
+  setTimeout(function(){ hideLoad(); }, 3000);
+  $('loading').addEventListener('click', function(){ hideLoad(); });
 });
+
 </script>
 </body>
 </html>
