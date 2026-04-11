@@ -731,6 +731,44 @@ function getUsuarios(){
 }
 function salvarUsuarios(u){ localStorage.setItem('hp_users', JSON.stringify(u)); }
 
+// ── SESSÃO ROBUSTA: localStorage + sessionStorage + cookie ──
+function salvarSessao(email){
+  var dados = JSON.stringify({email: email, ts: Date.now()});
+  // 1. localStorage (principal)
+  try { localStorage.setItem('hp_session', dados); } catch(e){}
+  // 2. sessionStorage (fallback tab)
+  try { sessionStorage.setItem('hp_session', dados); } catch(e){}
+  // 3. Cookie (365 dias — funciona mesmo se localStorage for limpo)
+  try {
+    var exp = new Date();
+    exp.setFullYear(exp.getFullYear() + 1);
+    document.cookie = 'hp_sess=' + encodeURIComponent(dados) + '; expires=' + exp.toUTCString() + '; path=/; SameSite=Lax';
+  } catch(e){}
+}
+function lerSessao(){
+  // Tentar localStorage primeiro
+  try {
+    var ls = localStorage.getItem('hp_session');
+    if(ls){ var u = JSON.parse(ls); if(u && u.email) return u; }
+  } catch(e){}
+  // Fallback sessionStorage
+  try {
+    var ss = sessionStorage.getItem('hp_session');
+    if(ss){ var u = JSON.parse(ss); if(u && u.email) return u; }
+  } catch(e){}
+  // Fallback cookie
+  try {
+    var match = document.cookie.match(/hp_sess=([^;]+)/);
+    if(match){ var u = JSON.parse(decodeURIComponent(match[1])); if(u && u.email) return u; }
+  } catch(e){}
+  return null;
+}
+function limparSessao(){
+  try { localStorage.removeItem('hp_session'); } catch(e){}
+  try { sessionStorage.removeItem('hp_session'); } catch(e){}
+  try { document.cookie = 'hp_sess=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;'; } catch(e){}
+}
+
 function rotearUsuario(){
   if(!CU){ showScr('sa'); return; }
   loadUD();
@@ -765,8 +803,7 @@ window.fazerLogin = function(){
   if(!users[email]){ err.textContent = 'E-mail não encontrado.'; err.classList.add('on'); return; }
   if(users[email].hash !== hashSenha(senha)){ err.textContent = 'Senha incorreta.'; err.classList.add('on'); return; }
   CU = {email: email, uid: email};
-  // Sempre salvar sessão ao criar conta (usuário novo nunca quer fazer login de novo)
-  localStorage.setItem('hp_session', JSON.stringify({email: email}));
+  salvarSessao(email);
   rotearUsuario();
 };
 window.esqueceuSenha = function(){
@@ -798,8 +835,7 @@ window.criarConta = function(){
   CU = {email: email, uid: email};
   UD = {perfil: {nome: nome, email: email}};
   localStorage.setItem(lsKey(), JSON.stringify(UD));
-  // Sempre salvar sessão ao criar conta
-  localStorage.setItem('hp_session', JSON.stringify({email: email}));
+  salvarSessao(email);
   rotearUsuario();
 };
 
@@ -1842,7 +1878,7 @@ window.salvarPerf = function(){
   renderPerf();
 };
 window.logout = function(){
-  localStorage.removeItem('hp_session');
+  limparSessao();
   CU = null; UD = {};
   showScr('sa');
   toast('Logout realizado.');
@@ -1852,7 +1888,7 @@ window.delConta = function(){
     var email = CU && CU.email;
     if(email){
       localStorage.removeItem(lsKey());
-      localStorage.removeItem('hp_session');
+      limparSessao();
       var users = getUsuarios();
       delete users[email];
       salvarUsuarios(users);
@@ -2125,11 +2161,16 @@ function renderDiscHome() {
 // ── INIT ──
 (function(){
   try{
-    var sess = localStorage.getItem('hp_session');
-    if(sess){
-      var u = JSON.parse(sess);
+    var u = lerSessao();
+    if(u && u.email){
       var users = getUsuarios();
-      if(users[u.email]){ CU = {email:u.email, uid:u.email}; rotearUsuario(); return; }
+      if(users[u.email]){
+        CU = {email: u.email, uid: u.email};
+        // Renovar sessão a cada acesso
+        salvarSessao(u.email);
+        rotearUsuario();
+        return;
+      }
     }
   } catch(e){}
   showScr('sa');
