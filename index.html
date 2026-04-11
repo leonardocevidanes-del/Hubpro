@@ -670,11 +670,13 @@ textarea.ta:focus{border-color:var(--gold)}
   <button class="btn-p" style="margin-top:22px;max-width:260px" onclick="document.getElementById('celeb').classList.remove('on')">Continuar →</button>
 </div>
 
+
 <script>
 // ── HUB PRO — 100% Local, Zero Firebase ──
 // Autenticação via localStorage — sem dependência de rede, sem travamento
 
 let CU = null, UD = {}, privOrig = 'lgpd';
+let scriptsScore = {acertos:0, erros:0, vistos:[]};
 
 // UTILS
 const $ = id => document.getElementById(id);
@@ -730,8 +732,8 @@ function rotearUsuario(){
   showScr('shome');renderHome();
 }
 
-// Inicializa: verifica se há sessão salva
-(function init(){
+// Init — executa direto pois o script está no final do body (DOM já pronto)
+(function(){
   try{
     const sess=localStorage.getItem('hp_session');
     if(sess){
@@ -1216,8 +1218,6 @@ const OBJ=[
   {titulo:'Posso comprar direto com o proprietário',scripts:{D:'Você pode — mas o risco é real. Compra direta sem assessoria já gerou bloqueio de imóvel, dívidas ocultas e processos longos. Meu serviço cobre esses riscos sem custo extra para você.',I:'Muita gente pensa isso — e alguns chegaram até mim depois para resolver problemas que custaram caro. O que eu faço é garantir que você compre com segurança total.',S:'Me permite te contar o que já vi de problemas em compras diretas no litoral SC? Não para te assustar — mas para você decidir com informação completa.',C:'A comissão do corretor é paga pelo vendedor na maioria dos casos — então você não economiza comprando direto. E ganha análise jurídica, pesquisa de ônus reais e segurança total.'}},
   {titulo:'Já tentei vender meu imóvel atual e não consegui',scripts:{D:'Imóvel encalhado geralmente tem um de três problemas: preço, apresentação ou exposição. Posso olhar o seu e te dar um diagnóstico honesto?',I:'Isso é mais comum do que parece — e quase sempre tem solução. Já tive clientes que ficaram 18 meses sem vender e venderam em 30 dias depois de pequenos ajustes.',S:'Me conta os detalhes: qual era o preço pedido e como estava sendo divulgado? Quero entender antes de desistir.',C:'Um imóvel sem venda após 90 dias geralmente indica desvio no preço de mercado, má qualidade das fotos ou distribuição limitada. Você tem os dados da estratégia anterior?'}}
 ];
-
-let scriptsScore={acertos:0,erros:0,vistos:[]};
 
 function renderScripts(){
   if(UD.scripts_score)scriptsScore={...scriptsScore,...UD.scripts_score};
