@@ -229,6 +229,79 @@ html,body{height:100%;overflow:hidden;background:var(--navy);font-family:var(--f
 .sim-fb .fbl{font-size:.62rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:5px}
 .sim-fb.ok-fb .fbl{color:var(--green)}
 .sim-fb.err-fb .fbl{color:var(--red)}
+/* ACADEMIA */
+.ac-header{background:linear-gradient(180deg,var(--navy3),var(--navy));padding:20px 16px 14px;flex-shrink:0}
+.ac-header-title{font-size:1.1rem;font-weight:700;color:var(--white)}
+.ac-header-sub{font-size:.68rem;color:var(--gold);margin-top:2px}
+.ac-prog-bar{height:3px;background:rgba(255,255,255,.07);border-radius:3px;margin-top:10px;overflow:hidden}
+.ac-prog-fill{height:100%;background:var(--gold);border-radius:3px;transition:.5s}
+.ac-prog-label{display:flex;justify-content:space-between;margin-top:4px}
+.ac-prog-label span{font-size:.6rem;color:var(--dim)}
+.ac-sec-title{font-size:.6rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:12px 16px 4px;color:var(--dim)}
+.sk-card{background:var(--navy3);border:1px solid rgba(184,154,79,.12);border-radius:12px;padding:12px 14px;margin:0 16px 8px;display:flex;align-items:center;gap:12px;cursor:pointer}
+.sk-card.sk-active{border-color:var(--gold);background:rgba(184,154,79,.06)}
+.sk-card.sk-done{border-color:rgba(76,175,125,.3)}
+.sk-card.sk-locked{opacity:.42}
+.sk-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1)}
+.sk-icon.si-done{background:rgba(76,175,125,.18);border-color:var(--green)}
+.sk-icon.si-active{background:rgba(184,154,79,.18);border-color:var(--gold)}
+.sk-info{flex:1;min-width:0}
+.sk-name{font-size:.82rem;font-weight:600;color:var(--white);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sk-sub{font-size:.68rem;color:var(--dim);margin-top:2px}
+.sk-arr{font-size:.9rem;color:var(--gold)}
+/* TRILHA */
+.tl-header{background:rgba(184,154,79,.06);border-bottom:1px solid rgba(184,154,79,.2);padding:14px 16px;flex-shrink:0}
+.tl-back{font-size:.72rem;color:rgba(184,154,79,.7);cursor:pointer;margin-bottom:6px}
+.tl-title{font-size:1rem;font-weight:700;color:var(--white)}
+.tl-disc-tag{display:inline-block;background:rgba(184,154,79,.12);border:1px solid rgba(184,154,79,.35);border-radius:20px;padding:2px 10px;font-size:.62rem;font-weight:700;color:var(--gold);margin-top:6px;letter-spacing:.5px}
+.mod-list{padding:14px 16px 80px;display:flex;flex-direction:column;gap:0}
+.mod-row{display:flex;gap:10px;align-items:flex-start;margin-bottom:10px}
+.mod-line{display:flex;flex-direction:column;align-items:center;flex-shrink:0;width:28px}
+.mod-dot{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.68rem;font-weight:700;flex-shrink:0}
+.md-done{background:var(--green);color:#fff}
+.md-active{background:var(--gold);color:var(--navy)}
+.md-locked{background:rgba(255,255,255,.06);color:var(--dim);border:1px solid rgba(255,255,255,.1)}
+.mod-connector{width:1px;flex:1;min-height:14px;background:rgba(255,255,255,.07);margin:2px 0}
+.mod-connector.mc-done{background:var(--green)}
+.mod-card{flex:1;background:rgba(255,255,255,.03);border:1px solid rgba(184,154,79,.1);border-radius:12px;padding:10px 12px;margin-bottom:2px}
+.mod-card.mc-active{border-color:var(--gold);background:rgba(184,154,79,.05)}
+.mod-card.mc-locked{opacity:.4}
+.mod-tag{font-size:.58rem;font-weight:700;color:rgba(184,154,79,.6);text-transform:uppercase;letter-spacing:.8px;margin-bottom:3px}
+.mod-name{font-size:.82rem;font-weight:600;color:var(--white)}
+.mod-desc{font-size:.7rem;color:var(--dim);margin-top:3px;line-height:1.4}
+/* MODULO DETALHE */
+.md-screen{padding:16px 16px 80px;display:flex;flex-direction:column;gap:14px}
+.md-conceito{background:var(--navy3);border:1px solid rgba(184,154,79,.18);border-radius:12px;padding:14px}
+.md-conceito h3{font-size:.62rem;font-weight:700;color:var(--gold);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px}
+.md-conceito p{font-size:.8rem;color:var(--dim);line-height:1.7}
+.md-disc-section{background:var(--navy3);border:1px solid rgba(184,154,79,.15);border-radius:12px;overflow:hidden}
+.md-disc-section h3{font-size:.62rem;font-weight:700;color:var(--gold);letter-spacing:2px;text-transform:uppercase;padding:12px 14px 8px}
+.md-disc-item{padding:10px 14px;border-top:1px solid rgba(184,154,79,.07)}
+.md-disc-label{font-size:.62rem;font-weight:700;color:var(--gold);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px}
+.md-disc-label.hl-disc{color:var(--white)}
+.md-disc-item.hl-item{background:rgba(184,154,79,.08)}
+.md-disc-text{font-size:.78rem;color:var(--dim);line-height:1.6}
+.md-disc-item.hl-item .md-disc-text{color:var(--white)}
+.md-tecnica{background:linear-gradient(135deg,rgba(184,154,79,.08),rgba(184,154,79,.04));border:1px solid rgba(184,154,79,.25);border-radius:12px;padding:14px}
+.md-tecnica h3{font-size:.62rem;font-weight:700;color:var(--gold);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px}
+.md-tecnica p{font-size:.8rem;color:var(--white);line-height:1.7}
+.md-cenario{background:var(--navy3);border-left:3px solid var(--gold);border-radius:0 10px 10px 0;padding:14px}
+.md-cenario h3{font-size:.62rem;font-weight:700;color:var(--gold);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px}
+.md-cenario p{font-size:.8rem;color:var(--white);line-height:1.7}
+.md-compromisso{background:rgba(76,175,125,.06);border:1px solid rgba(76,175,125,.25);border-radius:12px;padding:14px}
+.md-compromisso h3{font-size:.62rem;font-weight:700;color:var(--green);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px}
+.md-compromisso p{font-size:.8rem;color:var(--white);line-height:1.7}
+.md-compromisso textarea{width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(76,175,125,.3);border-radius:8px;padding:10px 12px;font-size:.8rem;font-family:var(--font);color:var(--white);outline:none;resize:none;margin-top:8px;min-height:80px}
+/* PERFIL OVERLAY */
+.perf-overlay{position:fixed;inset:0;background:var(--navy);z-index:200;overflow-y:auto;display:none;flex-direction:column}
+.perf-overlay.open{display:flex}
+.perf-ov-header{background:linear-gradient(180deg,var(--navy3),var(--navy));padding:20px 16px 14px;display:flex;align-items:center;gap:12px;flex-shrink:0}
+.perf-ov-close{background:transparent;border:1px solid rgba(184,154,79,.3);border-radius:6px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--gold);font-size:1rem;flex-shrink:0}
+/* HOME academia card */
+.ac-home-card{background:var(--navy3);border:1px solid rgba(184,154,79,.2);border-radius:12px;padding:14px;cursor:pointer;margin-bottom:0}
+.ac-home-card .ach-label{font-size:.6rem;font-weight:700;color:var(--gold);letter-spacing:2px;text-transform:uppercase;margin-bottom:5px}
+.ac-home-card .ach-name{font-size:.88rem;font-weight:600;color:var(--white);margin-bottom:3px}
+.ac-home-card .ach-sub{font-size:.72rem;color:var(--dim)}
 /* MERCADO */
 .mkt-sec{padding:14px 16px;display:flex;flex-direction:column;gap:12px}
 .mkt-crd{background:var(--navy3);border:1px solid rgba(184,154,79,.15);border-radius:10px;padding:14px}
@@ -496,6 +569,16 @@ textarea.ta:focus{border-color:var(--gold)}
       </div>
     </div>
 
+    <!-- ACADEMIA CARD HOME -->
+    <div class="hsec" id="home-ac-sec" onclick="goSec('academia')" style="margin-bottom:4px">
+      <div class="ac-home-card" id="home-ac-card">
+        <div class="ach-label">🎓 ACADEMIA DE SOFT SKILLS</div>
+        <div class="ach-name" id="home-ac-name">Comece sua primeira trilha</div>
+        <div class="ach-sub" id="home-ac-sub">10 trilhas · 50 módulos · Personalizado para você</div>
+        <div class="pb-track" style="margin-top:8px"><div class="pb-fill" id="home-ac-bar" style="width:0%"></div></div>
+      </div>
+    </div>
+
     <!-- MENSAGEM DO DIA + LIVRO + DISC HOME -->
     <div class="hsec" style="margin-bottom:6px" id="home-msg-dia-sec">
       <div class="hsec-title">✨ MENSAGEM DO DIA</div>
@@ -529,8 +612,8 @@ textarea.ta:focus{border-color:var(--gold)}
     <button class="ni" onclick="goSec('mercado')" data-s="mercado">
       <span class="ni-emoji">🏖️</span>MERCADO SC
     </button>
-    <button class="ni" onclick="goSec('perfil')" data-s="perfil">
-      <span class="ni-emoji">👤</span>PERFIL
+    <button class="ni" onclick="goSec('academia')" data-s="academia">
+      <span class="ni-emoji">🎓</span>ACADEMIA
     </button>
   </nav>
 </div>
@@ -620,6 +703,42 @@ textarea.ta:focus{border-color:var(--gold)}
   <div class="mc" id="perf-content"></div>
 </div>
 
+<!-- ACADEMIA -->
+<div id="sacademia" class="screen">
+  <div class="ac-header">
+    <div class="ac-header-title">🎓 Academia</div>
+    <div class="ac-header-sub">Soft Skills para corretores de alto desempenho</div>
+    <div class="ac-prog-bar"><div class="ac-prog-fill" id="ac-prog-fill" style="width:0%"></div></div>
+    <div class="ac-prog-label"><span id="ac-prog-label-l">0 de 10 trilhas</span><span id="ac-prog-label-r">0% concluído</span></div>
+  </div>
+  <div class="mc" id="academia-content"></div>
+</div>
+
+<!-- TRILHA DETALHE -->
+<div id="strilha" class="screen">
+  <div class="tl-header" id="tl-header-wrap">
+    <div class="tl-back" onclick="goSec('academia')">← Academia</div>
+    <div class="tl-title" id="tl-title">Trilha</div>
+    <div class="tl-disc-tag" id="tl-disc-tag"></div>
+  </div>
+  <div class="mc" id="trilha-content"></div>
+</div>
+
+<!-- MODULO DETALHE -->
+<div id="smodulo" class="screen">
+  <div class="phdr"><button class="back" id="mod-back-btn" onclick="window.voltarModulo()">←</button><div><h1 id="mod-title-h">Módulo</h1><p id="mod-sub-h">Academia</p></div></div>
+  <div class="mc" id="modulo-content"></div>
+</div>
+
+<!-- PERFIL OVERLAY (abre pelo avatar) -->
+<div class="perf-overlay" id="perfil-overlay">
+  <div class="perf-ov-header">
+    <button class="perf-ov-close" onclick="window.fecharPerfil()">✕</button>
+    <div><h1 style="font-size:.95rem;font-weight:700;color:var(--gold)">Meu Perfil</h1></div>
+  </div>
+  <div style="flex:1;overflow-y:auto" id="perf-ov-content"></div>
+</div>
+
 <!-- PRIVACIDADE -->
 <div id="spriv" class="screen">
   <div class="phdr"><button class="back" onclick="voltarPriv()">←</button><div><h1>Política de Privacidade</h1></div></div>
@@ -704,6 +823,7 @@ window.goSec = function(s){
   if(s === 'mercado')   renderMkt();
   if(s === 'registros') renderReg();
   if(s === 'perfil')    renderPerf();
+  if(s === 'academia')  renderAcademia();
 };
 
 // ── DATA LAYER ──
@@ -912,11 +1032,12 @@ function renderHome(){
       av.innerHTML = '<span>' + (p.nome ? p.nome.charAt(0).toUpperCase() : 'C') + '</span>';
       av.style.backgroundImage = '';
     }
+    av.onclick = function(){ window.abrirPerfil(); };
   }
   var hNome = $('hdr-nome');
   if(hNome) hNome.textContent = p.nome ? 'Olá, ' + p.nome.split(' ')[0] + '!' : 'Olá!';
   var hSub = $('hdr-sub');
-  if(hSub) hSub.textContent = p.cidade || 'Hub Litoral';
+  if(hSub) hSub.textContent = (p.cidade || 'Hub Litoral') + (p.especialidade ? ' · ' + p.especialidade : '');
 
   // Badge DISC
   var discEl = $('hdr-disc');
@@ -2157,6 +2278,585 @@ function renderDiscHome() {
     + '<button class="btn-s" style="margin-top:12px;font-size:.72rem" onclick="goSec(\'disc\')">Refazer o Quiz DISC</button>'
     + '</div>';
 }
+
+
+// ── PERFIL OVERLAY (avatar) ──
+window.abrirPerfil = function(){
+  renderPerfOverlay();
+  $('perfil-overlay').classList.add('open');
+};
+window.fecharPerfil = function(){
+  $('perfil-overlay').classList.remove('open');
+  renderHome();
+};
+function renderPerfOverlay(){
+  var p = UD.perfil || {};
+  var disc = UD.disc;
+  $('perf-ov-content').innerHTML = '<div class="perf-screen">'
+    + '<div class="perf-top">'
+    + '<div class="perf-av" id="perf-av-el">' + (p.foto ? '<img src="' + p.foto + '" alt="foto">' : '<span>' + ((p.nome||'U').charAt(0).toUpperCase()) + '</span>') + '</div>'
+    + '<div style="display:flex;gap:8px;margin-top:8px;justify-content:center">'
+    + '<label style="background:rgba(184,154,79,.15);border:1px solid rgba(184,154,79,.4);border-radius:6px;padding:7px 14px;font-size:.75rem;font-weight:600;color:var(--gold);cursor:pointer">&#128444;&#65039; Galeria<input type="file" accept="image/*" onchange="window.atualizarFotoOv(this)" style="display:none"></label>'
+    + '<label style="background:rgba(184,154,79,.15);border:1px solid rgba(184,154,79,.4);border-radius:6px;padding:7px 14px;font-size:.75rem;font-weight:600;color:var(--gold);cursor:pointer">&#128247; Camera<input type="file" accept="image/*" capture="environment" onchange="window.atualizarFotoOv(this)" style="display:none"></label>'
+    + '</div>'
+    + '<div class="perf-nome">' + (p.nome||'Corretor') + '</div>'
+    + (disc ? '<div class="perf-disc">DISC ' + disc.perfil + ' &#8212; ' + disc.nome + '</div>' : '<div style="font-size:.72rem;color:var(--dim);margin-top:4px">Faca o Quiz DISC</div>')
+    + '</div>'
+    + '<div class="perf-sec"><h3>Informacoes</h3>'
+    + '<div class="pf"><label>Nome</label><input type="text" id="pf-nome-ov" value="' + (p.nome||'') + '" autocapitalize="words"></div>'
+    + '<div class="pf"><label>Cidade</label><input type="text" id="pf-cidade-ov" value="' + (p.cidade||'') + '" autocapitalize="words" autocomplete="off"></div>'
+    + '<div class="pf"><label>Especialidade</label><select id="pf-esp-ov" style="background:var(--navy);border:1px solid rgba(184,154,79,.18);border-radius:6px;padding:10px 12px;font-size:.83rem;font-family:var(--font);color:var(--white);outline:none;width:100%"><option value="">Selecione</option>'
+    + ['Locacao','Alto Padrao','Luxo','Medio Padrao','Terrenos e Lotes','Minha Casa Minha Vida','Imoveis Rurais','Imoveis Comerciais'].map(function(e){ return '<option ' + (p.especialidade===e?'selected':'') + '>' + e + '</option>'; }).join('')
+    + '</select></div>'
+    + '<div class="pf"><label>Tempo como corretor</label><select id="pf-tempo-ov" style="background:var(--navy);border:1px solid rgba(184,154,79,.18);border-radius:6px;padding:10px 12px;font-size:.83rem;font-family:var(--font);color:var(--white);outline:none;width:100%"><option value="">Selecione</option>'
+    + ['Menos de 1 ano','1 a 3 anos','3 a 5 anos','5 a 10 anos','Mais de 10 anos'].map(function(e){ return '<option ' + (p.tempo===e?'selected':'') + '>' + e + '</option>'; }).join('')
+    + '</select></div>'
+    + '<button class="btn-p" style="margin-top:6px" onclick="window.salvarPerfOv()">Salvar alteracoes</button>'
+    + '</div>'
+    + '<div class="perf-sec"><h3>Conta</h3>'
+    + '<p style="font-size:.75rem;color:var(--dim);margin-bottom:12px">E-mail: ' + (CU && CU.email ? CU.email : '&#8212;') + '</p>'
+    + '<button class="btn-s" onclick="window.showPriv(\'perfil\')">Politica de Privacidade</button>'
+    + '<button class="btn-s" style="margin-top:8px" onclick="window.logout()">Sair da conta</button>'
+    + '<button class="btn-danger" style="margin-top:8px" onclick="window.delConta()">Excluir minha conta e dados</button>'
+    + '</div>'
+    + '<div style="height:24px"></div></div>';
+}
+window.atualizarFotoOv = function(inp){
+  var f = inp.files && inp.files[0];
+  if(!f) return;
+  var r = new FileReader();
+  r.onload = function(e){ var p = Object.assign({}, UD.perfil||{}, {foto:e.target.result}); save('perfil',p); toast('Foto atualizada!'); renderPerfOverlay(); };
+  r.readAsDataURL(f);
+};
+window.salvarPerfOv = function(){
+  var p = Object.assign({}, UD.perfil||{}, {
+    nome: $('pf-nome-ov') ? $('pf-nome-ov').value.trim() : '',
+    cidade: $('pf-cidade-ov') ? $('pf-cidade-ov').value.trim() : '',
+    especialidade: $('pf-esp-ov') ? $('pf-esp-ov').value : '',
+    tempo: $('pf-tempo-ov') ? $('pf-tempo-ov').value : ''
+  });
+  save('perfil', p);
+  toast('Perfil atualizado!');
+  renderPerfOverlay();
+};
+
+
+// ── ACADEMIA DATA ──
+var AC_TRILHAS = [
+  {id:'comunicacao',nome:'Comunicacao',icone:'🗣️',modulos:[
+    {id:'c1',tipo:'Conceito',nome:'Por que corretores perdem vendas na comunicacao',
+     conceito:'55% do impacto de uma mensagem vem da linguagem corporal, 38% do tom de voz e apenas 7% das palavras. Os 3 erros mais comuns: falar demais, nao pausar, e usar jargoes que o cliente nao entende.',
+     disc:{D:'Fala muito rapido. Exercicio: conte ate 3 antes de responder.',I:'Entusiasmo excessivo pode soar artificial. Adicione um dado concreto a cada argumento.',S:'Comunicacao suave mas pouco assertiva. Pratique afirmacoes no imperativo.',C:'Muitos dados e pouca conexao emocional. Comece toda explicacao tecnica com um beneficio humano.'},
+     tecnica:'Tecnica do Eco: repita a ultima palavra do cliente antes de responder. Isso cria conexao instantanea e mostra escuta ativa.',
+     cenario:'Cliente diz que esta pensando em outros imoveis. Resposta errada: despejar argumentos. Resposta certa: "Outros imoveis... me conta mais sobre o que te chamou atencao neles?"',
+     compromisso:'Em quantas conversas desta semana voce vai aplicar a tecnica do Eco? Defina um numero e registre os resultados.'},
+    {id:'c2',tipo:'Autodiagnostico',nome:'Como voce se comunica sob pressao',
+     conceito:'Sob pressao, cada perfil DISC tem uma reacao padrao. O D fica mais impaciente, o I mais emocional, o S mais quieto, o C mais tecnico. Conhecer seu padrao e o primeiro passo para quebra-lo.',
+     disc:{D:'Quando o cliente objeta, voce acelera os argumentos. Pergunte-se: "Estou vendendo ou impondo?"',I:'Quando a conversa esfria, voce tenta animar. Pergunte-se: "Estou animando ou mascarando a objecao?"',S:'Quando o cliente hesita, voce recua. Pergunte-se: "Estou respeitando ou desaparecendo?"',C:'Quando o cliente duvida, voce apresenta mais dados. Pergunte-se: "Estou informando ou intimidando?"'},
+     tecnica:'Grave um audio de 2 minutos falando sobre um imovel. Ouca e identifique: velocidade, tom, pausas, palavras repetidas.',
+     cenario:'O cliente para de responder suas mensagens por 2 dias. Qual e seu primeiro impulso? Analise se esse impulso serve ao cliente ou a sua ansiedade.',
+     compromisso:'Identifique uma situacao da semana passada em que sua comunicacao nao funcionou. Escreva o que faria diferente hoje.'},
+    {id:'c3',tipo:'Tecnica',nome:'Escuta ativa - a habilidade mais rara em vendas',
+     conceito:'Escuta ativa tem 4 etapas: atencao total, demonstrar que esta ouvindo, perguntar para aprofundar, e refletir o que ouviu. Vendedores que praticam escuta ativa fecham em media 43% mais negociacoes.',
+     disc:{D:'Maior desafio: impaciencia. Anote mentalmente 1 palavra-chave do que o cliente diz antes de responder.',I:'O I ouve mas interpreta emocionalmente. Tente ouvir tambem os fatos, nao so os sentimentos.',S:'Naturalmente bom ouvinte, mas tende a concordar demais. Treine questionar gentilmente.',C:'Ouve atentamente mas filtra pelo racional. Tente tambem escutar o que o cliente sente.'},
+     tecnica:'Na proxima visita, fique em silencio nos primeiros 3 minutos. Apenas observe e pergunte: "O que voce esta sentindo?"',
+     cenario:'Cliente diz que o quarto e um pouco pequeno. Quem nao escuta muda de assunto. Quem escuta pergunta: "Pequeno em relacao ao que voce tem hoje ou ao que imaginou?"',
+     compromisso:'Em uma conversa desta semana, faca pelo menos 3 perguntas abertas antes de apresentar qualquer argumento.'},
+    {id:'c4',tipo:'Simulacao',nome:'Negociacao travada - o cliente nao responde mais',
+     conceito:'A tecnica correta e a mensagem de valor sem cobranca: uma mensagem curta que entrega algo util sem pedir nada em troca. Isso reposiciona o corretor como parceiro, nao como vendedor ansioso.',
+     disc:{D:'"Surgiu uma informacao nova sobre o financiamento deste imovel. Posso te passar em 2 minutos?"',I:'"Estava pensando em voce quando vi uma noticia sobre o bairro que pode te interessar. Mando o link?"',S:'"Sem pressao nenhuma, so queria saber se ficou alguma duvida que eu possa esclarecer."',C:'"Pesquisei os ultimos lancamentos comparaveis e tenho numeros que podem ajudar sua analise. Quando tiver 10 minutos?"'},
+     tecnica:'Regra dos 3 toques com valor: antes de qualquer follow-up, pergunte "o que eu posso entregar de valor neste contato?"',
+     cenario:'Escolha um cliente que esta em silencio agora. Escreva a mensagem de reativacao usando o estilo do seu perfil DISC. Envie e registre a resposta.',
+     compromisso:'Quantos clientes em silencio voce tem hoje? Liste e defina uma mensagem de valor especifica para cada um.'},
+    {id:'c5',tipo:'Compromisso',nome:'Como vou me comunicar diferente a partir de hoje',
+     conceito:'Os melhores corretores comunicam com intencao. Cada mensagem, cada ligacao, cada visita tem um objetivo claro definido antes de comecar. Isso aumenta a taxa de resposta em ate 60%.',
+     disc:{D:'Antes de cada ligacao, escreva em uma palavra o objetivo dela: "Descoberta", "Fechamento", "Reativacao".',I:'Crie uma mensagem padrao de follow-up com um fato e uma emocao. Balance entusiasmo com substancia.',S:'Escreva uma frase assertiva para quando o cliente hesitar. Pratique em voz alta ate soar natural.',C:'Nas proximas 5 ligacoes, comece com uma pergunta sobre o cliente antes de apresentar qualquer dado.'},
+     tecnica:'Diario de comunicacao: por 7 dias, anote apos cada interacao: o que funcionou, o que nao funcionou, o que faria diferente.',
+     cenario:'Imagine que voce e o corretor mais bem comunicado da sua equipe. Como essa versao de voce abriria uma conversa com um novo cliente amanha?',
+     compromisso:'Escreva sua meta de comunicacao para os proximos 30 dias.'}
+  ]},
+  {id:'inteligencia',nome:'Inteligencia Emocional',icone:'🧠',modulos:[
+    {id:'ie1',tipo:'Conceito',nome:'O que e inteligencia emocional na pratica',
+     conceito:'5 componentes: autoconsciencia, autorregulacao, motivacao, empatia e habilidades sociais. No mercado imobiliario, a IE diferencia o corretor que fecha uma negociacao dificil do que desiste na primeira objecao.',
+     disc:{D:'Maior desafio: autorregulacao. Quando perde uma venda, reage com frustracao visivel. Defina um ritual de reset apos cada "nao".',I:'Maior desafio: autoconsciencia. Pode nao perceber quando seu entusiasmo cansa o cliente.',S:'Maior desafio: motivacao interna. Crie uma rotina de motivacao propria que independa dos outros.',C:'Maior desafio: empatia. Em cada reuniao, faca uma pergunta sobre como o cliente esta se sentindo.'},
+     tecnica:'Diario emocional: por 5 dias, antes de dormir, anote qual foi a emocao mais forte em uma negociacao e como ela influenciou sua decisao.',
+     cenario:'Voce perdeu uma venda para um concorrente. Quais emocoes aparecem? Como cada uma, se nao gerenciada, pode sabotar a proxima negociacao?',
+     compromisso:'Qual e o maior gatilho emocional que voce tem em negociacoes? Escreva e defina uma estrategia para lidar com ele.'},
+    {id:'ie2',tipo:'Autodiagnostico',nome:'Como voce reage sob pressao emocional',
+     conceito:'As 3 situacoes de maior estresse: proposta recusada, cliente que desaparece, colega que fecha seu cliente. Cada perfil DISC reage de forma diferente.',
+     disc:{D:'Proposta recusada: tende a reargumentar imediatamente. Custo: parece desesperado.',I:'Cliente some: tende a culpar a si mesmo. Beneficio do I gerenciado: usa a emocao para criar reconexao autentica.',S:'Colega fecha seu cliente: absorve em silencio e ressente. Beneficio do S gerenciado: aprende com o estilo do colega.',C:'Qualquer situacao: analisa excessivamente e paralisa. Beneficio do C gerenciado: transforma analise em melhoria.'},
+     tecnica:'Tecnica STOP: Stop (pare), Take a breath (respire fundo), Observe (o que esta acontecendo?), Proceed (retome com intencao).',
+     cenario:'Voce esta com um casal: o marido e entusiasmado, a esposa esta resistente. Como voce gerencia suas proprias emocoes para nao polarizar?',
+     compromisso:'Identifique qual das 3 situacoes de estresse mais te afeta. Escreva 3 acoes para a proxima vez.'},
+    {id:'ie3',tipo:'Tecnica',nome:'Regulacao emocional em negociacoes dificeis',
+     conceito:'3 tecnicas: Reframe cognitivo (trocar "perdi essa venda" por "aprendi o que esse cliente precisava"), Ancoragem fisica (gesto discreto que aciona calma), e Pausa estrategica (pedir 30 segundos para verificar um dado).',
+     disc:{D:'Reframe D: em vez de "nao vou aceitar esse nao", pense "esse nao e um dado - o que ele me revela sobre esse cliente?"',I:'Reframe I: em vez de "nao estou sendo eu mesmo", pense "o que esse cliente precisa que ainda nao dei a ele?"',S:'Reframe S: em vez de "nao quero criar conflito", pense "clareza agora evita problema maior depois."',C:'Reframe C: em vez de "preciso de mais dados", pense "qual e o minimo que preciso para dar o proximo passo?"'},
+     tecnica:'Antes da proxima visita, faca este ritual de 2 minutos: respire 3 vezes, defina o que quer que o cliente sinta ao final, e lembre de um fechamento que voce se orgulha.',
+     cenario:'Durante uma negociacao, o cliente faz uma critica pessoal: "Voce parece novato nesse tipo de imovel." Escreva sua reacao emocional honesta e depois a resposta gerenciada.',
+     compromisso:'Escolha uma das 3 tecnicas. Comprometa-se a usar em todas as negociacoes desta semana e anote os resultados.'},
+    {id:'ie4',tipo:'Simulacao',nome:'Casal em conflito na visita ao imovel',
+     conceito:'Quando um casal esta em desacordo, o corretor vira mediador emocional. Nao tente convencer os dois ao mesmo tempo. Reconheca a emocao de cada um sem tomar partido.',
+     disc:{D:'"Voces tem perspectivas diferentes - isso e normal. Vamos separar os pontos em que concordam dos que precisam de conversa?"',I:'"Sabe o que eu adoro nessa situacao? Significa que voces estao levando a serio. O que cada um mais valoriza?"',S:'"Faz sentido que queiram pensar mais. Conversem esta noite e me digam amanha o que cada um consideraria ideal."',C:'"Vou mapear os criterios dos dois. Voce valoriza X, e voce valoriza Y. Deixa eu ver se esse imovel atende os dois."'},
+     tecnica:'Em conflito entre clientes, sua funcao nao e resolver o conflito deles - e mostrar que o imovel pode ser a solucao para ambos.',
+     cenario:'Maria quer apartamento grande para os filhos. Carlos quer algo menor e moderno. Carlos diz: "Isso nao e o que eu quero." Como voce responde?',
+     compromisso:'Relembre um casal que atendeu. Qual foi o maior ponto de tensao? Como lidaria com ele hoje?'},
+    {id:'ie5',tipo:'Compromisso',nome:'Meu plano de desenvolvimento emocional',
+     conceito:'IE se desenvolve pela pratica deliberada. O sistema que funciona tem 3 elementos: gatilho (situacao especifica), acao (o que vou fazer diferente), e medicao (como vou saber se funcionou).',
+     disc:{D:'Gatilho: receber um "nao". Acao: pausar 3 segundos. Medicao: quantas vezes conseguiu parar antes de reagir.',I:'Gatilho: venda esfriou. Acao: perguntar ao cliente o que esta sentindo. Medicao: quantas conversas geraram informacao nova.',S:'Gatilho: vontade de ceder. Acao: falar a verdade gentilmente antes de ceder. Medicao: quantas vezes foi direto sem perder o relacionamento.',C:'Gatilho: precisar de mais informacao. Acao: definir 1 dado suficiente para avancar. Medicao: quantas decisoes tomou com o "minimo necessario".'},
+     tecnica:'Revisao semanal de 5 minutos toda sexta: melhor reacao emocional, pior reacao, o que aprendo com as duas.',
+     cenario:'Daqui a 30 dias, como seria diferente uma negociacao dificil para voce, comparado com hoje?',
+     compromisso:'Escreva seu sistema com gatilho, acao e medicao.'}
+  ]},
+  {id:'empatia',nome:'Empatia',icone:'❤️',modulos:[
+    {id:'em1',tipo:'Conceito',nome:'Empatia vs simpatia - a diferenca que fecha vendas',
+     conceito:'Simpatia e entrar no buraco com o cliente. Empatia e reconhecer o que ele sente sem perder sua perspectiva. O corretor simpatico perde a margem. O empatico mantem o controle da negociacao.',
+     disc:{D:'Antes de argumentar, nomeie a emocao do cliente: "Parece que voce esta em duvida sobre..."',I:'Quando sentir vontade de concordar com uma objecao, pause e pergunte "o que exatamente preocupa voce nisso?"',S:'Sua empatia natural e sua maior forca. Use-a para direcionar, nao so para validar.',C:'Em toda reuniao, identifique a emocao dominante do cliente e adapte seu tom.'},
+     tecnica:'Tecnica do "parece que": "Parece que o que mais importa e a seguranca a longo prazo, e nao o preco agora - estou certo?"',
+     cenario:'Cliente: "Nao sei, talvez nao seja o momento certo." Simpatico: "Tudo bem, me avisa." Empatico: "O que tornaria esse momento mais certo para voce?"',
+     compromisso:'Em quantas conversas desta semana voce vai usar a tecnica do "parece que"?'},
+    {id:'em2',tipo:'Autodiagnostico',nome:'Qual e o seu nivel de empatia atual',
+     conceito:'4 indicadores: voce faz perguntas sobre a vida do cliente (nao so o imovel), percebe desconforto sem ele dizer, adapta o ritmo ao humor, e lembra de detalhes pessoais de reunioes anteriores.',
+     disc:{D:'Geralmente forte em ritmo mas fraco em perguntas pessoais.',I:'Forte em perguntas pessoais mas pode perder sinais de desconforto - o ambiente positivo mascara.',S:'Pontua bem nos 4 indicadores. Desafio: usar a leitura para agir, nao so para se adaptar.',C:'Fraco em perguntas pessoais. Antes de cada reuniao, releia as anotacoes anteriores e prepare uma pergunta pessoal.'},
+     tecnica:'Apos cada reuniao, anote 1 dado pessoal que o cliente mencionou. Use na proxima conversa.',
+     cenario:'Voce atende um cliente pela terceira vez. Ele mencionou buscar imovel mais perto da escola do filho. Como voce usaria esse dado para abrir a terceira conversa?',
+     compromisso:'Qual dos 4 indicadores de empatia voce vai treinar esta semana?'},
+    {id:'em3',tipo:'Tecnica',nome:'Leitura de sinais nao-verbais em visitas',
+     conceito:'Sinais durante a visita: diminuicao de ritmo (se imaginando la), toque (conexao emocional com o espaco), silencio contemplativo (processando positivamente), resistencia corporal (desconforto com algo).',
+     disc:{D:'Tende a continuar falando no silencio contemplativo. Aprenda a calar - o silencio do cliente vendendo para si mesmo e mais poderoso que qualquer argumento.',I:'Bom em ler entusiasmo mas pode perder desconforto. Observe a linguagem corporal a cada 2 minutos.',S:'Le bem os sinais negativos mas subestima os positivos. Aja nos sinais positivos sem esperar confirmacao verbal.',C:'Raramente presta atencao em linguagem corporal. Antes de cada visita, defina qual sinal vai observar.'},
+     tecnica:'Silencio estrategico: quando o cliente esta em silencio contemplativo, pare de falar por pelo menos 30 segundos.',
+     cenario:'O cliente para na sala de estar, olha pela janela em silencio por 15 segundos e diz "interessante". O que isso indica? O que voce faz?',
+     compromisso:'Na proxima visita, escolha um sinal nao-verbal para observar. Registre e como mudou sua abordagem.'},
+    {id:'em4',tipo:'Simulacao',nome:'O cliente que nao sabe o que quer',
+     conceito:'O cliente que visita 10 imoveis sem decidir nao e indeciso - e alguem que ainda nao encontrou a resposta para a necessidade emocional nao declarada. Voce e um detetive das necessidades nao ditas.',
+     disc:{D:'"Se eu pudesse garantir que o proximo imovel seria o ultimo, o que precisaria ter?"',I:'"Imagina voce daqui a 1 ano ja morando no imovel perfeito. Me conta como e a cena."',S:'"Me conta sobre o lugar onde voce mais se sentiu em casa na sua vida. O que esse lugar tinha?"',C:'"Vamos listar os criterios que voce mencionou e colocar em ordem de prioridade de 1 a 5."'},
+     tecnica:'A pergunta magica: "Se voce encontrasse o imovel perfeito amanha, o que precisaria ter - e o que nao poderia ter de jeito nenhum?"',
+     cenario:'Joao e Maria visitaram 8 imoveis com voce. Em cada visita encontram algo errado. Como voce usaria empatia para descobrir o que realmente esta impedindo a decisao?',
+     compromisso:'Voce tem algum cliente que visita imoveis ha muito tempo sem decidir? O que a abordagem empatica revelaria?'},
+    {id:'em5',tipo:'Compromisso',nome:'Empatia como diferencial competitivo',
+     conceito:'68% das pessoas contratam o corretor indicado por alguem que "disse que ele realmente me ouviu." Empatia e o melhor marketing que existe.',
+     disc:{D:'Apos cada fechamento, pergunte: "Voce conhece alguem que esteja pensando em comprar ou vender nos proximos 6 meses?"',I:'Envie uma mensagem personalizada 30 dias apos o fechamento perguntando como o cliente esta na nova casa.',S:'Use seu cuidado para criar um protocolo de acompanhamento que faz o cliente se sentir especial muito depois do fechamento.',C:'Crie um sistema de registro de preferencias. Quando um imovel do perfil aparecer meses depois, voce sera o primeiro a avisar.'},
+     tecnica:'O pedido de indicacao empatico: "Se voce achar que eu poderia ajudar seu amigo da mesma forma, adoraria ser apresentado."',
+     cenario:'Qual foi o cliente com quem voce teve mais empatia genuina? O que fez diferente? Como replicar?',
+     compromisso:'Escreva um compromisso de pos-venda empatico para o proximo fechamento.'}
+  ]},
+  {id:'proatividade',nome:'Proatividade',icone:'⚡',modulos:[
+    {id:'pr1',tipo:'Conceito',nome:'Reativo vs proativo - qual corretor voce e hoje',
+     conceito:'O corretor reativo espera. O corretor proativo cria. A diferenca de resultado no litoral SC e de ate 3x no volume de fechamentos anuais. Proatividade nao e energia - e sistema.',
+     disc:{D:'Ja tem instinto proativo mas age por impulso. Canalize em 3 acoes proativas fixas por semana.',I:'Proativo em relacionamentos mas reativo em processos. Crie uma lista semanal de follow-ups proativos.',S:'Reativo por nao querer incomodar. Ressignifique: ser proativo e cuidar do cliente antes que ele precise pedir.',C:'Proativo em analise mas reativo em acao. Prazo maximo de 24h entre "analisei" e "agi".'},
+     tecnica:'A regra do "e agora?": ao fim de cada interacao, pergunte: "Qual e a proxima acao proativa nas proximas 24 horas?"',
+     cenario:'Voce soube que um vizinho de um cliente seu colocou o apartamento a venda. Voce nao foi contratado, mas conhece compradores. O que voce faz nas proximas 2 horas?',
+     compromisso:'Defina 3 acoes proativas que voce tomara esta semana - acoes que nao foram solicitadas por nenhum cliente.'},
+    {id:'pr2',tipo:'Autodiagnostico',nome:'Onde voce e reativo sem perceber',
+     conceito:'Os 5 pontos de reatividade invisivel: esperar o cliente perguntar o preco, esperar a objecao aparecer, esperar o cliente decidir, esperar o mercado mudar, esperar indicacao.',
+     disc:{D:'Maior ponto cego: esperar o cliente decidir sem criar pressao inteligente.',I:'Maior ponto cego: esperar que o relacionamento produza negocio naturalmente.',S:'Maior ponto cego: esperar o cliente sentir falta e voltar. Voce tem clientes sumidos ha mais de 30 dias?',C:'Maior ponto cego: esperar ter todas as informacoes antes de apresentar qualquer proposta.'},
+     tecnica:'Auditoria de reatividade: liste os 5 ultimos clientes que nao fecharam. Em que momento voce poderia ter agido proativamente e nao agiu?',
+     cenario:'Voce tem um cliente com interesse ha 3 semanas sem retorno. O que uma acao proativa ideal pareceria agora?',
+     compromisso:'Identifique seu maior ponto cego de reatividade. Escreva uma acao especifica que vai mudar a partir de amanha.'},
+    {id:'pr3',tipo:'Tecnica',nome:'Sistema de gestao proativa de carteira',
+     conceito:'4 categorias: Quentes (contato a cada 48h), Mornos (a cada 7 dias com valor), Frios (mensal com novidade), Adormecidos (trimestral). A maioria dos corretores so gerencia os Quentes.',
+     disc:{D:'Use um quadro com 4 colunas. Revise toda segunda-feira.',I:'Use redes sociais como ferramenta proativa - comentar em posts de clientes Mornos mantem o relacionamento aquecido.',S:'Crie um calendario de "toques de cuidado" - mensagens de valor real, nao so follow-ups de venda.',C:'Crie uma planilha com a ultima data de contato e o proximo contato planejado para cada cliente.'},
+     tecnica:'Toda segunda-feira, identifique 3 clientes Mornos ou Frios e prepare uma mensagem especifica com algo util para cada um.',
+     cenario:'Voce tem 40 clientes na carteira. Quanto potencial de receita existe nos Mornos e Frios que esta ignorando?',
+     compromisso:'Organize sua carteira nas 4 categorias ainda esta semana.'},
+    {id:'pr4',tipo:'Simulacao',nome:'Criando oportunidade onde nao existia',
+     conceito:'O corretor reativo pede para o cliente aguardar. O corretor proativo cria opcoes: pesquisa imoveis off-market, aciona a rede de colegas, apresenta imoveis adjacentes ao perfil.',
+     disc:{D:'"Nao tenho o que voce descreveu, mas tenho algo que atende 80% dos criterios e negocia melhor. Vale 20 minutos?"',I:'"Tenho um colega com um imovel off-market que pode ser exatamente o que voce quer. Posso te apresentar?"',S:'"Posso fazer uma pesquisa mais ampla e te retornar em 48 horas com opcoes que talvez voce nao conheca?"',C:'"Vou cruzar seus criterios com os lancamentos previstos. Ha uma possibilidade real chegando em breve. Posso te manter informado?"'},
+     tecnica:'O "nao" que vira oportunidade: nunca encerre a conversa sem propor uma proxima acao especifica com prazo.',
+     cenario:'Cliente quer apartamento de 3 quartos em Barra Velha entre R$ 400 e R$ 450 mil. Voce nao tem nada assim agora. O que faz nas proximas 2 horas?',
+     compromisso:'Quantos clientes voce tem hoje sem o imovel certo? O que fara proativamente por cada um nos proximos 3 dias?'},
+    {id:'pr5',tipo:'Compromisso',nome:'Proatividade como identidade profissional',
+     conceito:'Os corretores mais bem-sucedidos do litoral SC sao reconhecidos por agir antes dos outros. Essa reputacao se constroi em acoes pequenas e consistentes ao longo de 90 dias.',
+     disc:{D:'Meta: 1 acao proativa nao solicitada por dia durante 30 dias.',I:'Meta: toda semana, conecte 2 pessoas da sua rede que poderiam se beneficiar mutuamente.',S:'Meta: protocolo de cuidado pos-venda de 6 meses. Uma mensagem por mes para cada cliente que fechou.',C:'Meta: boletim mensal de mercado - 5 linhas - enviado para sua carteira de clientes.'},
+     tecnica:'Defina sua "assinatura proativa" - a coisa especifica que voce faz que te diferencia de qualquer outro corretor.',
+     cenario:'Se um cliente te descrevesse para um amigo em 3 palavras, o que voce gostaria que ele dissesse?',
+     compromisso:'Escreva sua meta de proatividade para os proximos 30 dias e como vai medir consistencia.'}
+  ]},
+  {id:'lideranca',nome:'Lideranca',icone:'👑',modulos:[
+    {id:'l1',tipo:'Conceito',nome:'Lideranca na venda - o corretor que conduz',
+     conceito:'Em toda negociacao, alguem lidera. Se o corretor nao lidera, o cliente lidera - e geralmente vai para o caminho mais confortavel (nao comprar). 3 elementos: agenda clara, perguntas que direcionam, confianca na proposta.',
+     disc:{D:'Lideranca e convite, nao imposicao. Em vez de "voce precisa decidir logo", use "o que mais precisaria para se sentir seguro?"',I:'Defina antes de cada reuniao os 3 pontos que precisam ser cobertos e garanta que a conversa passe por eles.',S:'Lideranca gentil: "Posso sugerir um proximo passo que funciona bem para situacoes como a sua?"',C:'Alem de apresentar os dados, articule o impacto na vida do cliente.'},
+     tecnica:'Defina a agenda da visita: "Hoje gostaria de entender o que voce busca, mostrar o que encontrei e - se fizer sentido - alinhar um proximo passo. Funciona para voce?"',
+     cenario:'Voce esta em uma visita e o cliente começa a comparar tudo com outro imovel. Como retoma a lideranca sem invalidar a experiencia anterior?',
+     compromisso:'Nas proximas 3 reunioes, defina a agenda antes de comecar usando a tecnica acima.'},
+    {id:'l2',tipo:'Autodiagnostico',nome:'Seu estilo de lideranca em negociacao',
+     conceito:'4 estilos: Diretivo (conduz com firmeza), Inspirador (cria visao e entusiasmo), Suportivo (apoia e facilita), Consultivo (analisa e recomenda). O corretor de alto desempenho conhece seu estilo e sabe quando flexibilizar.',
+     disc:{D:'Estilo Diretivo. Forte quando o cliente precisa de direcao. Aprenda a recuar estrategicamente sem perder presenca.',I:'Estilo Inspirador. Forte com clientes indecisos emocionalmente. Aprenda a alternar entusiasmo com substancia.',S:'Estilo Suportivo. Forte com clientes ansiosos. Aprenda a liderar com gentileza E assertividade.',C:'Estilo Consultivo. Forte com clientes analiticos. Aprenda a liderar pelo coracao quando necessario.'},
+     tecnica:'Antes de cada reuniao, identifique o estilo dominante do cliente e prepare respostas nos 4 estilos para as objecoes mais provaveis.',
+     cenario:'Voce tem um executivo direto e um casal de primeira compra nervoso. Como adapta seu estilo de lideranca para cada um?',
+     compromisso:'Qual estilo de lideranca voce menos usa e seria mais util desenvolver?'},
+    {id:'l3',tipo:'Tecnica',nome:'Presenca e autoridade sem arrogancia',
+     conceito:'Autoridade nao vem de titulos - vem de competencia demonstrada + confianca genuina + cuidado evidente. 3 pilares: conhecimento, postura, e servico.',
+     disc:{D:'Cuidado para nao confundir confianca com pressao. Quando sentir vontade de pressionar, pergunte: "Estou confiante ou ansioso?"',I:'Cuidado para nao confundir entusiasmo com autoridade. Fortaleça o conhecimento tecnico como base da sua presenca.',S:'Voce tem cuidado e consistencia. O que falta e a expressao da autoridade. Pratique dizer "minha recomendacao e..." com firmeza.',C:'Voce tem o conhecimento - o desafio e transmiti-lo com calor humano.'},
+     tecnica:'"Com base no que conheco desse mercado e no que voce me contou, minha recomendacao e X. Voce tem alguma duvida sobre esse caminho?"',
+     cenario:'Cliente diz: "Vou pesquisar mais por conta propria." Como voce responde mantendo a autoridade sem soar inseguro?',
+     compromisso:'Escreva uma frase de autoridade especifica para o tipo de imovel que voce mais vende.'},
+    {id:'l4',tipo:'Simulacao',nome:'Cliente quer liderar a negociacao',
+     conceito:'Alguns clientes - especialmente perfis D - tentam assumir o controle. O corretor que cede perde credibilidade. O que resiste agressivamente perde o cliente. A habilidade e a lideranca compartilhada.',
+     disc:{D:'"Respeito que voce sabe o que quer. Minha funcao e garantir que a decisao seja a melhor possivel - e isso as vezes significa te dar informacoes que voce ainda nao tem."',I:'Use a conexao para retomar: "Voce esta sendo muito direto, e eu valorizo isso. Me conta mais sobre o que esta por tras desse criterio."',S:'"Entendo sua posicao completamente. Com sua licenca, posso compartilhar uma perspectiva que pode ser util?"',C:'"Seus criterios fazem sentido. Tenho dados do mercado que podem embasar melhor sua decisao. Posso te mostrar?"'},
+     tecnica:'Quando perder a lideranca, retome com pergunta - nao com argumento.',
+     cenario:'Cliente chega e diz: "Nao vou pagar mais que R$ 380 mil por isso aqui." O imovel esta pedindo R$ 420 mil. Como voce lidera?',
+     compromisso:'Pense em uma negociacao recente em que perdeu a lideranca. Escreva como a reconduziria hoje.'},
+    {id:'l5',tipo:'Compromisso',nome:'Tornando-me o corretor que inspira confianca',
+     conceito:'Os corretores de maior sucesso sao descritos pelos clientes com as mesmas palavras: "ele me deu seguranca", "eu confiava completamente", "sentia que estava sendo guiado por alguem que sabia o que fazia."',
+     disc:{D:'Lideranca a cultivar: a coragem de dizer a verdade mesmo quando o cliente nao quer ouvir.',I:'Lideranca a cultivar: a consistencia. Seu entusiasmo e seu maior talento - mantenha mesmo quando a negociacao esfria.',S:'Lideranca a cultivar: a assertividade gentil. Sua opiniao merece ser ouvida com firmeza.',C:'Lideranca a cultivar: o calor humano. Um C que combina rigor com conexao e imbativel.'},
+     tecnica:'Toda semana: em qual interacao eu mais me senti um lider genuino? O que fiz que criou isso? Como replico?',
+     cenario:'Daqui a 1 ano, como voce quer que seus clientes descrevam sua lideranca como corretor?',
+     compromisso:'Escreva sua declaracao de lideranca: "Como corretor, eu lidero atraves de ___, ___ e ___."'}
+  ]},
+  {id:'equipe',nome:'Trabalho em Equipe',icone:'🤝',modulos:[
+    {id:'eq1',tipo:'Conceito',nome:'Por que corretores solitarios ganham menos',
+     conceito:'Corretores que participam de redes de colaboracao fecham em media 2,3x mais vendas por ano. No litoral SC, a colaboracao multiplica os fechamentos sem aumentar o esforco individual.',
+     disc:{D:'Tende a ver colegas como concorrentes. Ressignifique: divisao de comissao em parceria e melhor que nenhuma comissao.',I:'Cria redes naturalmente mas nao as transforma em negocios. Converta 3 relacionamentos em parcerias formais.',S:'Trabalha bem em equipe mas nao assume lideranca de iniciativas. Proponha uma parceria especifica esta semana.',C:'Reservado sobre sua carteira e metodos. Abertura estrategica constroi reputacao de especialista.'},
+     tecnica:'Mapa de parceiros: liste 5 profissionais com quem poderia criar uma rede de indicacao mutua. Contate um deles esta semana.',
+     cenario:'Um colega tem um cliente que quer exatamente o tipo de imovel que voce tem em carteira. Como estrutura a proposta de parceria?',
+     compromisso:'Defina uma parceria de colaboracao que vai propor ainda esta semana.'},
+    {id:'eq2',tipo:'Autodiagnostico',nome:'Como voce colabora hoje',
+     conceito:'4 niveis: 0 nenhuma, 1 reativa, 2 seletiva, 3 sistematica. Corretores no nivel 3 tem 40% mais indicacoes.',
+     disc:{D:'Nivel tipico: 1 ou 2. Para o nivel 3, defina um dia fixo para acoes de colaboracao.',I:'Nivel tipico: 2. Para o nivel 3, registre cada parceria e seu resultado.',S:'Nivel tipico: 2. Para o nivel 3, pratique ser quem propoe, nao quem aceita.',C:'Nivel tipico: 1. Comece com parcerias pequenas e bem definidas.'},
+     tecnica:'Reuniao de troca semanal: proponha para 2 colegas uma reuniao de 30 min toda semana para trocar informacoes.',
+     cenario:'Voce tem 5 clientes que nao encontraram o imovel ideal. Quais colegas acionaria para cada um?',
+     compromisso:'Em qual nivel de colaboracao voce esta? O que faria para subir um nivel?'},
+    {id:'eq3',tipo:'Tecnica',nome:'Comunicacao assertiva dentro da equipe',
+     conceito:'Conflitos em equipe raramente sao sobre quem tem razao - sao sobre como a discordancia e comunicada. Formula: falar na primeira pessoa, ser especifico sobre o comportamento, propor solucao.',
+     disc:{D:'E direto mas as vezes brusco. Adicione uma frase de contexto antes do feedback.',I:'Evita conflito para manter o clima. Exercicio: use o formato assertivo para abordar uma situacao que incomoda.',S:'Harmonioso mas pode reter frustracao. Expresse discordancias pequenas antes de virarem grandes.',C:'Logico no feedback mas pode soar julgador. Antes de apontar o erro, reconheca o que funcionou.'},
+     tecnica:'"Quando [comportamento] aconteceu, eu senti [impacto], e o que eu preciso e [pedido especifico]."',
+     cenario:'Um colega ficou com um cliente que voce havia prospectado. Como aborda a situacao de forma assertiva sem criar conflito?',
+     compromisso:'Ha alguma conversa com um colega que voce esta evitando? Planeje como torna-la assertiva.'},
+    {id:'eq4',tipo:'Simulacao',nome:'Dividindo uma venda - acordos de parceria',
+     conceito:'Vendas em parceria exigem: papeis definidos, divisao acordada antes, e comunicacao unica para o cliente (um porta-voz para nao gerar mensagens contraditórias).',
+     disc:{D:'"Voce traz o cliente, eu trago o imovel, dividimos 50/50. Fechado?"',I:'Voce e excelente no relacionamento. Assuma esse papel. Mas garanta que o acordo esta claro antes.',S:'Voce e um parceiro leal. Cuidado com parcerias desequilibradas onde voce faz mais e recebe menos.',C:'Elabore um acordo simples por escrito antes de comecar.'},
+     tecnica:'"Tenho um cliente que busca X. Voce tem imovel nesse perfil? Proponho dividir a comissao Y/Y. Voce cuida do [papel A], eu cuido do [papel B]."',
+     cenario:'Voce esta em uma co-corretagem e o colega esta dando informacoes contraditórias ao cliente. Como resolve sem criar conflito na frente do cliente?',
+     compromisso:'Ha alguma oportunidade de co-corretagem que voce poderia propor esta semana?'},
+    {id:'eq5',tipo:'Compromisso',nome:'Construindo uma rede de parceiros de alto valor',
+     conceito:'Diferenca entre contato e parceiro: contato e alguem que voce conhece. Parceiro e alguem que ativamente indica voce e para quem voce indica. 5 parceiros verdadeiros valem mais que 500 contatos passivos.',
+     disc:{D:'Identifique 1 parceiro estrategico por mes nos proximos 3 meses.',I:'Transforme seus 3 relacionamentos mais fortes em parcerias formais.',S:'Crie um protocolo de manutencao de parceria - uma mensagem mensal com novidades.',C:'Crie um mapa de parceiros com nome, especialidade, historico de indicacoes e proxima acao.'},
+     tecnica:'Reuniao de parceria trimestral: a cada 3 meses, revise resultados e defina estrategia para o proximo trimestre.',
+     cenario:'Se voce perdesse 50% da carteira amanha, quais parcerias garantiriam sua recuperacao em menos de 30 dias?',
+     compromisso:'Escreva os nomes dos 5 parceiros que voce quer ter ativos nos proximos 6 meses.'}
+  ]},
+  {id:'conflitos',nome:'Gestao de Conflitos',icone:'⚖️',modulos:[
+    {id:'co1',tipo:'Conceito',nome:'Conflito como dado - o que ele revela',
+     conceito:'Toda objecao forte, toda resistencia carrega informacao valiosa sobre o que o cliente realmente precisa. O corretor que navega o conflito com curiosidade descobre o que nenhum concorrente descobriu.',
+     disc:{D:'Em conflito: tende a contra-atacar. Substitua o instinto de vencer pelo de entender.',I:'Em conflito: tende a minimizar. Nomeie a tensao: "Percebo que temos uma divergencia aqui."',S:'Em conflito: tende a ceder prematuramente. Fique no conflito o tempo necessario para extrair o dado.',C:'Em conflito: entra em modo de prova. As vezes o cliente precisa ser ouvido antes de ser convencido.'},
+     tecnica:'"Ajuda-me a entender - o que precisaria ser diferente para que isso funcionasse para voce?"',
+     cenario:'Cliente bate o pe: "Esse preco e absurdo." Como voce usa o conflito como dado para avancar a negociacao?',
+     compromisso:'Identifique um conflito atual com um cliente. Como navegaria usando o que aprendeu?'},
+    {id:'co2',tipo:'Autodiagnostico',nome:'Seu padrao de resposta ao conflito',
+     conceito:'4 padroes: Luta (enfrenta diretamente), Fuga (evita e muda de assunto), Rendicao (cede imediatamente), Negociacao (busca entendimento). A maioria dos corretores raramente usa Negociacao.',
+     disc:{D:'Padrao dominante: Luta. Trabalhe em como voce enfrenta - nao em se evita.',I:'Padrao dominante: Fuga. Conflitos nao resolvidos ressurgem maiores.',S:'Padrao dominante: Rendicao. Perde margem e o cliente nao respeita os limites.',C:'Pode ser qualquer um. O C conflita sobre dados mas cede em emocao.'},
+     tecnica:'Mapeie seus 3 conflitos mais recentes. Em cada um: qual foi seu padrao? Qual foi o resultado?',
+     cenario:'Um cliente esta claramente errado sobre um dado de mercado mas bate pe. Como voce resolve sem ceder nem atacar?',
+     compromisso:'Qual e o seu padrao dominante de resposta ao conflito? O que custou para voce no ultimo mes?'},
+    {id:'co3',tipo:'Tecnica',nome:'Tecnicas de desescalada em negociacoes tensas',
+     conceito:'3 tecnicas: Validacao sem concordancia, Reformulacao positiva, e Pausa estrategica.',
+     disc:{D:'Validacao pode parecer fraqueza. Reformule: validar a emocao nao e ceder ao argumento - e inteligencia social.',I:'Voce valida bem mas as vezes valida demais. Combine validacao com reformulacao para manter o rumo.',S:'Voce desescala naturalmente - maior risco e desescalar cedo demais e perder a informacao do conflito.',C:'Voce usa dados como desescalada, mas com clientes emocionais isso pode ter efeito oposto.'},
+     tecnica:'Script em 3 movimentos: 1. "Entendo que isso e importante." 2. "O que ouco e que voce quer garantir que..." 3. "O que eu posso fazer nesse sentido e..."',
+     cenario:'Cliente esta irritado porque o apartamento tem uma caracteristica que voce nao mencionou antes. Como voce desescala?',
+     compromisso:'Memorize o script de 3 movimentos. Na proxima negociacao tensa, use e registre o resultado.'},
+    {id:'co4',tipo:'Simulacao',nome:'Negociacao bilateral - vendedor vs comprador',
+     conceito:'Em negociacoes bilaterais, o corretor e o mediador. Sua funcao e encontrar o ponto de convergencia sem sacrificar a integridade de nenhum dos dois.',
+     disc:{D:'Use clareza e firmeza para conduzir com agilidade. Cuidado: sua pressa pode fazer uma das partes sentir que nao foi ouvida.',I:'Voce tem empatia com ambas as partes. Cuidado: nao favoreça emocionalmente quem tem mais afinidade.',S:'Voce e um mediador nato. Desenvolva a habilidade de fechar quando o momento certo chegar.',C:'Voce cria argumentos logicos solidos. Combine com conexao emocional.'},
+     tecnica:'Tecnica do "e se": quando as partes estao travadas, use hipoteticas: "E se o preco fosse X, o que mais precisaria ser diferente para o acordo fechar?"',
+     cenario:'Vendedor quer R$ 450 mil. Comprador oferece R$ 410 mil. Ambos dizem que e o maximo. Qual e sua estrategia de mediacao?',
+     compromisso:'Qual e a negociacao bilateral mais dificil que voce tem agora? Escreva a estrategia.'},
+    {id:'co5',tipo:'Compromisso',nome:'Tornando-me um mediador de confianca',
+     conceito:'A reputacao mais valiosa: ser conhecido como "o que resolve." Esse corretor e chamado nos casos dificeis que outros desistiram.',
+     disc:{D:'Reputacao a construir: o corretor direto que resolve rapido sem perder o relacionamento.',I:'Reputacao a construir: o corretor que cria um ambiente tao positivo que as partes querem resolver.',S:'Reputacao a construir: o corretor paciente que nunca desiste da negociacao.',C:'Reputacao a construir: o corretor que encontra solucoes criativas baseadas em dados.'},
+     tecnica:'Apos cada negociacao dificil: anote o que funcionou, o que nao funcionou, o que aprendeu.',
+     cenario:'Qual foi a negociacao mais dificil da sua vida como corretor? O que ela te ensinou?',
+     compromisso:'"Quando chega um conflito dificil, eu..."'}
+  ]},
+  {id:'resiliencia',nome:'Flexibilidade e Resiliencia',icone:'🌱',modulos:[
+    {id:'re1',tipo:'Conceito',nome:'A diferenca entre resistencia e resiliencia',
+     conceito:'Resistencia e tentar manter o que ja foi. Resiliencia e ser dobrado sem quebrar e voltar mais forte. O corretor resiliente ja esta se adaptando enquanto os outros ainda estao em choque.',
+     disc:{D:'Recupera rapido mas ignora sinais de mudanca. Treine a adaptacao de rota sem perder a direcao.',I:'Adapta-se bem em relacionamentos mas pode ficar abalado quando o mercado esfria. Desenvolva fontes de energia internas.',S:'E estavel mas pode demorar para se adaptar. Treine a velocidade de adaptacao.',C:'Analisa bem as mudancas mas pode paralisar buscando a resposta perfeita.'},
+     tecnica:'Protocolo de reset: quando receber um "nao", 10 minutos de frustracao - so 10 minutos. Depois: 1 aprendizado e 1 proxima acao.',
+     cenario:'Voce perdeu uma venda que trabalhava ha 3 meses para um concorrente no ultimo momento. Como se recupera nas proximas 24 horas?',
+     compromisso:'Qual foi o maior "nao" da sua carreira? O que ele te ensinou?'},
+    {id:'re2',tipo:'Autodiagnostico',nome:'Seu nivel de resiliencia atual',
+     conceito:'4 dimensoes: fisica (sono, alimentacao, exercicio), emocional (processa ou acumula?), cognitiva (aprende ou repete?), e social (tem rede de suporte?).',
+     disc:{D:'Dimensao mais fraca: emocional. O D processa rapido demais sem extrair o aprendizado completo.',I:'Dimensao mais fraca: social. O I tem muitos contatos mas poucas conexoes profundas de suporte real.',S:'Dimensao mais fraca: cognitiva. Pode repetir padroes por lealdade ao que sempre funcionou.',C:'Dimensao mais fraca: fisica. Esquece de cuidar do corpo quando esta em modo de analise.'},
+     tecnica:'Avaliacao semanal de resiliencia (5 min): Fisica? Emocional? Cognitiva? Social?',
+     cenario:'Voce esta passando por um mes fraco. Como voce avalia sua resiliencia nas 4 dimensoes agora?',
+     compromisso:'Qual dimensao precisa de mais atencao agora? Defina uma acao especifica esta semana.'},
+    {id:'re3',tipo:'Tecnica',nome:'Adaptacao rapida a mudancas de mercado',
+     conceito:'3 passos: Detectar (identificar a mudanca antes dos outros), Interpretar (entender o impacto na sua carteira), Agir (adaptar o discurso antes que o cliente questione).',
+     disc:{D:'Age rapido mas pode agir antes de interpretar. Adicione 30 minutos de analise antes de mudar a estrategia.',I:'Detecta bem as mudancas mas pode nao agir sistematicamente. Converta insights em acoes concretas.',S:'Precisa de tempo para mudar. Antecipe: quando vir sinais de mudanca, prepare-se antes de precisar.',C:'Analisa bem mas espera dados definitivos. No mercado imobiliario, dados definitivos chegam tarde.'},
+     tecnica:'Leitura de mercado semanal (15 min toda segunda): 1 dado macroeconomico, 1 dado regional, 1 dado de comportamento do cliente.',
+     cenario:'O Banco Central aumentou a Selic inesperadamente. Voce tem 3 propostas em andamento com financiamento. O que voce faz nas proximas 2 horas?',
+     compromisso:'Qual e a mudanca de mercado que voce esta monitorando? O que faria se ela se confirmasse em 30 dias?'},
+    {id:'re4',tipo:'Simulacao',nome:'O mes zero - como agir quando nada esta funcionando',
+     conceito:'5 movimentos: Diagnosticar (o que nao esta funcionando), Reativar (carteira fria), Aprender (estudar e treinar), Construir (parcerias e conteudo), Manter (rotina, saude, presenca).',
+     disc:{D:'Risco: desespero que vira agressividade em vendas. Canalize para construcao sistematica.',I:'Risco: queda de energia visivel para o cliente. Encontre fontes de energia que independem do resultado.',S:'Risco: esperar que a situacao mude sozinha. Acao intencional e o antidoto.',C:'Risco: paralisia por excesso de analise. Aja e analise em paralelo.'},
+     tecnica:'Plano de 72 horas: Hora 0-24: diagnostico. Hora 24-48: reativacao de 10 clientes frios. Hora 48-72: 3 novas acoes de prospeccao que nunca tentou.',
+     cenario:'E o dia 20 do mes, sem nenhum fechamento e poucas perspectivas. Como voce aplica os 5 movimentos nos proximos 10 dias?',
+     compromisso:'Escreva seu plano para um "mes zero" - o que faria para se recuperar em 30 dias.'},
+    {id:'re5',tipo:'Compromisso',nome:'Construindo antifragilidade profissional',
+     conceito:'O corretor antifragil usa cada crise para ampliar a carteira, cada rejeicao para afiar o discurso, cada competidor mais forte para elevar o proprio nivel.',
+     disc:{D:'Use sua competitividade para se tornar o melhor em tecnica nos momentos de menor volume.',I:'Use os momentos dificeis para aprofundar relacionamentos que o mercado agitado nao permite.',S:'Use sua estabilidade como diferencial - no caos, o cliente quer o corretor calmo.',C:'Use os periodos de baixo volume para completar a analise de mercado que nunca tem tempo na alta.'},
+     tecnica:'Toda vez que algo dificil acontecer: "Como isso pode me tornar mais forte ou mais preparado para o futuro?"',
+     cenario:'O mercado esta em baixa. Voce tem tempo, mas sem volume. O que faria para se tornar 30% melhor quando o mercado retornar?',
+     compromisso:'"Quando o mercado fica dificil, eu fico mais forte porque eu..."'}
+  ]},
+  {id:'inovacao',nome:'Inovacao',icone:'💡',modulos:[
+    {id:'in1',tipo:'Conceito',nome:'O que e inovacao para um corretor imobiliario',
+     conceito:'3 areas: apresentacao do imovel (tour virtual, video, drone), gestao do relacionamento (CRM, automacao), e proposta de valor (o que voce oferece que nenhum outro oferece).',
+     disc:{D:'Tem energia para testar coisas novas mas pode desistir antes de ver resultado. Escolha 1 inovacao e execute por 90 dias.',I:'Adota tecnologia nova facilmente pelo lado social. Tente inovar na substancia - nao so nas ferramentas.',S:'Prefere o que funciona. Inovacao incremental e sua zona: melhore 1% do que ja faz, toda semana.',C:'Pesquisa exaustivamente antes de adotar. Velocidade de adocao importa.'},
+     tecnica:'Auditoria de diferencial: o que voce faz que nenhum outro corretor da sua regiao faz?',
+     cenario:'Voce soube que um concorrente comecou a usar tour virtual. Como voce responde - copia, supera ou ignora?',
+     compromisso:'Qual e a 1 inovacao que vai testar nos proximos 30 dias? O que ela resolve para o seu cliente?'},
+    {id:'in2',tipo:'Autodiagnostico',nome:'Seu perfil de inovacao',
+     conceito:'Curva de Rogers: Inovadores (2,5%), Adotantes Iniciais (13,5%), Maioria Precoce (34%), Maioria Tardia (34%), Retardatarios (16%). Nao ha perfil certo - ha estrategia certa.',
+     disc:{D:'Perfil tipico: Adotante Inicial. Cuidado: nao troque o fundamental pelo novo.',I:'Perfil tipico: Inovador. Use seu entusiasmo para testar e depois ensinar - isso cria autoridade.',S:'Perfil tipico: Maioria Precoce. Nao e fraqueza - e prudencia. Identifique 1 area para ser Adotante Inicial.',C:'Perfil tipico: Maioria Precoce. Sua adocao e mais consistente que a do I. Cuidado: pesquisa demais pode virar atraso.'},
+     tecnica:'Mapeie as 5 principais ferramentas que voce usa. Para cada uma: voce e pioneiro, seguidor ou atrasado?',
+     cenario:'Um colega mais jovem fechou uma venda usando so Instagram e WhatsApp, sem visita presencial ate a proposta. O que isso te diz?',
+     compromisso:'Em que area voce quer ser Adotante Inicial nos proximos 60 dias?'},
+    {id:'in3',tipo:'Tecnica',nome:'Ferramentas digitais que multiplicam o corretor',
+     conceito:'As 5 mais impactantes: CRM simples (+35% fechamentos), WhatsApp Business, Reels de imovel, Google Meu Negocio, e Tour virtual.',
+     disc:{D:'Ferramenta prioritaria: CRM. Voce tem energia para prospectar muito - organize para nao perder.',I:'Ferramenta prioritaria: Reels. Sua personalidade e presenca sao seu diferencial - o video amplifica.',S:'Ferramenta prioritaria: WhatsApp Business com mensagens automaticas.',C:'Ferramenta prioritaria: tour virtual + analise de metricas.'},
+     tecnica:'Teste minimo viavel: escolha 1 ferramenta que ainda nao usa. Implemente a versao mais simples em 48 horas. Avalie em 2 semanas.',
+     cenario:'Voce tem 30 minutos por dia para investir em uma ferramenta digital. Qual escolheria e como usaria?',
+     compromisso:'Qual ferramenta vai implementar esta semana? O que espera que mude em 30 dias?'},
+    {id:'in4',tipo:'Simulacao',nome:'Apresentacao inovadora de imovel para cliente exigente',
+     conceito:'3 elementos: narrativa (a historia do imovel e do bairro), visualizacao (ajude o cliente a se imaginar morando la), e dados de contexto (o que esta crescendo ao redor, a tendencia de valorizacao).',
+     disc:{D:'"3 razoes objetivas por que esse imovel e o melhor custo-beneficio no mercado agora."',I:'"Imagina sua familia aqui num sabado de manha, com essa vista..." - cria a cena antes dos numeros.',S:'"Vou te mostrar cada detalhe e quero que voce me conte o que sente em cada comodo."',C:'Estruturada com dados de valorizacao e comparativos. Entregue um material escrito.'},
+     tecnica:'Prepare uma ficha de experiencia: 3 cenas de vida possivel no imovel, 3 dados de contexto do bairro e 1 historia de alguem que ja vive la.',
+     cenario:'Voce vai apresentar um apartamento de 2 quartos em Barra Velha para um casal jovem. Como tornaria essa apresentacao memoravel?',
+     compromisso:'No seu proximo imovel a apresentar, o que voce vai fazer diferente do padrao?'},
+    {id:'in5',tipo:'Compromisso',nome:'Tornando-me o corretor mais inovador da minha regiao',
+     conceito:'O corretor que testa 1 inovacao por mes, ao longo de 12 meses, testou 12. Estatisticamente, 2 a 3 delas vao gerar resultado significativo.',
+     disc:{D:'Plano: 1 inovacao de processo por mes.',I:'Plano: 1 inovacao de comunicacao por mes.',S:'Plano: 1 melhoria incremental por mes no que ja funciona.',C:'Plano: 1 analise de mercado inovadora por mes.'},
+     tecnica:'Diario de inovacao: todo mes, anote: o que testei, funcionou, nao funcionou, aprendi.',
+     cenario:'Daqui a 5 anos, como voce quer que o mercado imobiliario do litoral SC te descreva?',
+     compromisso:'Escreva seu plano de inovacao para os proximos 3 meses: 1 inovacao por mes, com objetivo e criterio de sucesso.'}
+  ]},
+  {id:'tecnologia',nome:'Habilidades Tecnologicas',icone:'📱',modulos:[
+    {id:'te1',tipo:'Conceito',nome:'O corretor digital - o que voce precisa saber',
+     conceito:'As 5 habilidades essenciais do corretor em 2026: 1. Fotos e videos de qualidade no celular. 2. WhatsApp Business configurado. 3. Perfil no Instagram. 4. Google Meu Negocio ativo. 5. Gestao de carteira (planilha ou app).',
+     disc:{D:'Foca nas ferramentas que economizam tempo e escalam resultado.',I:'Tem facilidade com tecnologia social. Aprofunde o lado de organizacao.',S:'Comece pelas ferramentas de relacionamento - WhatsApp Business e CRM simples.',C:'Ja usa mais tecnologia que os outros. Foco em simplificar.'},
+     tecnica:'Auditoria digital em 30 min: avalie cada uma das 5 habilidades. Qual esta mais defasada?',
+     cenario:'Um cliente pesquisa seu nome no Google antes de te contatar. O que ele encontra? O que voce gostaria que encontrasse?',
+     compromisso:'Das 5 habilidades, qual vai desenvolver esta semana?'},
+    {id:'te2',tipo:'Autodiagnostico',nome:'Sua presenca digital atual',
+     conceito:'3 tipos de busca que o cliente faz: pelo nome, por especialidade, e por prova social (reviews, depoimentos, conteudo de qualidade).',
+     disc:{D:'Presenca a construir: reviews e depoimentos. Sua confianca impressiona - solicite depoimentos de clientes.',I:'Presenca a construir: consistencia de conteudo. Crie um calendario: 3 posts por semana.',S:'Presenca a construir: visibilidade. Google Meu Negocio ativo ja te coloca no mapa.',C:'Presenca a construir: conteudo educativo. Um post com dado de mercado por semana.'},
+     tecnica:'Pesquise seu proprio nome no Google agora. Pesquise "corretor [sua especialidade] [sua cidade]". O que encontrou?',
+     cenario:'Um cliente esta decidindo entre voce e um concorrente. Ele pesquisa os dois no Google. O que ele encontra?',
+     compromisso:'Qual e uma acao especifica que vai tomar esta semana para melhorar sua presenca digital?'},
+    {id:'te3',tipo:'Tecnica',nome:'Producao de conteudo simples e eficaz',
+     conceito:'5 formatos de maior retorno: dado de mercado + interpretacao, tour rapido de imovel, resposta a pergunta frequente, depoimento de cliente, e bastidores da profissao.',
+     disc:{D:'Conteudo eficaz: direto e informativo. "O mercado de BC em numeros esta semana - 3 dados que voce precisa saber."',I:'Conteudo eficaz: pessoal e envolvente. Voce em cena, falando com naturalidade.',S:'Conteudo eficaz: educativo e cuidadoso. Como funciona o FGTS - explicado passo a passo.',C:'Conteudo eficaz: especialista e embasado. Dados + interpretacao = autoridade.'},
+     tecnica:'Formula de conteudo: Gancho (provoca curiosidade), Corpo (informacao util em 30-90 segundos), Chamada (o que o cliente deve fazer).',
+     cenario:'Voce tem 15 minutos e um celular. Como criaria um conteudo que poderia gerar 1 lead qualificado esta semana?',
+     compromisso:'Comprometa-se a criar e publicar 1 conteudo usando a formula ainda esta semana.'},
+    {id:'te4',tipo:'Simulacao',nome:'Atendimento digital de alta qualidade',
+     conceito:'Regras: velocidade (responder em menos de 5 minutos aumenta 300% a chance de agendamento), personalizacao, valor imediato, e proxima acao clara.',
+     disc:{D:'Voce ja e rapido. Adicione personalizacao - use o nome e referencia ao que o cliente busca.',I:'Voce ja e personalizado. Adicione estrutura - conversa rica que nao avanca nao converte.',S:'Voce ja e cuidadoso. Adicione velocidade - a janela de interesse e curta.',C:'Voce ja tem conteudo. Adicione calor - mensagem fria nao gera visita.'},
+     tecnica:'Script de primeiro contato: 1. Personalizacao, 2. Valor imediato, 3. Pergunta de qualificacao, 4. Proposta de proximo passo.',
+     cenario:'Voce recebe no Instagram: "Oi, voce tem apartamentos em Barra Velha?" Escreva a resposta ideal usando o script de 4 movimentos.',
+     compromisso:'Escreva o script de primeiro contato personalizado para o tipo de cliente que voce mais atende.'},
+    {id:'te5',tipo:'Compromisso',nome:'Minha estrategia digital dos proximos 90 dias',
+     conceito:'O plano que funciona e simples (voce executa sozinho), consistente (mantem por 90 dias), e mensuravel (voce sabe se esta funcionando).',
+     disc:{D:'Meta: automatize o maximo possivel - mensagens automaticas, catalogo atualizado, agendamento digital.',I:'Meta: crie uma rotina de conteudo que voce mantenha por 90 dias sem gaps.',S:'Meta: protocolo de atendimento que garante que nenhum lead fica sem resposta em mais de 2 horas.',C:'Meta: dashboard simples de metricas digitais para monitorar semanalmente.'},
+     tecnica:'Plano digital em 1 pagina: Canal principal, Frequencia de conteudo, Rotina de atendimento, Metrica principal, Revisao.',
+     cenario:'Se voce destinasse apenas 30 minutos por dia para tecnologia, como os dividiria para ter o maximo de resultado?',
+     compromisso:'Escreva seu plano digital para os proximos 90 dias.'}
+  ]}
+];
+
+// ── ACADEMIA FUNCS ──
+function acGetData(){ return UD.academia || {modulos_concluidos:{}, compromissos:[]}; }
+function acSave(d){ save('academia', d); }
+function acTotalModulos(){ return AC_TRILHAS.length * 5; }
+function acModulosConcluidos(){
+  var d = acGetData();
+  return Object.keys(d.modulos_concluidos).filter(function(k){ return d.modulos_concluidos[k]; }).length;
+}
+function acTrilhasConcluidas(){
+  var d = acGetData();
+  return AC_TRILHAS.filter(function(t){
+    return t.modulos.every(function(m){ return d.modulos_concluidos[m.id]; });
+  }).length;
+}
+function acTrilhaDesbloqueada(idx){
+  if(idx === 0) return true;
+  var prev = AC_TRILHAS[idx-1];
+  var d = acGetData();
+  return prev.modulos.every(function(m){ return d.modulos_concluidos[m.id]; });
+}
+function acModuloDesbloqueado(trilhaIdx, modIdx){
+  if(!acTrilhaDesbloqueada(trilhaIdx)) return false;
+  if(modIdx === 0) return true;
+  var prev = AC_TRILHAS[trilhaIdx].modulos[modIdx-1];
+  return !!acGetData().modulos_concluidos[prev.id];
+}
+function acModuloConcluido(modId){ return !!acGetData().modulos_concluidos[modId]; }
+
+var _acTrilhaIdx = 0, _acModIdx = 0;
+
+function renderAcademia(){
+  var totConc = acTrilhasConcluidas();
+  var pct = Math.round(totConc / AC_TRILHAS.length * 100);
+  var pfill = $('ac-prog-fill');
+  if(pfill) pfill.style.width = pct + '%';
+  var plL = $('ac-prog-label-l'); if(plL) plL.textContent = totConc + ' de ' + AC_TRILHAS.length + ' trilhas';
+  var plR = $('ac-prog-label-r'); if(plR) plR.textContent = pct + '% concluido';
+
+  var h = '';
+  var hasConc = AC_TRILHAS.some(function(t,i){ return t.modulos.every(function(m){ return acModuloConcluido(m.id); }); });
+  if(hasConc){
+    h += '<div class="ac-sec-title" style="color:rgba(76,175,125,.7)">Concluidas</div>';
+    AC_TRILHAS.forEach(function(t,i){
+      if(!t.modulos.every(function(m){ return acModuloConcluido(m.id); })) return;
+      h += '<div class="sk-card sk-done" onclick="window.abrirTrilha(' + i + ')">'
+        + '<div class="sk-icon si-done">&#10003;</div>'
+        + '<div class="sk-info"><div class="sk-name">' + t.icone + ' ' + t.nome + '</div><div class="sk-sub">5 modulos concluidos</div></div>'
+        + '<div style="font-size:.72rem;color:var(--green);font-weight:700">&#10003;</div></div>';
+    });
+  }
+
+  var hasAtivo = AC_TRILHAS.some(function(t,i){
+    return acTrilhaDesbloqueada(i) && !t.modulos.every(function(m){ return acModuloConcluido(m.id); });
+  });
+  if(hasAtivo){
+    h += '<div class="ac-sec-title" style="color:rgba(184,154,79,.8)">Em andamento</div>';
+    AC_TRILHAS.forEach(function(t,i){
+      if(!acTrilhaDesbloqueada(i) || t.modulos.every(function(m){ return acModuloConcluido(m.id); })) return;
+      var nConc = t.modulos.filter(function(m){ return acModuloConcluido(m.id); }).length;
+      var disc = UD.disc ? UD.disc.perfil : '';
+      h += '<div class="sk-card sk-active" onclick="window.abrirTrilha(' + i + ')">'
+        + '<div class="sk-icon si-active">' + t.icone + '</div>'
+        + '<div class="sk-info"><div class="sk-name">' + t.nome + '</div><div class="sk-sub">Modulo ' + (nConc+1) + ' de 5' + (disc ? ' · Perfil ' + disc : '') + '</div></div>'
+        + '<div class="sk-arr">&#8594;</div></div>';
+    });
+  }
+
+  var hasBloq = AC_TRILHAS.some(function(t,i){ return !acTrilhaDesbloqueada(i); });
+  if(hasBloq){
+    h += '<div class="ac-sec-title">Bloqueadas</div>';
+    AC_TRILHAS.forEach(function(t,i){
+      if(acTrilhaDesbloqueada(i)) return;
+      var prevNome = i > 0 ? AC_TRILHAS[i-1].nome : '';
+      h += '<div class="sk-card sk-locked"><div class="sk-icon">' + t.icone + '</div>'
+        + '<div class="sk-info"><div class="sk-name">' + t.nome + '</div><div class="sk-sub">Destrava apos ' + prevNome + '</div></div>'
+        + '<div style="font-size:.88rem;color:var(--dim)">&#128274;</div></div>';
+    });
+  }
+  h += '<div style="height:8px"></div>';
+  $('academia-content').innerHTML = h;
+
+  var acBar = $('home-ac-bar');
+  var acName = $('home-ac-name');
+  var acSub = $('home-ac-sub');
+  var modConc = acModulosConcluidos();
+  var pctMod = Math.round(modConc / acTotalModulos() * 100);
+  if(acBar) acBar.style.width = pctMod + '%';
+  if(acName){
+    var ativo = null;
+    AC_TRILHAS.forEach(function(t,i){
+      if(ativo) return;
+      if(acTrilhaDesbloqueada(i) && !t.modulos.every(function(m){ return acModuloConcluido(m.id); })){
+        var n = t.modulos.filter(function(m){ return acModuloConcluido(m.id); }).length;
+        ativo = {nome: t.nome, mod: n+1};
+      }
+    });
+    if(ativo) acName.textContent = ativo.nome + ' · Modulo ' + ativo.mod + ' de 5';
+    else if(modConc === acTotalModulos()) acName.textContent = 'Academia concluida!';
+    else acName.textContent = 'Comece pela primeira trilha';
+  }
+  if(acSub) acSub.textContent = modConc + ' de ' + acTotalModulos() + ' modulos concluidos · ' + pctMod + '%';
+}
+
+window.abrirTrilha = function(idx){
+  _acTrilhaIdx = idx;
+  var t = AC_TRILHAS[idx];
+  var disc = UD.disc ? UD.disc.perfil : '';
+  $('tl-title').textContent = t.icone + ' ' + t.nome;
+  $('tl-disc-tag').textContent = disc ? 'Adaptado para perfil ' + disc + (UD.disc ? ' · ' + UD.disc.nome : '') : 'Faca o Quiz DISC para personalizar';
+  var h = '<div class="mod-list">';
+  t.modulos.forEach(function(m, mi){
+    var conc = acModuloConcluido(m.id);
+    var desbloq = acModuloDesbloqueado(idx, mi);
+    var ativo = desbloq && !conc;
+    var dotCls = conc ? 'md-done' : (ativo ? 'md-active' : 'md-locked');
+    var cardCls = ativo ? 'mc-active' : (conc ? '' : 'mc-locked');
+    var isLast = mi === t.modulos.length - 1;
+    h += '<div class="mod-row">'
+      + '<div class="mod-line"><div class="mod-dot ' + dotCls + '">' + (conc ? '&#10003;' : (mi+1)) + '</div>'
+      + (!isLast ? '<div class="mod-connector' + (conc ? ' mc-done' : '') + '"></div>' : '') + '</div>'
+      + '<div class="mod-card ' + cardCls + '"' + (desbloq ? ' onclick="window.abrirModulo(' + idx + ',' + mi + ')" style="cursor:pointer"' : '') + '>'
+      + '<div class="mod-tag">Modulo ' + (mi+1) + ' · ' + m.tipo + '</div>'
+      + '<div class="mod-name">' + m.nome + '</div>'
+      + (conc ? '<div style="font-size:.65rem;color:var(--green);margin-top:4px;font-weight:600">&#10003; Concluido</div>' : '')
+      + (ativo ? '<button class="btn-p" style="margin-top:8px;padding:8px 16px;font-size:.78rem" onclick="event.stopPropagation();window.abrirModulo(' + idx + ',' + mi + ')">Continuar &#8594;</button>' : '')
+      + '</div></div>';
+  });
+  h += '</div>';
+  $('trilha-content').innerHTML = h;
+  document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
+  $('strilha').classList.add('active');
+};
+
+window.voltarModulo = function(){
+  document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
+  $('strilha').classList.add('active');
+  window.abrirTrilha(_acTrilhaIdx);
+};
+
+window.abrirModulo = function(tIdx, mIdx){
+  _acTrilhaIdx = tIdx; _acModIdx = mIdx;
+  var t = AC_TRILHAS[tIdx];
+  var m = t.modulos[mIdx];
+  var disc = UD.disc ? UD.disc.perfil : null;
+  var conc = acModuloConcluido(m.id);
+  $('mod-title-h').textContent = 'Modulo ' + (mIdx+1) + ' · ' + m.tipo;
+  $('mod-sub-h').textContent = t.nome;
+  var discHtml = '';
+  ['D','I','S','C'].forEach(function(p){
+    var isHL = disc === p;
+    discHtml += '<div class="md-disc-item' + (isHL ? ' hl-item' : '') + '">'
+      + '<div class="md-disc-label' + (isHL ? ' hl-disc' : '') + '">' + p + ' — ' + DP[p].nome + (isHL ? ' &#10022; Seu perfil' : '') + '</div>'
+      + '<div class="md-disc-text">' + (m.disc[p]||'') + '</div></div>';
+  });
+  var savedComp = '';
+  var d = acGetData();
+  if(d.compromissos){ var found = d.compromissos.find(function(c){ return c.modId === m.id; }); if(found) savedComp = found.texto; }
+  var h = '<div class="md-screen">'
+    + '<div class="md-conceito"><h3>Conceito</h3><p>' + m.conceito + '</p></div>'
+    + '<div class="md-disc-section"><h3>Por perfil DISC</h3>' + discHtml + '</div>'
+    + '<div class="md-tecnica"><h3>Tecnica Pratica</h3><p>' + m.tecnica + '</p></div>'
+    + '<div class="md-cenario"><h3>Cenario Real</h3><p>' + m.cenario + '</p></div>'
+    + '<div class="md-compromisso"><h3>Compromisso de Aplicacao</h3><p>' + m.compromisso + '</p>'
+    + '<textarea id="comp-textarea" placeholder="Escreva aqui seu compromisso de aplicacao..." rows="3">' + savedComp + '</textarea>'
+    + (!conc ? '<button class="btn-p" style="margin-top:10px;font-size:.82rem" onclick="window.concluirModulo()">Concluir este modulo &#8594;</button>'
+              : '<div style="font-size:.75rem;color:var(--green);margin-top:10px;text-align:center;padding:8px;background:rgba(76,175,125,.08);border-radius:8px;border:1px solid rgba(76,175,125,.2)">&#10003; Modulo concluido!</div>')
+    + '</div><div style="height:16px"></div></div>';
+  $('modulo-content').innerHTML = h;
+  document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
+  $('smodulo').classList.add('active');
+};
+
+window.concluirModulo = function(){
+  var t = AC_TRILHAS[_acTrilhaIdx];
+  var m = t.modulos[_acModIdx];
+  var d = acGetData();
+  d.modulos_concluidos[m.id] = true;
+  var compText = $('comp-textarea') ? $('comp-textarea').value.trim() : '';
+  if(compText){
+    if(!d.compromissos) d.compromissos = [];
+    var existing = d.compromissos.findIndex(function(c){ return c.modId === m.id; });
+    var entry = {modId:m.id, trilha:t.nome, modulo:m.nome, texto:compText, data:new Date().toISOString()};
+    if(existing >= 0) d.compromissos[existing] = entry; else d.compromissos.push(entry);
+    var regs = UD.registros || [];
+    regs.push({tipo:'academia', pergunta:t.nome + ' · ' + m.nome, texto:compText, data:new Date().toISOString()});
+    save('registros', regs);
+  }
+  acSave(d);
+  var trilhaConc = t.modulos.every(function(mod){ return d.modulos_concluidos[mod.id]; });
+  if(trilhaConc){ toast('Trilha "' + t.nome + '" concluida!', 4000); setTimeout(function(){ window.abrirTrilha(_acTrilhaIdx); }, 1200); }
+  else { toast('Modulo concluido!'); setTimeout(function(){ window.abrirTrilha(_acTrilhaIdx); }, 800); }
+};
 
 // ── INIT ──
 (function(){
