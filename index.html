@@ -585,7 +585,7 @@ textarea.ta:focus{border-color:var(--gold)}
       <div id="home-msg-dia-card"></div>
     </div>
     <div class="hsec" style="margin-bottom:6px">
-      <div class="hsec-title">📚 LEITURA DO MÊS</div>
+      <div class="hsec-title">📚 LEITURA DA SEMANA</div>
       <div id="home-livro-card"></div>
     </div>
     <div class="hsec" style="margin-bottom:6px">
@@ -706,7 +706,10 @@ textarea.ta:focus{border-color:var(--gold)}
 <!-- ACADEMIA -->
 <div id="sacademia" class="screen">
   <div class="ac-header">
-    <div class="ac-header-title">🎓 Academia</div>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+      <button class="back" onclick="goSec('home')" style="flex-shrink:0">&#8592;</button>
+      <div class="ac-header-title">🎓 Academia</div>
+    </div>
     <div class="ac-header-sub">Soft Skills para corretores de alto desempenho</div>
     <div class="ac-prog-bar"><div class="ac-prog-fill" id="ac-prog-fill" style="width:0%"></div></div>
     <div class="ac-prog-label"><span id="ac-prog-label-l">0 de 10 trilhas</span><span id="ac-prog-label-r">0% concluído</span></div>
@@ -1975,6 +1978,7 @@ function renderPerf(){
     + '<div class="perf-sec"><h3>Conta</h3>'
     + '<p style="font-size:.75rem;color:var(--dim);margin-bottom:12px">E-mail: ' + (CU && CU.email ? CU.email : '—') + '</p>'
     + '<button class="btn-s" onclick="window.showPriv(\'perfil\')">📄 Política de Privacidade</button>'
+    + '<button class="btn-s" style="margin-top:8px" onclick="window.toggleNotifPerf()">🔔 ' + (UD.notif_ativo ? 'Desativar lembretes' : 'Ativar lembretes diários') + '</button>'
     + '<button class="btn-s" style="margin-top:8px" onclick="window.logout()">Sair da conta</button>'
     + '<button class="btn-danger" style="margin-top:8px" onclick="window.delConta()">Excluir minha conta e dados</button>'
     + '</div>'
@@ -2158,19 +2162,31 @@ var MSGS_DIA = [
   'Voce esta no negocio de pessoas. Imoveis sao apenas o motivo da conversa.'
 ];
 
-var LIVROS_MES = [
-  {mes:0, titulo:'O Jeito Disney de Encantar Clientes', autor:'Michael D. Eisner', foco:'Atendimento e experiencia do cliente', obj:'Aprenda como criar momentos memoraveis em cada atendimento imobiliario.'},
-  {mes:1, titulo:'Como Fazer Amigos e Influenciar Pessoas', autor:'Dale Carnegie', foco:'Relacionamento e persuasao', obj:'Tecnicas atemporais para conquistar a confianca de qualquer cliente.'},
-  {mes:2, titulo:'A Biblia das Vendas', autor:'Jeffrey Gitomer', foco:'Tecnicas de venda e fechamento', obj:'O guia definitivo para transformar conversas em negociamentos.'},
-  {mes:3, titulo:'Os Segredos da Mente Milionaria', autor:'T. Harv Eker', foco:'Mentalidade financeira', obj:'Reprograme sua relacao com dinheiro e metas de comissionamento.'},
-  {mes:4, titulo:'Influencia', autor:'Robert Cialdini', foco:'Psicologia da persuasao', obj:'Entenda os 6 principios que movem decisoes de compra.'},
-  {mes:5, titulo:'O Poder do Habito', autor:'Charles Duhigg', foco:'Produtividade e rotina', obj:'Construa habitos que sustentam alta performance todos os dias.'},
-  {mes:6, titulo:'Negocie Como se Sua Vida Dependesse Disso', autor:'Chris Voss', foco:'Negociacao de alto nivel', obj:'Tecnicas do FBI aplicadas a negociacoes imobiliarias.'},
-  {mes:7, titulo:'Mindset', autor:'Carol Dweck', foco:'Mentalidade de crescimento', obj:'Desenvolva a mentalidade que separa corretores comuns dos extraordinarios.'},
-  {mes:8, titulo:'Vender e Humano', autor:'Daniel Pink', foco:'Vendas modernas', obj:'Como vender sem parecer vendedor em um mercado hiperconectado.'},
-  {mes:9, titulo:'A Arte da Guerra', autor:'Sun Tzu', foco:'Estrategia e posicionamento', obj:'Aplique estrategia milenar para dominar seu territorio de atuacao.'},
-  {mes:10, titulo:'O Codigo da Cultura', autor:'Daniel Coyle', foco:'Equipe e lideranca', obj:'Como construir uma equipe de alta performance em imobiliarias.'},
-  {mes:11, titulo:'Pense e Enriqueça', autor:'Napoleon Hill', foco:'Mentalidade e metas', obj:'Os principios que transformam ambicao em resultado concreto.'}
+var LIVROS_SEMANA = [
+  {titulo:'Como Fazer Amigos e Influenciar Pessoas', autor:'Dale Carnegie', foco:'Relacionamento e persuasao',
+   trecho:'Carnegie descobriu algo que a maioria ignora: as pessoas nao sao movidas por logica, sao movidas pelo desejo de se sentir importantes. Em vendas imobiliarias, isso muda tudo. O corretor que faz o cliente sentir que sua opiniao importa — que seus medos sao validos, que seu sonho e compreendido — fecha mais nao porque e mais inteligente, mas porque e mais humano. A proxima vez que um cliente hesitar, pergunte: "O que voce acha que seria o ideal para voce?" E ouca de verdade.'},
+  {titulo:'Influencia', autor:'Robert Cialdini', foco:'Psicologia da persuasao',
+   trecho:'Cialdini identificou que os seres humanos usam atalhos mentais para tomar decisoes rapidas — e um dos mais poderosos e a escassez. Quando algo e raro ou esta acabando, o cerebro automaticamente o valora mais. No mercado imobiliario do litoral SC, isso nao e manipulacao — e realidade: os terrenos de frente para o mar estao acabando, os lancamentos vendem antes do habite-se, e Barra Velha em 2026 lembra o que BC era em 2010. Quando voce apresenta esses fatos com dados reais, nao esta criando urgencia artificial. Esta ajudando o cliente a ver o que e verdadeiro.'},
+  {titulo:'Negocie Como se Sua Vida Dependesse Disso', autor:'Chris Voss', foco:'Negociacao de alto nivel',
+   trecho:'Chris Voss negociava com sequestradores. A licao mais surpreendente que ele traz e esta: o objetivo de uma negociacao nao e chegar ao "sim" — e fazer o outro lado se sentir ouvido o suficiente para dizer "e isso mesmo." Ele chama isso de "nao estrategico": quando voce faz uma pergunta que permite o outro dizer nao, ele se sente seguro e abre. Tente na proxima visita: em vez de "voce gostou?", pergunte "tem alguma coisa que nao faz sentido para voce?" O nao que voce receber vai revelar o caminho para o sim.'},
+  {titulo:'O Poder do Habito', autor:'Charles Duhigg', foco:'Produtividade e rotina',
+   trecho:'Duhigg explica que habitos funcionam em um ciclo de tres partes: gatilho, rotina e recompensa. O problema de corretores que nao conseguem manter prospecao diaria nao e falta de disciplina — e falta de gatilho claro. Um corretor que define "toda vez que tomar o primeiro cafe, abro o CRM e mando uma mensagem para um cliente frio" esta criando um gatilho. Em 66 dias isso vira automatico. A pergunta nao e "como me disciplino mais?" — e "qual e o gatilho que vou usar para comecar?"'},
+  {titulo:'Mindset', autor:'Carol Dweck', foco:'Mentalidade de crescimento',
+   trecho:'Carol Dweck passou decadas estudando por que algumas pessoas evoluem diante do fracasso e outras entram em colapso. A resposta e simples e transformadora: as que evoluem nao acreditam que talento e fixo. Elas acreditam que habilidade se desenvolve. O corretor com mentalidade fixa pensa "nao sou bom em fechamento" — e para por ai. O corretor com mentalidade de crescimento pensa "ainda nao sou bom em fechamento" — e busca o proximo treinamento. Uma palavra muda tudo: "ainda".'},
+  {titulo:'Os Segredos da Mente Milionaria', autor:'T. Harv Eker', foco:'Mentalidade financeira',
+   trecho:'Eker afirma que cada pessoa tem um "termostato financeiro" interno — um nivel de renda que o subconsciente considera normal. Quando os ganhos sobem acima desse nivel, algo faz a pessoa autossabotar. Quando caem abaixo, algo a empurra de volta. A pergunta que ele propoe e incisiva: "Qual e o nivel de renda que sua mente considera seguro e confortavel?" Para um corretor que quer dobrar sua comissao, o trabalho comeca nao nas tecnicas de venda — mas em se sentir merecedor do resultado que busca.'},
+  {titulo:'A Biblia das Vendas', autor:'Jeffrey Gitomer', foco:'Tecnicas de venda e fechamento',
+   trecho:'Gitomer e provocador: "As pessoas nao gostam que vendam para elas, mas adoram comprar." Isso tem uma implicacao direta para corretores. Cada vez que voce "empurra" um imovel, o cliente recua. Cada vez que voce ajuda o cliente a descobrir por que aquele imovel e certo para ele, o cliente avanca. A diferenca entre vender e ajudar a comprar esta na direcao da conversa: vendedor fala sobre o produto, consultor faz perguntas sobre o cliente. Qual voce e na maioria das visitas?'},
+  {titulo:'Vender e Humano', autor:'Daniel Pink', foco:'Vendas modernas',
+   trecho:'Pink argumenta que vivemos em uma era de transparencia radical — o cliente sabe o preco do m² antes de falar com voce, pesquisa o bairro no Google e le as avaliacoes da construtora. O vendedor que tinha vantagem por ter mais informacao perdeu esse ativo. O que sobrou? A capacidade de curar — de ajudar o cliente a encontrar o imovel certo em um oceano de opcoes. O corretor do futuro nao e o que tem mais dados: e o que sabe fazer as perguntas certas para revelar o que o cliente realmente precisa.'},
+  {titulo:'A Arte da Guerra', autor:'Sun Tzu', foco:'Estrategia e posicionamento',
+   trecho:'"Conheca o inimigo e conheca a si mesmo; em cem batalhas, nunca estara em perigo." Sun Tzu escreveu isso ha 2.500 anos. No mercado imobiliario, o "inimigo" nao e o concorrente — e a indecisao do cliente. E voce precisa conhecer os dois lados: entender profundamente o que trava a decisao do cliente (medo financeiro? desacordo familiar? falta de informacao?) e conhecer seus proprios pontos cegos como corretor. O profissional que faz esse duplo diagnostico antes de cada negociacao entra preparado para o que vai encontrar.'},
+  {titulo:'O Codigo da Cultura', autor:'Daniel Coyle', foco:'Equipe e lideranca',
+   trecho:'Coyle estudou as equipes mais bem-sucedidas do mundo — desde SEALs da marinha americana ate times de basquete — e descobriu que o que as une nao e talento excepcional. E um conjunto de sinais que comunicam uma coisa simples: "voce e seguro aqui, voce pertence aqui, esse time tem um futuro." Em imobiliarias, o corretor que cria esse ambiente com o cliente — onde o cliente se sente seguro para expressar suas duvidas sem julgamento — ja ganhou metade da negociacao antes de mostrar o primeiro imovel.'},
+  {titulo:'Pense e Enriqueca', autor:'Napoleon Hill', foco:'Mentalidade e metas',
+   trecho:'Hill entrevistou mais de 500 pessoas bem-sucedidas ao longo de 20 anos e encontrou um padrao: todas tinham um "objetivo principal definido" — uma meta especifica, escrita, com prazo, que ocupava seus pensamentos com consistencia. Nao era otimismo vago. Era clareza cirurgica sobre o que queriam. Para o corretor, a pergunta e direta: voce tem uma meta de comissionamento para este ano escrita em algum lugar? Se a resposta e "mais ou menos", essa e a primeira coisa a resolver — antes de qualquer tecnica de vendas.'},
+  {titulo:'O Jeito Disney de Encantar Clientes', autor:'Michael D. Eisner', foco:'Experiencia do cliente',
+   trecho:'A Disney descobriu que os momentos que os clientes mais lembram nao sao os grandes — sao os pequenos e inesperados. Um funcionario que se lembra do nome da crianca. Uma surpresa no final da visita ao parque. No mercado imobiliario, o equivalente e o corretor que manda uma mensagem no aniversario do cliente 6 meses apos o fechamento. Que lembra que a esposa preferia o segundo andar. Que envia uma noticia do bairro que o cliente comprou antes de ele perguntar. Esses detalhes transformam uma transacao em uma relacao — e uma relacao em indicacoes.'}
 ];
 
 var DISC_DESCRICOES = {
@@ -2225,20 +2241,20 @@ function renderMsgDia() {
 }
 
 function renderLivroMes() {
-  var mes = new Date().getMonth();
-  var livro = LIVROS_MES[mes];
+  var semAno = Math.floor(new Date().getTime() / (7*24*60*60*1000)) % LIVROS_SEMANA.length;
+  var livro = LIVROS_SEMANA[semAno];
   var el = document.getElementById('home-livro-card');
   if(!el || !livro) return;
   el.innerHTML = '<div style="background:var(--navy3);border:1px solid rgba(184,154,79,.2);border-radius:12px;padding:16px">'
-    + '<div style="display:flex;align-items:flex-start;gap:12px">'
-    + '<div style="font-size:2.2rem;flex-shrink:0">📖</div>'
+    + '<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">'
+    + '<div style="font-size:2rem;flex-shrink:0">📖</div>'
     + '<div style="flex:1">'
-    + '<div style="font-size:.82rem;font-weight:700;color:var(--white);line-height:1.4;margin-bottom:3px">' + livro.titulo + '</div>'
-    + '<div style="font-size:.7rem;color:var(--gold);margin-bottom:8px">' + livro.autor + '</div>'
-    + '<div style="background:rgba(184,154,79,.1);border-radius:6px;padding:8px 10px">'
-    + '<div style="font-size:.6rem;font-weight:700;color:var(--gold);letter-spacing:1px;text-transform:uppercase;margin-bottom:3px">Foco do mês: ' + livro.foco + '</div>'
-    + '<div style="font-size:.75rem;color:var(--dim);line-height:1.55">' + livro.obj + '</div>'
-    + '</div></div></div></div>';
+    + '<div style="font-size:.82rem;font-weight:700;color:var(--white);line-height:1.4;margin-bottom:2px">' + livro.titulo + '</div>'
+    + '<div style="font-size:.7rem;color:var(--gold)">' + livro.autor + '</div>'
+    + '</div></div>'
+    + '<div style="font-size:.58rem;font-weight:700;color:var(--gold);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px">TRECHO DA SEMANA · ' + livro.foco.toUpperCase() + '</div>'
+    + '<div style="font-size:.8rem;color:var(--white);line-height:1.75;font-style:italic;border-left:2px solid var(--gold);padding-left:12px">' + livro.trecho + '</div>'
+    + '</div>';
 }
 
 function renderDiscHome() {
@@ -2316,6 +2332,7 @@ function renderPerfOverlay(){
     + '<div class="perf-sec"><h3>Conta</h3>'
     + '<p style="font-size:.75rem;color:var(--dim);margin-bottom:12px">E-mail: ' + (CU && CU.email ? CU.email : '&#8212;') + '</p>'
     + '<button class="btn-s" onclick="window.showPriv(\'perfil\')">Politica de Privacidade</button>'
+    + '<button class="btn-s" style="margin-top:8px" id="btn-notif-perf" onclick="window.toggleNotifPerf()">&#128276; ' + (UD.notif_ativo ? 'Desativar lembretes' : 'Ativar lembretes diarios') + '</button>'
     + '<button class="btn-s" style="margin-top:8px" onclick="window.logout()">Sair da conta</button>'
     + '<button class="btn-danger" style="margin-top:8px" onclick="window.delConta()">Excluir minha conta e dados</button>'
     + '</div>'
@@ -2858,6 +2875,15 @@ window.concluirModulo = function(){
   else { toast('Modulo concluido!'); setTimeout(function(){ window.abrirTrilha(_acTrilhaIdx); }, 800); }
 };
 
+window.toggleNotifPerf = function(){
+  if(UD.notif_ativo) {
+    window.desativarNotificacoes();
+  } else {
+    window.solicitarNotificacoes();
+  }
+  setTimeout(function(){ renderPerfOverlay(); }, 500);
+};
+
 // ── INIT ──
 (function(){
   try{
@@ -2876,6 +2902,152 @@ window.concluirModulo = function(){
   showScr('sa');
 })();
 
+</script>
+
+<!-- SERVICE WORKER + NOTIFICAÇÕES PUSH -->
+<script>
+// ── NOTIFICAÇÕES PUSH ──
+var NOTIF_MSGS = {
+  meta: [
+    'Sua meta da semana está esperando por você. O que você vai fazer hoje para chegar mais perto?',
+    'Lembre da meta que você definiu. Cada ação pequena hoje vale no resultado de sexta.',
+    'Metas sem ação são só desejos. O que você vai fazer nas próximas 2 horas?'
+  ],
+  plano: [
+    'Você tem uma tarefa do Plano 30 Dias pendente. 5 minutos agora valem muito no seu desenvolvimento.',
+    'Seu plano de desenvolvimento está esperando. Abra o Hub Pro e marque mais uma tarefa concluída.',
+    'Consistência diária é o que separa corretores comuns dos extraordinários. Sua tarefa de hoje está pronta.'
+  ],
+  academia: [
+    'Você tem um módulo da Academia disponível. Soft skills se desenvolvem com prática — abra e avance.',
+    'Sua próxima trilha da Academia está desbloqueada. 10 minutos hoje fazem diferença amanhã.',
+    'O corretor que aprende todo dia fecha mais. Abra a Academia e avance no seu desenvolvimento.'
+  ],
+  disc_D: [
+    'Perfil D: antes da próxima negociação, pause 3 segundos antes de responder uma objeção. Teste hoje.',
+    'Perfil D: sua maior força é a decisão. Use ela para prospectar agora, sem esperar o momento perfeito.',
+    'Perfil D: lembre — escutar mais que falar em uma visita fecha mais do que qualquer argumento.'
+  ],
+  disc_I: [
+    'Perfil I: que tal mandar uma mensagem genuína para um cliente antigo hoje? Só para saber como está.',
+    'Perfil I: seu entusiasmo é seu maior ativo. Use-o em um vídeo rápido para o Instagram hoje.',
+    'Perfil I: antes de toda ligação importante, defina em uma palavra o objetivo dela. Foco é poder.'
+  ],
+  disc_S: [
+    'Perfil S: você tem clientes que sumiu há mais de 7 dias? Hoje é o dia de dar sinal de vida.',
+    'Perfil S: sua paciência fideliza — use isso para fazer um follow-up cuidadoso com quem visitou imóveis esta semana.',
+    'Perfil S: ser assertivo não é agressivo. Que tal propor um próximo passo claro para um cliente hesitante hoje?'
+  ],
+  disc_C: [
+    'Perfil C: você já tem os dados — o que está esperando para agir? Uma análise que não vira ação não fecha venda.',
+    'Perfil C: compartilhe um dado de mercado com um cliente hoje. Seu conhecimento é seu diferencial visível.',
+    'Perfil C: antes de dormir, reflita: analisei mais do que agi hoje? O mercado recompensa quem move primeiro.'
+  ],
+  mercado: [
+    'O litoral SC registra valorização consistente acima de 10% ao ano. Você usou esse argumento hoje?',
+    'A sazonalidade favorece negociações entre março e outubro. Você está prospectando os clientes certos agora?',
+    'Barra Velha está em expansão acelerada. Você tem imóveis nessa região no seu portfólio?',
+    'Com a Selic em trajetória de corte, o crédito imobiliário fica mais acessível. Já atualizou seu discurso?',
+    'O FGTS pode cobrir a entrada. Você já perguntou a todos os seus clientes sobre o saldo deles?'
+  ],
+  livro: [
+    'Carnegie ensina: as pessoas não são movidas por lógica — são movidas pelo desejo de se sentir importantes. Como você vai aplicar isso hoje?',
+    'Cialdini lembra: escassez é o gatilho mais poderoso. Quantos imóveis únicos você tem no portfólio agora?',
+    'Chris Voss: o objetivo não é chegar ao sim — é fazer o outro se sentir ouvido. Ouça mais hoje.',
+    'Duhigg prova: hábito = gatilho + rotina + recompensa. Qual é o seu gatilho de prospecção diária?',
+    'Dweck ensina: o poder está em adicionar a palavra "ainda". Você ainda não fechou este mês. Ainda.',
+    'Napoleon Hill: clareza de meta é mais poderosa que talento. Sua meta mensal está escrita em algum lugar?'
+  ],
+  geral: [
+    'Bom dia! Sua reflexão de hoje está esperando no Hub Pro. Comece o dia com intenção.',
+    'O corretor que revisa sua meta toda manhã fecha em média 40% mais. Abra o Hub Pro agora.',
+    'Uma ação proativa antes das 9h define o tom do dia inteiro. O que você vai fazer agora?',
+    'Boa tarde! Quantos contatos você fez hoje? Se for menos de 3, ainda dá tempo de mudar esse número.',
+    'O fim de tarde é o melhor momento para follow-up. Seus clientes estão encerrando o dia — entre em contato.',
+    'Antes de encerrar o dia: o que você fez hoje que o corretor que você quer ser faria?'
+  ]
+};
+
+function getNotifContent(hora, discPerfil) {
+  var tipos = ['meta','plano','academia','mercado','livro','geral'];
+  if(discPerfil) tipos.push('disc_' + discPerfil);
+  var seed = Math.floor(new Date().getTime() / 86400000) + hora;
+  var tipo = tipos[seed % tipos.length];
+  var msgs = NOTIF_MSGS[tipo] || NOTIF_MSGS.geral;
+  var msg = msgs[seed % msgs.length];
+  var titulos = {
+    meta:'🎯 Sua Meta da Semana', plano:'📋 Plano 30 Dias', academia:'🎓 Academia de Soft Skills',
+    mercado:'🏖️ Mercado SC', livro:'📖 Leitura da Semana', geral:'🚀 Hub Pro',
+    disc_D:'🦁 Dica para Perfil D', disc_I:'🌟 Dica para Perfil I',
+    disc_S:'🤝 Dica para Perfil S', disc_C:'🔬 Dica para Perfil C'
+  };
+  return {title: titulos[tipo] || '🚀 Hub Pro', body: msg};
+}
+
+window.solicitarNotificacoes = function() {
+  if(!('Notification' in window)) { toast('Notificações não suportadas neste dispositivo.'); return; }
+  if(!('serviceWorker' in navigator)) { toast('Service Worker não disponível.'); return; }
+  Notification.requestPermission().then(function(perm) {
+    if(perm === 'granted') {
+      save('notif_ativo', true);
+      toast('✅ Notificações ativadas! Você receberá lembretes às 8h e 18h.');
+      agendarNotificacoes();
+    } else {
+      toast('Notificações negadas. Você pode ativar nas configurações do celular.');
+    }
+  });
+};
+
+window.desativarNotificacoes = function() {
+  save('notif_ativo', false);
+  toast('Notificações desativadas.');
+};
+
+function agendarNotificacoes() {
+  if(!('serviceWorker' in navigator)) return;
+  navigator.serviceWorker.ready.then(function(reg) {
+    var discP = UD.disc ? UD.disc.perfil : null;
+    var manha = getNotifContent(8, discP);
+    var tarde = getNotifContent(18, discP);
+    var agora = new Date();
+    var h8 = new Date(agora); h8.setHours(8,0,0,0);
+    var h18 = new Date(agora); h18.setHours(18,0,0,0);
+    var msAteh8 = h8.getTime() - agora.getTime();
+    var msAteh18 = h18.getTime() - agora.getTime();
+    if(msAteh8 > 0) setTimeout(function(){ if(UD.notif_ativo) reg.showNotification(manha.title, {body:manha.body, icon:'/favicon.ico', badge:'/favicon.ico', tag:'hubpro-manha', vibrate:[200,100,200]}); }, msAteh8);
+    if(msAteh18 > 0) setTimeout(function(){ if(UD.notif_ativo) reg.showNotification(tarde.title, {body:tarde.body, icon:'/favicon.ico', badge:'/favicon.ico', tag:'hubpro-tarde', vibrate:[200,100,200]}); }, msAteh18);
+  }).catch(function(){});
+}
+
+// Registrar Service Worker inline
+if('serviceWorker' in navigator) {
+  var swCode = 'self.addEventListener("notificationclick",function(e){e.notification.close();e.waitUntil(clients.matchAll({type:"window"}).then(function(cs){for(var i=0;i<cs.length;i++){if(cs[i].url&&"focus" in cs[i])return cs[i].focus();}if(clients.openWindow)return clients.openWindow("/")}))});';
+  var swBlob = new Blob([swCode], {type:'application/javascript'});
+  var swUrl = URL.createObjectURL(swBlob);
+  navigator.serviceWorker.register(swUrl).then(function(reg) {
+    if(UD && UD.notif_ativo) agendarNotificacoes();
+  }).catch(function(){});
+}
+
+// Mostrar banner de ativação se ainda não foi decidido
+window.addEventListener('load', function(){
+  setTimeout(function(){
+    if(!CU) return;
+    loadUD();
+    if(UD.notif_ativo === undefined && 'Notification' in window && Notification.permission !== 'denied') {
+      var banner = document.createElement('div');
+      banner.id = 'notif-banner';
+      banner.style.cssText = 'position:fixed;bottom:76px;left:12px;right:12px;background:#0f2c3e;border:1px solid rgba(184,154,79,.5);border-radius:12px;padding:14px 16px;z-index:300;display:flex;flex-direction:column;gap:10px;box-shadow:0 4px 20px rgba(0,0,0,.4)';
+      banner.innerHTML = '<div style="font-size:.82rem;font-weight:700;color:#E8E6E2">🔔 Ativar lembretes diários?</div>'
+        + '<div style="font-size:.75rem;color:#9a9690;line-height:1.55">Receba lembretes às 8h e 18h com sua meta, tarefas, dicas do perfil DISC e insights de mercado.</div>'
+        + '<div style="display:flex;gap:8px">'
+        + '<button onclick="window.solicitarNotificacoes();var b=document.getElementById(\'notif-banner\');if(b)b.remove();" style="flex:1;background:#B89A4F;color:#0B2230;border:none;border-radius:8px;padding:10px;font-size:.8rem;font-weight:700;font-family:inherit;cursor:pointer">Ativar</button>'
+        + '<button onclick="window.desativarNotificacoes();var b=document.getElementById(\'notif-banner\');if(b)b.remove();" style="flex:1;background:transparent;color:#9a9690;border:1px solid rgba(255,255,255,.15);border-radius:8px;padding:10px;font-size:.8rem;font-family:inherit;cursor:pointer">Agora nao</button>'
+        + '</div>';
+      document.body.appendChild(banner);
+    }
+  }, 3000);
+});
 </script>
 </body>
 </html>
