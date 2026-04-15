@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Meetup de Vendas do Litoral</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #F5F2EC;
+    --surface: #FFFDF8;
+    --surface2: #F0EDE5;
+    --ink: #1A1714;
+    --ink2: #5C5651;
+    --ink3: #9C9791;
+    --accent: #C45B2A;
+    --accent-soft: #F5E8DF;
+    --blue: #2A5FC4;
+    --blue-soft: #DFE8F5;
+    --green: #2A7A3B;
+    --green-soft: #DFF5E4;
+    --amber: #B86A10;
+    --amber-soft: #F5ECDF;
+    --border: rgba(26,23,20,0.1);
+    --radius: 14px;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    min-height: 100vh;
+    padding-bottom: 40px;
+  }
+
+  .hero {
+    background: var(--ink);
+    color: var(--bg);
+    padding: 36px 20px 28px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -40px;
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    background: var(--accent);
+    opacity: 0.15;
+  }
+
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: -30px; left: -20px;
+    width: 120px; height: 120px;
+    border-radius: 50%;
+    background: var(--accent);
+    opacity: 0.08;
+  }
+
+  .hero-eyebrow {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 10px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .hero h1 {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 28px;
+    line-height: 1.2;
+    margin-bottom: 6px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .hero-sub {
+    font-size: 13px;
+    color: rgba(245,242,236,0.55);
+    position: relative;
+    z-index: 1;
+  }
+
+  .tabs-wrap {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    padding: 0 16px;
+  }
+
+  .tabs {
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .tabs::-webkit-scrollbar { display: none; }
+
+  .tab-btn {
+    flex-shrink: 0;
+    padding: 14px 14px 12px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--ink3);
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: color 0.2s, border-color 0.2s;
+  }
+
+  .tab-btn.active {
+    color: var(--ink);
+    border-bottom-color: var(--accent);
+  }
+
+  .content {
+    padding: 20px 16px 0;
+  }
+
+  .block { display: none; }
+  .block.active { display: block; }
+
+  .q-card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    margin-bottom: 12px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    transition: box-shadow 0.2s;
+  }
+
+  .q-card.open {
+    box-shadow: 0 4px 20px rgba(26,23,20,0.08);
+  }
+
+  .q-header {
+    padding: 16px 16px 16px 16px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .q-number {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--surface2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--ink2);
+    margin-top: 1px;
+  }
+
+  .q-card.open .q-number {
+    background: var(--accent);
+    color: white;
+  }
+
+  .q-title {
+    flex: 1;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.45;
+    color: var(--ink);
+  }
+
+  .q-arrow {
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 2px;
+    transition: transform 0.25s;
+    color: var(--ink3);
+    font-size: 12px;
+  }
+
+  .q-card.open .q-arrow {
+    transform: rotate(180deg);
+    color: var(--accent);
+  }
+
+  .q-body {
+    display: none;
+    padding: 0 16px 18px 52px;
+    border-top: 1px solid var(--border);
+    padding-top: 14px;
+  }
+
+  .q-card.open .q-body {
+    display: block;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    padding: 3px 9px;
+    border-radius: 20px;
+    margin-bottom: 10px;
+  }
+
+  .badge-blue { background: var(--blue-soft); color: var(--blue); }
+  .badge-green { background: var(--green-soft); color: var(--green); }
+  .badge-amber { background: var(--amber-soft); color: var(--amber); }
+
+  .answer-text {
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--ink2);
+    margin-bottom: 10px;
+  }
+
+  .answer-text:last-child { margin-bottom: 0; }
+
+  .hl {
+    color: var(--ink);
+    font-weight: 500;
+  }
+
+  .stat-box {
+    background: var(--bg);
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin: 10px 0;
+    border: 1px solid var(--border);
+  }
+
+  .stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 3px 0;
+  }
+
+  .stat-lbl { font-size: 12px; color: var(--ink3); }
+  .stat-val { font-size: 12px; font-weight: 500; color: var(--ink); }
+
+  .q-ask {
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px dashed var(--border);
+  }
+
+  .q-ask-label {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink3);
+    margin-bottom: 6px;
+  }
+
+  .ask-item {
+    font-size: 13px;
+    color: var(--ink2);
+    padding: 5px 0;
+    display: flex;
+    gap: 6px;
+    line-height: 1.5;
+  }
+
+  .ask-dot {
+    color: var(--accent);
+    flex-shrink: 0;
+    font-weight: 500;
+  }
+
+  .section-label {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink3);
+    margin: 20px 0 10px;
+  }
+
+  .tip-bar {
+    background: var(--accent-soft);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 8px 8px 0;
+    padding: 10px 12px;
+    margin: 10px 0;
+    font-size: 13px;
+    color: var(--accent);
+    font-weight: 500;
+    line-height: 1.5;
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-eyebrow">1º Encontro · Litoral SC</div>
+  <h1>Meetup de<br>Vendas do Litoral</h1>
+  <p class="hero-sub">Guia de respostas · mercado imobiliário 2026</p>
+</div>
+
+<div class="tabs-wrap">
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab(0)">Cenário de mercado</button>
+    <button class="tab-btn" onclick="switchTab(1)">Vendas na prática</button>
+    <button class="tab-btn" onclick="switchTab(2)">Economia &amp; política</button>
+  </div>
+</div>
+
+<div class="content">
+
+  <!-- BLOCO 1 -->
+  <div class="block active" id="blk-0">
+    <p class="section-label">Bloco 1 — Cenário atual</p>
+
+    <div class="q-card" onclick="toggleCard(this)">
+      <div class="q-header">
+        <div class="q-number">1</div>
+        <div class="q-title">Como está o mercado imobiliário no litoral catarinense agora?</div>
+        <div class="q-arrow">▾</div>
+      </div>
+      <div class="q-body">
+        <span class="badge badge-blue">Dado forte para abrir</span>
+        <p class="answer-text">Em 2025, BC, Itapema, Itajaí e Porto Belo juntas bateram <span class="hl">R$ 13,47 bilhões em VGV</span> — o 5º maior mercado imobiliário do Brasil em apenas 490 km². Curitiba fez R$ 2,26 bi no mesmo período. Aqui é mais de 6x maior.</p>
+        <div class="stat-box">
+          <div class="stat-row"><span class="stat-lbl">VGV litoral norte 2025</span><span class="stat-val">R$ 13,47 bi</span></div>
+          <div class="stat-row"><span class="stat-lbl">Posição no Brasil</span><span class="stat-val">5º lugar</span></div>
+          <div class="stat-row"><span class="stat-lbl">Barra Velha (2021 → 2024)</span><span class="stat-val">R$ 562M → R$ 1,14 bi</span></div>
+          <div class="stat-row"><span class="stat-lbl">Unidades vendidas 2025</span><span class="stat-val">+9.000</span></div>
+        </div>
+        <p class="answer-text">O mercado entrou em 2026 <span class="hl">mais maduro e seletivo</span>. Projetos bem posicionados seguem líquidos; produtos genéricos perdem tração.</p>
+        <div class="q-ask">
+          <div class="q-ask-label">Pergunte ao grupo</div>
+          <div class="ask-item"><span class="ask-dot">›</span>"Vocês sentiram esse crescimento na prática? O que mais surpreendeu?"</div>
+          <div class="ask-item"><span class="ask-dot">›</span>"O que mudou no tipo de cliente que vocês estão atendendo?"</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="q-card" onclick="toggleCard(this)">
+      <div class="q-header">
+        <div class="q-number">2</div>
+        <div class="q-title">O que mudou nos últimos 12 meses no comportamento do comprador?</div>
+        <div class="q-arrow">▾</div>
+      </div>
+      <div class="q-body">
+        <span class="badge badge-blue">Tom consultivo</span>
+        <p class="answer-text">O comprador ficou <span class="hl">mais exigente e mais racional</span>. Quem precisa de financiamento pesou mais a decisão. Quem tem capital próprio continuou acelerando — menos especulação de curto prazo, mais foco em qualidade de vida e potencial de valorização.</p>
+        <p class="answer-text">O cliente chega mais preparado, pesquisou mais e quer entender o produto de verdade antes de assinar. Cresceu muito a demanda por <span class="hl">alto padrão e short-stay</span>.</p>
+        <div class="tip-bar">Cliente bem informado = você precisa saber mais que ele.</div>
+        <div class="q-ask">
+          <div class="q-ask-label">Pergunte ao grupo</div>
+          <div class="ask-item"><span class="ask-dot">›</span>"Vocês estão recebendo clientes mais preparados do que há 2 anos?"</div>
+          <div class="ask-item"><span class="ask-dot">›</span>"O que eles pesquisam antes de chegar até você?"</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="q-card" onclick="toggleCard(this)">
+      <div class="q-header">
+        <div class="q-number">3</div>
+        <div class="q-title">Taxa Selic alta: freio real ou só desculpa?</div>
+        <div class="q-arrow">▾</div>
+      </div>
+      <div class="q-body">
+        <span class="badge badge-amber">Provoca debate</span>
+        <p class="answer-text">A resposta honesta: <span class="hl">um pouco dos dois</span>. É freio real para quem depende de financiamento — a cada 1 ponto de queda na Selic, 160 mil famílias voltam ao crédito imobiliário.</p>
+        <div class="stat-box">
+          <div class="stat-row"><span class="stat-lbl">Selic atual</span><span class="stat-val">14,75% a.a.</span></div>
+          <div class="stat-row"><span class="stat-lbl">Projeção fim de 2026</span><span class="stat-val">~12% a.a.</span></div>
+          <div class="stat-row"><span class="stat-lbl">Famílias por ponto de queda</span><span class="stat-val">+160 mil</span></div>
+        </div>
+        <p class="answer-text">No litoral, onde boa parte das compras é à vista, a Selic virou mais <span class="hl">desculpa do que realidade</span>. Ela filtra: quem tem capital não para, quem depende de banco hesita.</p>
+        <div class="q-ask">
+          <div class="q-ask-label">Pergunte ao grupo</div>
+          <div class="ask-item"><span class="ask-dot">›</span>"Quantos dos seus clientes nos últimos 6 meses precisaram de financiamento?"</div>
+          <div class="ask-item"><span class="ask-dot">›</span>"Você acha que a Selic mudou o perfil de quem te procura?"</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BLOCO 2 -->
+  <div class="block" id="blk-1">
+    <p class="section-label">Bloco 2 — Vendas na prática</p>
+
+    <div class="q-card" onclick="toggleCard(this)">
+      <div class="q-header">
+        <div class="q-number">4</div>
+        <div class="q-title">O que está funcionando de verdade na abordagem ao cliente?</div>
+        <div class="q-arrow">▾</div>
+      </div>
+      <div class="q-body">
+        <span class="badge badge-green">Insight prático</span>
+        <p class="answer-text">O que converte é <span class="hl">mostrar valor antes de mostrar o imóvel</span>. O cliente chega pesquisado — quem só fala de metragem e localização fica para trás.</p>
+        <p class="answer-text">Quem consegue ser <span class="hl">consultor, não só corretor</span>, fecha mais. Dados concretos vendem: VGV da região, histórico de valorização, comparativo com outras cidades.</p>
+        <div class="tip-bar">A venda não começa na visita — começa muito antes, com conteúdo e relacionamento.</div>
+        <div class="q-ask">
+          <div class="q-ask-label">Pergunte ao grupo</div>
+          <div class="ask-item"><span class="ask-dot">›</span>"Qual foi a abordagem que mais funcionou com um cliente difícil recentemente?"</div>
+          <div class="ask-item"><span class="ask-dot">›</span>"Vocês usam dados de mercado na conversa ou mais feeling?"</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="q-card" onclick="toggleCard(this)">
+      <div class="q-header">
+        <div class="q-number">5</div>
+        <div class="q-title">Como lidar com o cliente que "só está pesquisando"?</div>
+        <div class="q-arrow">▾</div>
+      </div>
+      <div class="q-body">
+        <span class="badge badge-green">O cliente mais valioso</span>
+        <p class="answer-text">Esse é o cliente mais valioso — ele ainda não decidiu, então você pode influenciar a decisão. O erro é <span class="hl">tentar fechar rápido demais</span>.</p>
+        <div class="stat-box">
+          <div class="stat-row"><span class="stat-lbl">"O que te trouxe ao litoral?"</span></div>
+          <div class="stat-row" style="padding-top:6px"><span class="stat-lbl">"Você pensa em morar ou investir?"</span></div>
+          <div class="stat-row" style="padding-top:6px"><span class="stat-lbl">"Qual seria o gatilho para você fechar?"</span></div>
+        </div>
+        <p class="answer-text">Manter contato qualificado — não spam de imóveis, mas informação útil. O cliente fecha com quem construiu <span class="hl">confiança</span>, não com quem insistiu mais.</p>
+        <div class="q-ask">
+          <div class="q-ask-label">Pergunte ao grupo</div>
+          <div class="ask-item"><span class="ask-dot">›</span>"Quantos 'só estou pesquisando' viraram fechamento nos últimos meses?"</div>
+          <div class="ask-item"><span class="ask-dot">›</span>"Qual é o intervalo de tempo médio entre o primeiro contato e o fechamento?"</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="q-card" onclick="toggleCard(this)">
+      <div class="q-header">
+        <div class="q-number">6</div>
+        <div class="q-title">Redes sociais, indicação e ferramentas — o que traz mais resultado?</div>
+        <div class="q-arrow">▾</div>
+      </div>
+      <div class="q-body">
+        <span class="badge badge-green">Hierarquia clara</span>
+        <div class="stat-box">
+          <div class="stat-row"><span class="stat-lbl">Maior conversão</span><span class="stat-val">Indicação</span></div>
+          <div class="stat-row"><span class="stat-lbl">Constrói marca</span><span class="stat-val">Instagram</span></div>
+          <div class="stat-row"><span class="stat-lbl">Fecha negócio</span><span class="stat-val">WhatsApp</span></div>
+          <div class="stat-row"><span class="stat-lbl">Diferencial oculto</span><span class="stat-val">CRM</span></div>
+        </div>
+        <p class="answer-text">Indicação ainda é o canal de maior conversão. Mas <span class="hl">quem você indica?</span> Quem você conhece, quem aparece, quem demonstra autoridade. CRM separa quem fecha de quem perde negócio por <span class="hl">esquecimento</span>.</p>
+        <div class="q-ask">
+          <div class="q-ask-label">Pergunte ao grupo</div>
+          <div class="ask-item"><span class="ask-dot">›</span>"De onde veio o último negócio que vocês fecharam? Indicação, redes ou prospecção?"</div>
+          <div class="ask-item"><span class="ask-dot">›</span>"Alguém aqui usa algum CRM ou sistema de follow-up?"</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BLOCO 3 -->
+  <div class="block" id="blk-2">
+    <p class="section-label">Bloco 3 — Economia &amp; política</p>
+
+    <div class="q-card" onclick="toggleCard(this)">
+      <div class="q-header">
+        <div class="q-number">7</div>
+        <div class="q-title">Impacto das eleições e política fiscal no setor</div>
+        <div class="q-arrow">▾</div>
+      </div>
+      <div class="q-body">
+        <span class="badge badge-amber">Ano eleitoral — cautela</span>
+        <p class="answer-text">2026 é ano eleitoral e o mercado historicamente <span class="hl">desacelera um pouco antes da eleição</span> por conta da incerteza — mas raramente para.</p>
+        <p class="answer-text">O que o mercado de verdade acompanha é a <span class="hl">trajetória fiscal</span>: Selic caindo + controle das contas públicas = setor cresce. Surpresa negativa fiscal = crédito encarece de novo.</p>
+        <div class="tip-bar">Para o litoral catarinense, o impacto político tende a ser menor — demanda nacional e pouco dependente de financiamento.</div>
+        <div class="q-ask">
+          <div class="q-ask-label">Pergunte ao grupo</div>
+          <div class="ask-item"><span class="ask-dot">›</span>"Vocês sentem que clientes estão hesitando por conta das eleições?"</div>
+          <div class="ask-item"><span class="ask-dot">›</span>"Como vocês costumam lidar com objeções políticas ou econômicas?"</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="q-card" onclick="toggleCard(this)">
+      <div class="q-header">
+        <div class="q-number">8</div>
+        <div class="q-title">Sazonalidade e o perfil do comprador do litoral</div>
+        <div class="q-arrow">▾</div>
+      </div>
+      <div class="q-body">
+        <span class="badge badge-blue">Virada estrutural</span>
+        <p class="answer-text">O litoral catarinense está deixando de ser só destino de veraneio para se tornar <span class="hl">destino de moradia permanente</span>. A demanda deixou de ser sazonal.</p>
+        <div class="stat-box">
+          <div class="stat-row"><span class="stat-lbl">Barra Velha — demanda 2024</span><span class="stat-val">+16,75%</span></div>
+          <div class="stat-row"><span class="stat-lbl">SC — não pretende sair do estado</span><span class="stat-val">90,8%</span></div>
+          <div class="stat-row"><span class="stat-lbl">Garopaba — valorização anual</span><span class="stat-val">12% a 15%</span></div>
+        </div>
+        <p class="answer-text">Perfis do comprador: <span class="hl">gaúcho e paulista</span> (2ª residência de alto padrão) + <span class="hl">catarinense</span> (qualidade de vida) + <span class="hl">investidor puro</span> (short-stay e rentabilidade).</p>
+        <div class="q-ask">
+          <div class="q-ask-label">Pergunte ao grupo</div>
+          <div class="ask-item"><span class="ask-dot">›</span>"De qual estado vêm a maioria dos compradores de vocês?"</div>
+          <div class="ask-item"><span class="ask-dot">›</span>"Percebem mais gente comprando para morar do que para veranear?"</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="q-card" onclick="toggleCard(this)">
+      <div class="q-header">
+        <div class="q-number">9</div>
+        <div class="q-title">Oportunidades que poucos estão enxergando agora</div>
+        <div class="q-arrow">▾</div>
+      </div>
+      <div class="q-body">
+        <span class="badge badge-green">Encerre com impacto</span>
+        <p class="answer-text"><span class="hl">1. Janela antes da queda dos juros</span><br>Quando a Selic cair mais, a demanda sobe — e os preços sobem junto. Quem compra agora trava o preço e pega a valorização.</p>
+        <p class="answer-text"><span class="hl">2. Cidades vizinhas em expansão</span><br>Penha, Balneário Piçarras, Porto Belo — preço menor que BC e Itapema, mas trajetória parecida de valorização. Porto Belo liderou lançamentos em 2025 com 18.899 unidades.</p>
+        <p class="answer-text"><span class="hl">3. Short-stay e locação permanente</span><br>Segmento com muito espaço para crescer. Investidor com horizonte de 5-10 anos tem janela aberta agora.</p>
+        <div class="tip-bar">Feche perguntando: "Qual dessas três vocês acham que tem mais potencial aqui na região de vocês?"</div>
+        <div class="q-ask">
+          <div class="q-ask-label">Pergunte ao grupo</div>
+          <div class="ask-item"><span class="ask-dot">›</span>"Alguém já está trabalhando com short-stay? Como está sendo?"</div>
+          <div class="ask-item"><span class="ask-dot">›</span>"Qual cidade vizinha vocês acham que vai crescer mais nos próximos 3 anos?"</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  function switchTab(i) {
+    document.querySelectorAll('.tab-btn').forEach((t, j) => t.classList.toggle('active', i === j));
+    document.querySelectorAll('.block').forEach((b, j) => b.classList.toggle('active', i === j));
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function toggleCard(card) {
+    const isOpen = card.classList.contains('open');
+    card.classList.toggle('open', !isOpen);
+  }
+</script>
+</body>
+</html>
