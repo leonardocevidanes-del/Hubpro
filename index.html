@@ -97,7 +97,7 @@ html,body{height:100%;overflow:hidden;background:var(--navy);font-family:var(--f
 /* CHECKIN META */
 .checkin-row{display:flex;gap:10px;margin-top:10px}
 .btn-sim{background:rgba(76,175,125,.15);border:1px solid var(--green);border-radius:8px;padding:11px;font-size:.8rem;font-weight:700;color:var(--green);cursor:pointer;flex:1;font-family:var(--font)}
-.btn-não{background:rgba(224,85,85,.1);border:1px solid var(--red);border-radius:8px;padding:11px;font-size:.8rem;font-weight:700;color:var(--red);cursor:pointer;flex:1;font-family:var(--font)}
+.btn-nao{background:rgba(224,85,85,.1);border:1px solid var(--red);border-radius:8px;padding:11px;font-size:.8rem;font-weight:700;color:var(--red);cursor:pointer;flex:1;font-family:var(--font)}
 /* PERGUNTA CARD */
 .pq-card{background:linear-gradient(135deg,var(--navy3),#1a3a50);border:1px solid rgba(184,154,79,.25);border-radius:12px;padding:16px;cursor:pointer;position:relative}
 .pq-card .pq-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
@@ -1071,7 +1071,7 @@ function renderHome(){
     if(metaViva && !metaAtual.checkin && (dow === 5 || dow === 6 || dow === 0)){
       row.innerHTML = '<div class="checkin-row">'
         + '<button class="btn-sim" onclick="event.stopPropagation();window.checkinHome(\'sim\')" style="flex:1;padding:10px;font-size:.8rem">Sim, cheguei ✓</button>'
-        + '<button class="btn-não" onclick="event.stopPropagation();window.checkinHome(\'nao\')" style="flex:1;padding:10px;font-size:.8rem;background:rgba(224,85,85,.1);border:1px solid var(--red);border-radius:8px;color:var(--red);font-family:var(--font);cursor:pointer">Não dessa vez</button>'
+        + '<button class="btn-nao" onclick="event.stopPropagation();window.checkinHome(\'nao\')" style="flex:1;padding:10px;font-size:.8rem;background:rgba(224,85,85,.1);border:1px solid var(--red);border-radius:8px;color:var(--red);font-family:var(--font);cursor:pointer">Não dessa vez</button>'
         + '</div>';
     } else {
       row.innerHTML = '';
