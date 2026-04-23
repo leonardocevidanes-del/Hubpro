@@ -930,13 +930,19 @@ window.esqueceuSenha = function(){
   var err = $('l-err');
   err.classList.remove('on');
   if(!email){ err.textContent = 'Digite seu e-mail acima.'; err.classList.add('on'); return; }
-  var users = getUsuarios();
-  if(!users[email]){ err.textContent = 'E-mail não encontrado.'; err.classList.add('on'); return; }
   var nova = prompt('Digite sua nova senha (mínimo 6 caracteres):');
   if(!nova || nova.length < 6){ toast('Senha deve ter pelo menos 6 caracteres.'); return; }
-  users[email].hash = hashSenha(nova);
+  var users = getUsuarios();
+  // Se conta não existe, cria automaticamente (recuperação de emergência)
+  if(!users[email]){
+    var nome = prompt('Conta não encontrada. Digite seu nome para criar uma nova conta:');
+    if(!nome){ return; }
+    users[email] = {hash: hashSenha(nova), nome: nome, criado: new Date().toISOString()};
+  } else {
+    users[email].hash = hashSenha(nova);
+  }
   salvarUsuarios(users);
-  toast('✅ Senha alterada! Faça login com a nova senha.', 4000);
+  toast('✅ Senha definida! Faça login agora.', 4000);
 };
 window.criarConta = function(){
   var nome = $('c-nome').value.trim();
