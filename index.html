@@ -898,7 +898,7 @@ function rotearUsuario(){
 }
 
 // ── AUTH FUNCS ──
-window.toggleSenhá = function(id, btn){
+window.toggleSenha = function(id, btn){
   var inp = $(id);
   var show = inp.type === 'password';
   inp.type = show ? 'text' : 'password';
@@ -914,38 +914,38 @@ window.authTab = function(t){
 };
 window.fazerLogin = function(){
   var email = $('l-email').value.trim().toLowerCase();
-  var senhá = $('l-senha').value;
+  var senha = $('l-senha').value;
   var err = $('l-err');
   err.classList.remove('on');
-  if(!email || !senha){ err.textContent = 'Preenchá e-mail e senha.'; err.classList.add('on'); return; }
+  if(!email || !senha){ err.textContent = 'Preencha e-mail e senha.'; err.classList.add('on'); return; }
   var users = getUsuarios();
   if(!users[email]){ err.textContent = 'E-mail não encontrado.'; err.classList.add('on'); return; }
-  if(users[email].hash !== hashSenha(senha)){ err.textContent = 'Senhá incorreta.'; err.classList.add('on'); return; }
+  if(users[email].hash !== hashSenha(senha)){ err.textContent = 'Senha incorreta.'; err.classList.add('on'); return; }
   CU = {email: email, uid: email};
   salvarSessao(email);
   rotearUsuario();
 };
-window.esqueceuSenhá = function(){
+window.esqueceuSenha = function(){
   var email = $('l-email').value.trim().toLowerCase();
   var err = $('l-err');
   err.classList.remove('on');
   if(!email){ err.textContent = 'Digite seu e-mail acima.'; err.classList.add('on'); return; }
   var users = getUsuarios();
   if(!users[email]){ err.textContent = 'E-mail não encontrado.'; err.classList.add('on'); return; }
-  var nova = prompt('Digite sua nova senhá (mínimo 6 caracteres):');
-  if(!nova || nova.length < 6){ toast('Senhá deve ter pelo menos 6 caracteres.'); return; }
+  var nova = prompt('Digite sua nova senha (mínimo 6 caracteres):');
+  if(!nova || nova.length < 6){ toast('Senha deve ter pelo menos 6 caracteres.'); return; }
   users[email].hash = hashSenha(nova);
   salvarUsuarios(users);
-  toast('✅ Senhá alterada! Faça login com a nova senha.', 4000);
+  toast('✅ Senha alterada! Faça login com a nova senha.', 4000);
 };
 window.criarConta = function(){
   var nome = $('c-nome').value.trim();
   var email = $('c-email').value.trim().toLowerCase();
-  var senhá = $('c-senha').value;
+  var senha = $('c-senha').value;
   var err = $('c-err');
   err.classList.remove('on');
-  if(!nome || !email || !senha){ err.textContent = 'Preenchá todos os campos.'; err.classList.add('on'); return; }
-  if(senha.length < 6){ err.textContent = 'Senhá deve ter pelo menos 6 caracteres.'; err.classList.add('on'); return; }
+  if(!nome || !email || !senha){ err.textContent = 'Preencha todos os campos.'; err.classList.add('on'); return; }
+  if(senha.length < 6){ err.textContent = 'Senha deve ter pelo menos 6 caracteres.'; err.classList.add('on'); return; }
   if(email.indexOf('@') < 0){ err.textContent = 'E-mail inválido.'; err.classList.add('on'); return; }
   var users = getUsuarios();
   if(users[email]){ err.textContent = 'E-mail já cadastrado.'; err.classList.add('on'); return; }
@@ -1181,9 +1181,9 @@ var DP = {
 };
 var DISC_DATA = [
   {q:'Quando enfrento uma objeção forte, minha primeira reação é:', opts:[{t:'Rebater com dados e argumentos diretos',p:'D'},{t:'Contar uma história de sucesso parecida',p:'I'},{t:'Ouvir com calma e entender o real motivo',p:'S'},{t:'Apresentar análise comparativa detalhada',p:'C'}]},
-  {q:'Minha maior força como corretor é:', opts:[{t:'Fechar negócios rápidamente',p:'D'},{t:'Criar conexões genuínas',p:'I'},{t:'Ser confiável e consistente',p:'S'},{t:'Dominar todos os detalhes técnicos',p:'C'}]},
+  {q:'Minha maior força como corretor é:', opts:[{t:'Fechar negócios rapidamente',p:'D'},{t:'Criar conexões genuínas',p:'I'},{t:'Ser confiável e consistente',p:'S'},{t:'Dominar todos os detalhes técnicos',p:'C'}]},
   {q:'Como prefiro iniciar uma abordagem com novo cliente?', opts:[{t:'Indo direto ao ponto e perguntando o que precisa',p:'D'},{t:'Quebrando o gelo com conversa leve e bom humor',p:'I'},{t:'Ouvindo primeiro para entender a situação',p:'S'},{t:'Apresentando dados do mercado para criar credibilidade',p:'C'}]},
-  {q:'Quando perco uma venda, minha reação é:', opts:[{t:'Analisar rápidamente o que deu errado e seguir em frente',p:'D'},{t:'Ligar para o cliente e entender o que aconteceu',p:'I'},{t:'Refletir com calma e ajustar a abordagem',p:'S'},{t:'Documentar tudo e criar um plano para não repetir',p:'C'}]},
+  {q:'Quando perco uma venda, minha reação é:', opts:[{t:'Analisar rapidamente o que deu errado e seguir em frente',p:'D'},{t:'Ligar para o cliente e entender o que aconteceu',p:'I'},{t:'Refletir com calma e ajustar a abordagem',p:'S'},{t:'Documentar tudo e criar um plano para não repetir',p:'C'}]},
   {q:'Meu ambiente de trabalho ideal é:', opts:[{t:'Dinâmico, com metas desafiadoras e liberdade de ação',p:'D'},{t:'Colaborativo, com muita interação e energia positiva',p:'I'},{t:'Estável, com processos claros e equipe de confiança',p:'S'},{t:'Organizado, com dados e informações sempre disponíveis',p:'C'}]},
   {q:'Quando preciso convencer um cliente indeciso, eu:', opts:[{t:'Apresento um prazo ou condição especial para decidir logo',p:'D'},{t:'Compartilho casos de outros clientes satisfeitos',p:'I'},{t:'Dou espaço e mostro que estou disponível quando precisar',p:'S'},{t:'Envio uma análise comparativa completa por escrito',p:'C'}]},
   {q:'Como você prefere aprender coisas novas?', opts:[{t:'Testando na prática direto no campo',p:'D'},{t:'Em conversas, treinamentos em grupo e exemplos reais',p:'I'},{t:'Com tempo para assimilar, passo a passo',p:'S'},{t:'Lendo materiais técnicos e estudando a fundo',p:'C'}]},
@@ -2160,7 +2160,7 @@ var MSGS_DIA = [
 
 var LIVROS_SEMANA = [
   {título:'Como Fazer Amigos e Influenciar Pessoas', autor:'Dale Carnegie', foco:'Relacionamento e persuasao',
-   trecho:'Carnegie descobriu algo que a maioria ignora: as pessoas não são movidas por lógica, são movidas pelo desejo de se sentir importantes. Em vendas imobiliárias, isso muda tudo. O corretor que faz o cliente sentir que sua opiniao importa — que seus medos são validos, que seu sonho e compreendido — fecha mais não porque e mais inteligente, mas porque e mais humano. A próxima vez que um cliente hesitar, pergunte: "O que você achá que seria o ideal para você?" E ouca de verdade.'},
+   trecho:'Carnegie descobriu algo que a maioria ignora: as pessoas não são movidas por lógica, são movidas pelo desejo de se sentir importantes. Em vendas imobiliárias, isso muda tudo. O corretor que faz o cliente sentir que sua opinião importa — que seus medos são válidos, que seu sonho é compreendido — fecha mais não porque é mais inteligente, mas porque é mais humano. A próxima vez que um cliente hesitar, pergunte: "O que você acha que seria o ideal para você?" E ouca de verdade.'},
   {título:'Influencia', autor:'Robert Cialdini', foco:'Psicologia da persuasao',
    trecho:'Cialdini identificou que os seres humanos usam atalhos mentais para tomar decisões rápidas — e um dos mais poderosos e a escassez. Quando algo e raro ou está acabando, o cérebro automaticamente o valora mais. No mercado imobiliário do litoral SC, isso não é manipulação — e realidade: os terrenos de frente para o mar estão acabando, os lançamentos vendem antes do habite-se, e Barra Velha em 2026 lembra o que BC era em 2010. Quando você apresenta esses fatos com dados reais, não está criando urgência artificial. Está ajudando o cliente a ver o que é verdadeiro.'},
   {título:'Negocie Como se Sua Vida Dependesse Disso', autor:'Chris Voss', foco:'Negociação de alto nível',
@@ -2190,7 +2190,7 @@ var DISC_DESCRICOES = {
     título: 'Dominante — D',
     cor: '#e05555',
     emoji: '🦁',
-    resumo: 'Você e direto, decidido e orientado a resultados. Age rápido e gosta de estar no controle.',
+    resumo: 'Você é direto, decidido e orientado a resultados. Age rápido e gosta de estar no controle.',
     fortes: ['Fecha negociações com agilidade', 'Foco total no resultado', 'Não perde tempo com indecisão'],
     atenção: ['Pode pressionar demais clientes mais sensíveis', 'Tende a pular etapas de rapport'],
     dica: 'Use sua determinação para criar urgência genuína — não pressão artificial. Clientes D compram de quem vai direto ao ponto como eles.'
@@ -2208,7 +2208,7 @@ var DISC_DESCRICOES = {
     título: 'Estável — S',
     cor: '#4caf7d',
     emoji: '🤝',
-    resumo: 'Você e paciente, confiável e um ouvinte excepcional. Gera segurança nos clientes.',
+    resumo: 'Você é paciente, confiável e um ouvinte excepcional. Gera segurança nos clientes.',
     fortes: ['Constroem relacionamentos duradouros', 'Clientes confiam profundamente', 'Excelente no pós-venda'],
     atenção: ['Evita conflito quando precisa ser direto', 'Demora para criar urgência no fechamento'],
     dica: 'Sua consistência e seu superpoder. Trabalhe técnicas de fechamento com urgência ética — o cliente precisa decidir, e você pode ajudar.'
@@ -2218,7 +2218,7 @@ var DISC_DESCRICOES = {
     cor: '#4a9edd',
     emoji: '🔬',
     resumo: 'Você é analítico, preciso e domina os detalhes do mercado melhor que ninguém.',
-    fortes: ['Dominio tecnico do produto e do mercado', 'Argumentos sólidos e baseados em dados', 'Confiável e preciso nas informações'],
+    fortes: ['Domínio técnico do produto e do mercado', 'Argumentos sólidos e baseados em dados', 'Confiável e preciso nas informações'],
     atenção: ['Pode paralisar por excesso de análise', 'Clientes emocionais podem se sentir distantes'],
     dica: 'Seu conhecimento e seu maior diferencial. Pratique apresentar dados de forma emocional — números convencem a mente, historias convencem o coração.'
   }
@@ -2367,7 +2367,7 @@ var AC_TRILHAS = [
      conceito:'Sob pressão, cada perfil DISC tem uma reação padrão. O D fica mais impaciente, o I mais emocional, o S mais quieto, o C mais tecnico. Conhecer seu padrão e o primeiro passo para quebra-lo.',
      disc:{D:'Quando o cliente objeta, você acelera os argumentos. Pergunte-se: "Estou vendendo ou impondo?"',I:'Quando a conversa esfria, você tenta animar. Pergunte-se: "Estou animando ou mascarando a objeção?"',S:'Quando o cliente hesita, você recua. Pergunte-se: "Estou respeitando ou desaparecendo?"',C:'Quando o cliente dúvida, você apresenta mais dados. Pergunte-se: "Estou informando ou intimidando?"'},
      técnica:'Grave um audio de 2 minutos falando sobre um imóvel. Ouca e identifique: velocidade, tom, pausas, palavras repetidas.',
-     cenário:'O cliente para de responder suas mensagens por 2 dias. Qual e seu primeiro impulso? Análise se esse impulso serve ao cliente ou a sua ansiedade.',
+     cenário:'O cliente para de responder suas mensagens por 2 dias. Qual é seu primeiro impulso? Analise se esse impulso serve ao cliente ou a sua ansiedade.',
      compromisso:'Identifique uma situação da semana passada em que sua comunicação não funcionou. Escreva o que faria diferente hoje.'},
     {id:'c3',tipo:'Técnica',nome:'Escuta ativa - a habilidade mais rara em vendas',
      conceito:'Escuta ativa tem 4 etapas: atenção total, demonstrar que está ouvindo, perguntar para aprofundar, e refletir o que ouviu. Vendedores que praticam escuta ativa fecham em média 43% mais negociações.',
@@ -2389,7 +2389,7 @@ var AC_TRILHAS = [
      compromisso:'Escreva sua meta de comunicação para os próximos 30 dias.'}
   ]},
   {id:'inteligencia',nome:'Inteligencia Emocional',icone:'🧠',módulos:[
-    {id:'ie1',tipo:'Conceito',nome:'O que e inteligencia emocional na prática',
+    {id:'ie1',tipo:'Conceito',nome:'O que é inteligência emocional na prática',
      conceito:'5 componentes: autoconsciência, autorregulação, motivação, empatia e habilidades sociais. No mercado imobiliário, a IE diferencia o corretor que fecha uma negociação difícil do que desiste na primeira objeção.',
      disc:{D:'Maior desafio: autorregulação. Quando perde uma venda, reage com frustração visivel. Defina um ritual de reset após cada "não".',I:'Maior desafio: autoconsciência. Pode não perceber quando seu entusiasmo cansa o cliente.',S:'Maior desafio: motivação interna. Crie uma rotina de motivação própria que independa dos outros.',C:'Maior desafio: empatia. Em cada reunião, faça uma pergunta sobre como o cliente está se sentindo.'},
      técnica:'Diário emocional: por 5 dias, antes de dormir, anote qual foi a emoção mais forte em uma negociação e como ela influenciou sua decisão.',
@@ -2411,7 +2411,7 @@ var AC_TRILHAS = [
      conceito:'Quando um casal está em desacordo, o corretor vira mediador emocional. Não tente convencer os dois ao mesmo tempo. Reconheca a emoção de cada um sem tomar partido.',
      disc:{D:'"Vocês tem perspectivas diferentes - isso é normal. Vamos separar os pontos em que concordam dos que precisam de conversa?"',I:'"Sabe o que eu adoro nessa situação? Significa que vocês estão levando a sério. O que cada um mais valoriza?"',S:'"Faz sentido que queiram pensar mais. Conversem esta noite e me digam amanhã o que cada um consideraria ideal."',C:'"Vou mapear os critérios dos dois. Você valoriza X, e você valoriza Y. Deixa eu ver se esse imóvel atende os dois."'},
      técnica:'Em conflito entre clientes, sua função não é resolver o conflito deles - é mostrar que o imóvel pode ser a solução para ambos.',
-     cenário:'Maria quer apartamento grande para os filhos. Carlos quer algo menor e moderno. Carlos diz: "Isso não e o que eu quero." Como você responde?',
+     cenário:'Maria quer apartamento grande para os filhos. Carlos quer algo menor e moderno. Carlos diz: "Isso não é o que eu quero." Como você responde?',
      compromisso:'Relembre um casal que atendeu. Qual foi o maior ponto de tensão? Como lidaria com ele hoje?'},
     {id:'ie5',tipo:'Compromisso',nome:'Meu plano de desenvolvimento emocional',
      conceito:'IE se desenvolve pela prática deliberada. O sistema que funciona tem 3 elementos: gatilho (situação específica), ação (o que vou fazer diferente), e medição (como vou saber se funcionou).',
