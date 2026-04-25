@@ -840,6 +840,18 @@ function save(campo, val){
 }
 
 // ── AUTH LOCAL ──
+
+// ═══════════════════════════════════════════════════════
+// HUB PRO — REGRA DE OURO AUTH (NAO REMOVER)
+// fazerLogin SEMPRE deve ter esta ordem:
+//   1. validar email e senha preenchidos
+//   2. var users = getUsuarios()
+//   3. if(!users[email]) → "E-mail nao encontrado"
+//   4. if(!verificarESalvarSenha(email, senha)) → "Senha incorreta"
+//   5. CU = {email, uid} → salvarSessao → rotearUsuario
+// verificarESalvarSenha() tenta hash novo (djb2) e faz fallback
+// para hash legado (Math.imul) migrando silenciosamente
+// ═══════════════════════════════════════════════════════
 function hashSenha(s){
   var hash = 5381;
   for(var i = 0; i < s.length; i++){
@@ -941,6 +953,7 @@ window.fazerLogin = function(){
   err.classList.remove('on');
   if(!email || !senha){ err.textContent = 'Preencha e-mail e senha.'; err.classList.add('on'); return; }
   var users = getUsuarios();
+  if(!users[email]){ err.textContent = 'E-mail nao encontrado. Crie uma conta.'; err.classList.add('on'); return; }
   if(!verificarESalvarSenha(email, senha)){ err.textContent = 'Senha incorreta.'; err.classList.add('on'); return; }
   CU = {email: email, uid: email};
   salvarSessao(email);
@@ -1248,7 +1261,7 @@ window.respDisc = function(p){
   var disc = {perfil:perfil, nome:DP[perfil].nome, scores:ds.scores, total:total};
   save('disc', disc);
   var p2 = DP[perfil];
-  $('disc-content').innerHTML = '<div class="dr-wrap">'
+  $('disc-content').innerHTML = '<div class="dr-wrap" style="padding-bottom:80px">'
     + '<div class="dr-card"><div class="dr-letter">' + perfil + '</div><div class="dr-name">' + p2.nome + '</div><div class="dr-desc">' + p2.desc + '</div></div>'
     + '<div class="bars-card"><h3>Distribuição dos eixos</h3>'
     + ['D','I','S','C'].map(function(l){
@@ -1773,14 +1786,14 @@ var CENS = [
 
 function renderSim(){
   var c = $('sim-content');
-  if(simAt !== null){ renderSimAt(c); return; }
+  if(window.simAt !== null){ renderSimAt(c); return; }
   var scoreHtml = '';
-  if(simScore.total > 0){
+  if(window.simScore.total > 0){
     scoreHtml = '<div class="score-wrap" style="margin:14px 16px 0"><h3>🎯 Seu Desempenho</h3>'
       + '<div class="score-nums">'
-      + '<div class="score-item ok"><div class="sn">' + simScore.acertos + '</div><div class="sl">acertos</div></div>'
-      + '<div class="score-item err"><div class="sn">' + simScore.erros + '</div><div class="sl">erros</div></div>'
-      + '<div class="score-item"><div class="sn" style="color:var(--gold)">' + simScore.total + '</div><div class="sl">feitos</div></div>'
+      + '<div class="score-item ok"><div class="sn">' + window.simScore.acertos + '</div><div class="sl">acertos</div></div>'
+      + '<div class="score-item err"><div class="sn">' + window.simScore.erros + '</div><div class="sl">erros</div></div>'
+      + '<div class="score-item"><div class="sn" style="color:var(--gold)">' + window.simScore.total + '</div><div class="sl">feitos</div></div>'
       + '</div>'
       + '<div style="margin-top:10px"><button class="btn-s" onclick="window.resetSimScore()" style="padding:8px 16px;font-size:.75rem;width:auto">↺ Reiniciar pontuação</button></div>'
       + '</div>';
@@ -1799,19 +1812,19 @@ function renderSim(){
       }).join('')
     + '</div>';
 }
-window.abrirSim = function(i){ simAt = {idx:i, resp:false}; renderSimAt($('sim-content')); };
-window.voltarSim = function(){ simAt = null; renderSim(); };
-window.resetSimScore = function(){ simScore = {acertos:0, erros:0, total:0}; renderSim(); };
+window.abrirSim = function(i){ window.simAt = {idx:i, resp:false}; renderSimAt($('sim-content')); };
+window.voltarSim = function(){ window.simAt = null; renderSim(); };
+window.resetSimScore = function(){ window.simScore = {acertos:0, erros:0, total:0}; renderSim(); };
 
 function renderSimAt(c){
-  var cn = CENS[simAt.idx];
+  var cn = CENS[window.simAt.idx];
   var nivColor = cn.nivel.length >= 9 ? 'var(--red)' : cn.nivel.length >= 7 ? 'var(--red)' : 'var(--gold)';
   c.innerHTML = '<div class="sim-active">'
     + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">'
     + '<button class="btn-back" onclick="window.voltarSim()">← Voltar</button>'
     + '<div style="font-size:.75rem;color:' + nivColor + '">' + cn.nivel + '</div>'
     + '</div>'
-    + '<div class="sim-num">CENÁRIO ' + (simAt.idx+1) + ' DE ' + CENS.length + '</div>'
+    + '<div class="sim-num">CENÁRIO ' + (window.simAt.idx+1) + ' DE ' + CENS.length + '</div>'
     + '<div style="font-size:.88rem;font-weight:600;color:var(--gold);margin:6px 0 10px;line-height:1.4">' + cn.titulo + '</div>'
     + '<div class="sim-cenario">' + cn.desc + '</div>'
     + '<div style="font-size:.65rem;font-weight:700;color:var(--dim);letter-spacing:2px;text-transform:uppercase;margin:12px 0 8px">Escolha a melhor resposta:</div>'
@@ -1826,23 +1839,23 @@ function renderSimAt(c){
     + '</div>';
 }
 window.respSim = function(i){
-  if(simAt.resp) return;
-  simAt.resp = true;
-  var o = CENS[simAt.idx].opts[i];
+  if(window.simAt.resp) return;
+  window.simAt.resp = true;
+  var o = CENS[window.simAt.idx].opts[i];
   var btn = document.getElementById('so' + i);
   if(btn) btn.classList.add(o.c ? 'ok' : 'err');
   var fb = $('sim-fb');
   fb.classList.add('on', o.c ? 'ok-fb' : 'err-fb');
   fb.innerHTML = '<div class="fbl">' + (o.c ? '✅ Resposta correta!' : '❌ Não é a melhor abordagem') + '</div>' + o.fb;
-  simScore.total++;
-  if(o.c) simScore.acertos++; else simScore.erros++;
+  window.simScore.total++;
+  if(o.c) window.simScore.acertos++; else window.simScore.erros++;
   var nxt = document.createElement('button');
   nxt.className = 'btn-p';
   nxt.style.marginTop = '10px';
-  nxt.textContent = simAt.idx < CENS.length-1 ? 'Próximo cenário →' : '↩ Ver todos os cenários';
+  nxt.textContent = window.simAt.idx < CENS.length-1 ? 'Próximo cenário →' : '↩ Ver todos os cenários';
   nxt.onclick = function(){
-    if(simAt.idx < CENS.length-1) simAt = {idx: simAt.idx+1, resp:false};
-    else simAt = null;
+    if(window.simAt.idx < CENS.length-1) window.simAt = {idx: window.simAt.idx+1, resp:false};
+    else window.simAt = null;
     renderSim();
   };
   document.querySelector('.sim-active').appendChild(nxt);
