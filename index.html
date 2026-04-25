@@ -772,8 +772,8 @@ textarea.ta:focus{border-color:var(--gold)}
 
 let CU = null, UD = {}, privOrig = 'lgpd';
 let scriptsScore = {acertos:0, erros:0, vistos:[]};
-let simScore = {acertos:0, erros:0, total:0};
-let simAt = null;
+window.simScore = {acertos:0, erros:0, total:0};
+window.simAt = null;
 let _metaEditMode = null;
 
 // ── UTILS ──
@@ -841,9 +841,31 @@ function save(campo, val){
 
 // ── AUTH LOCAL ──
 function hashSenha(s){
+  var hash = 5381;
+  for(var i = 0; i < s.length; i++){
+    var c = s.charCodeAt(i);
+    hash = ((hash << 5) + hash) + c;
+    hash = hash & hash;
+  }
+  return (hash >>> 0).toString(36);
+}
+function hashSenhaLegado(s){
   var h = 0;
   for(var i = 0; i < s.length; i++){ h = Math.imul(31, h) + s.charCodeAt(i) | 0; }
   return h.toString(36);
+}
+function verificarESalvarSenha(email, senha){
+  var users = getUsuarios();
+  if(!users[email]) return false;
+  var hashNovo = hashSenha(senha);
+  if(users[email].hash === hashNovo) return true;
+  var hashAntig = hashSenhaLegado(senha);
+  if(users[email].hash === hashAntig){
+    users[email].hash = hashNovo;
+    salvarUsuarios(users);
+    return true;
+  }
+  return false;
 }
 function getUsuarios(){
   try { return JSON.parse(localStorage.getItem('hp_users') || '{}'); } catch(e){ return {}; }
@@ -919,8 +941,7 @@ window.fazerLogin = function(){
   err.classList.remove('on');
   if(!email || !senha){ err.textContent = 'Preencha e-mail e senha.'; err.classList.add('on'); return; }
   var users = getUsuarios();
-  if(!users[email]){ err.textContent = 'E-mail não encontrado.'; err.classList.add('on'); return; }
-  if(users[email].hash !== hashSenha(senha)){ err.textContent = 'Senha incorreta.'; err.classList.add('on'); return; }
+  if(!verificarESalvarSenha(email, senha)){ err.textContent = 'Senha incorreta.'; err.classList.add('on'); return; }
   CU = {email: email, uid: email};
   salvarSessao(email);
   rotearUsuario();
@@ -1843,7 +1864,7 @@ function renderMkt(){
     + '<div class="mkt-crd">'
     + '<h3>📍 Preço do m² — Litoral SC</h3>'
     + '<p style="font-size:.78rem;color:var(--dim);line-height:1.7;margin-bottom:14px">O valor do metro quadrado varia por cidade, bairro, andar e acabamento. Consulte o FipeZap para dados atualizados por cidade.</p>'
-    + '<button onclick="window.open(\'https://www.fipe.org.br/pt-br/índices/fipezap\',\'_blank\')" style="background:rgba(184,154,79,.12);border:1px solid rgba(184,154,79,.4);border-radius:8px;padding:13px 16px;font-size:.82rem;font-weight:600;color:var(--gold);font-family:var(--font);cursor:pointer;text-align:left;width:100%">🔗 FipeZap — Índice de Preços Imobiliários<br><span style="font-size:.65rem;font-weight:400;color:var(--dim)">fipe.org.br · Atualizado mensalmente</span></button>'
+    + '<button onclick="window.open(\'https://www.fipezap.com.br',\'_blank\')" style="background:rgba(184,154,79,.12);border:1px solid rgba(184,154,79,.4);border-radius:8px;padding:13px 16px;font-size:.82rem;font-weight:600;color:var(--gold);font-family:var(--font);cursor:pointer;text-align:left;width:100%">🔗 FipeZap — Índice de Preços Imobiliários<br><span style="font-size:.65rem;font-weight:400;color:var(--dim)"> · Atualizado mensalmente</span></button>'
     + '</div>'
 
     + '<div class="mkt-crd"><h3>🏗️ Indicadores de Custo de Construção</h3>'
@@ -2712,7 +2733,7 @@ function acModuloDesbloqueado(trilhaIdx, modIdx){
 }
 function acModuloConcluido(modId){ return !!acGetData().modulos_concluidos[modId]; }
 
-var _acTrilhaIdx = 0, _acModIdx = 0;
+window._acTrilhaIdx = 0; window._acModIdx = 0;
 
 function renderAcademia(){
   var totConc = acTrilhasConcluidas();
