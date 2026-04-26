@@ -438,26 +438,26 @@ textarea.ta:focus{border-color:var(--gold)}
     <div class="pb">PRO</div>
   </div>
   <div class="atabs">
-    <div class="atab on" onclick="authTab('login')">Entrar</div>
-    <div class="atab" onclick="authTab('cad')">Criar conta</div>
+    <div class="atab on" onclick="window.authTab('login')">Entrar</div>
+    <div class="atab" onclick="window.authTab('cad')">Criar conta</div>
   </div>
   <div id="form-login" class="aform on mc" style="padding-top:20px">
     <div class="fl"><label>E-mail</label><input type="email" id="l-email" placeholder="seu@email.com" autocomplete="email"></div>
-    <div class="fl"><label>Senha</label><div class="pw-wrap"><input type="password" id="l-senha" placeholder="••••••••" autocomplete="current-password"><button class="pw-eye" onclick="toggleSenha('l-senha',this)" tabindex="-1">👁</button></div></div>
+    <div class="fl"><label>Senha</label><div class="pw-wrap"><input type="password" id="l-senha" placeholder="••••••••" autocomplete="current-password"><button class="pw-eye" onclick="window.toggleSenha('l-senha',this)" tabindex="-1">👁</button></div></div>
     <div class="rem-row" onclick="document.getElementById('rem-cb').click()">
       <div class="rem-row-touch"><input type="checkbox" id="rem-cb" onclick="event.stopPropagation()"></div>
       <label for="rem-cb" onclick="event.stopPropagation();document.getElementById('rem-cb').click()">Lembrar meu login neste dispositivo</label>
     </div>
     <div id="l-err" class="aerr"></div>
-    <button class="btn-p" onclick="fazerLogin()">Entrar</button>
-    <div style="text-align:center"><button onclick="esqueceuSenha()" style="background:transparent;border:none;color:var(--gold);font-size:.78rem;font-family:var(--font);cursor:pointer;text-decoration:underline;padding:4px">Esqueci minha senha</button></div>
+    <button class="btn-p" onclick="window.fazerLogin()">Entrar</button>
+    <div style="text-align:center"><button onclick="window.esqueceuSenha()" style="background:transparent;border:none;color:var(--gold);font-size:.78rem;font-family:var(--font);cursor:pointer;text-decoration:underline;padding:4px">Esqueci minha senha</button></div>
   </div>
   <div id="form-cad" class="aform mc" style="padding-top:20px">
     <div class="fl"><label>Nome completo</label><input type="text" id="c-nome" placeholder="Seu nome completo" autocomplete="name" autocapitalize="words"></div>
     <div class="fl"><label>E-mail</label><input type="email" id="c-email" placeholder="seu@email.com" autocomplete="email"></div>
-    <div class="fl"><label>Senha</label><div class="pw-wrap"><input type="password" id="c-senha" placeholder="mínimo 6 caracteres" autocomplete="new-password"><button class="pw-eye" onclick="toggleSenha('c-senha',this)" tabindex="-1">👁</button></div></div>
+    <div class="fl"><label>Senha</label><div class="pw-wrap"><input type="password" id="c-senha" placeholder="mínimo 6 caracteres" autocomplete="new-password"><button class="pw-eye" onclick="window.toggleSenha('c-senha',this)" tabindex="-1">👁</button></div></div>
     <div id="c-err" class="aerr"></div>
-    <button class="btn-p" onclick="criarConta()">Criar conta</button>
+    <button class="btn-p" onclick="window.criarConta()">Criar conta</button>
   </div>
 </div>
 
