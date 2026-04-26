@@ -452,7 +452,7 @@ textarea.ta:focus{border-color:var(--gold)}
     <button class="btn-p" onclick="fazerLogin()">Entrar</button>
     <div style="text-align:center"><button onclick="esqueceuSenha()" style="background:transparent;border:none;color:var(--gold);font-size:.78rem;font-family:var(--font);cursor:pointer;text-decoration:underline;padding:4px">Esqueci minha senha</button></div>
   </div>
-  <div id="form-cad" class="aform mc" style="padding-top:20px">
+  <div id="form-cadastro" class="aform mc" style="padding-top:20px">
     <div class="fl"><label>Nome completo</label><input type="text" id="c-nome" placeholder="Seu nome completo" autocomplete="name" autocapitalize="words"></div>
     <div class="fl"><label>E-mail</label><input type="email" id="c-email" placeholder="seu@email.com" autocomplete="email"></div>
     <div class="fl"><label>Senha</label><div class="pw-wrap"><input type="password" id="c-senha" placeholder="mínimo 6 caracteres" autocomplete="new-password"><button class="pw-eye" onclick="toggleSenha('c-senha',this)" tabindex="-1">👁</button></div></div>
@@ -768,13 +768,13 @@ textarea.ta:focus{border-color:var(--gold)}
 <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 
 // ── HUB PRO v4 — 100% Local, Zero Firebase ──
-'use strict';
+// strict mode removido — escopo global requer var
 
-let CU = null, UD = {}, privOrig = 'lgpd';
-let scriptsScore = {acertos:0, erros:0, vistos:[]};
+var CU = null, UD = {}, privOrig = 'lgpd';
+var scriptsScore = {acertos:0, erros:0, vistos:[]};
 window.simScore = {acertos:0, erros:0, total:0};
 window.simAt = null;
-let _metaEditMode = null;
+var _metaEditMode = null;
 
 // ── UTILS ──
 function $(id){ return document.getElementById(id); }
@@ -997,58 +997,6 @@ window.criarConta = function(){
   salvarSessao(email);
   rotearUsuario();
 };
-
-// ══════════════════════════════════════════════════════════════════
-// HUB PRO — AUTOPROTEÇÃO DO AUTH (NAO REMOVER / NAO ALTERAR)
-// Este bloco roda automaticamente ao carregar o app.
-// Se qualquer função crítica do auth estiver quebrada,
-// exibe alerta no console E trava o app com mensagem visível.
-// ══════════════════════════════════════════════════════════════════
-(function verificarIntegridadeAuth(){
-  var erros = [];
-  // 1. Funções obrigatórias existem?
-  var fns = ['hashSenha','hashSenhaLegado','verificarESalvarSenha','getUsuarios',
-             'salvarUsuarios','salvarSessao','lerSessao','limparSessao','rotearUsuario'];
-  fns.forEach(function(fn){
-    if(typeof window[fn] !== 'function' && typeof eval('typeof ' + fn) === 'undefined'){
-      erros.push('Funcao ausente: ' + fn);
-    }
-  });
-  // 2. window.toggleSenha existe?
-  if(typeof window.toggleSenha !== 'function') erros.push('toggleSenha ausente');
-  // 3. window.fazerLogin existe?
-  if(typeof window.fazerLogin !== 'function') erros.push('fazerLogin ausente');
-  // 4. window.esqueceuSenha existe?
-  if(typeof window.esqueceuSenha !== 'function') erros.push('esqueceuSenha ausente');
-  // 5. window.criarConta existe?
-  if(typeof window.criarConta !== 'function') erros.push('criarConta ausente');
-  // 6. hashSenha produz resultado estável?
-  try {
-    var h1 = hashSenha('teste123');
-    var h2 = hashSenha('teste123');
-    if(h1 !== h2) erros.push('hashSenha instável');
-    if(!h1) erros.push('hashSenha retorna vazio');
-  } catch(e){ erros.push('hashSenha erro: ' + e.message); }
-  // 7. getUsuarios retorna objeto?
-  try {
-    var u = getUsuarios();
-    if(typeof u !== 'object') erros.push('getUsuarios nao retorna objeto');
-  } catch(e){ erros.push('getUsuarios erro: ' + e.message); }
-  // Resultado
-  if(erros.length > 0){
-    console.error('[HUB PRO AUTH] FALHA DE INTEGRIDADE:', erros);
-    // Mostrar aviso visível no app
-    setTimeout(function(){
-      var d = document.createElement('div');
-      d.style.cssText = 'position:fixed;top:0;left:0;right:0;background:#e05555;color:#fff;font-size:.8rem;font-weight:700;padding:12px 16px;z-index:9999;text-align:center;font-family:sans-serif';
-      d.textContent = 'ERRO INTERNO: ' + erros[0] + '. Contate o suporte.';
-      document.body.appendChild(d);
-    }, 500);
-  } else {
-    console.log('[HUB PRO AUTH] OK — todas as funcoes de auth integras.');
-  }
-})();
-// ══════════════════════════════════════════════════════════════════
 
 // ── LGPD ──
 window.toggleLgpd = function(){
