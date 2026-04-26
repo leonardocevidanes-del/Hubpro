@@ -8,8 +8,8 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Hub Pro">
 <title>Hub Pro — Hub Litoral</title>
-<link rel="preçonnect" href="https://fonts.googleapis.com">
-<link rel="preçonnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{--navy:#0B2230;--navy2:#0f2c3e;--navy3:#163548;--gold:#B89A4F;--gold2:#d4b568;--white:#E8E6E2;--dim:#9a9690;--green:#4caf7d;--red:#e05555;--font:'Montserrat',sans-serif}
@@ -24,7 +24,7 @@ html,body{height:100%;overflow:hidden;background:var(--navy);font-family:var(--f
 .sl .lit{font-size:.9rem;font-weight:300;color:var(--white);letter-spacing:8px;margin-top:2px}
 .sl .pb{display:inline-block;background:var(--gold);color:var(--navy);font-size:.6rem;font-weight:700;letter-spacing:3px;padding:3px 10px;border-radius:2px;margin-top:10px}
 .sl .sub{margin-top:6px;font-size:.65rem;color:var(--dim);letter-spacing:2px}
-@keyframês fu{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fu{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
 .sl{text-align:center;animation:fu .7s ease both}
 /* AUTH */
 #sa .ah{background:linear-gradient(180deg,var(--navy3),var(--navy));padding:36px 24px 24px;text-align:center}
@@ -370,7 +370,7 @@ textarea.ta:focus{border-color:var(--gold)}
 .news-card:active{border-color:var(--gold)}
 .news-card .nc-label{font-size:.58rem;font-weight:700;color:var(--gold);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;display:flex;align-items:center;gap:6px}
 .news-card .nc-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 1.5s infinite}
-@keyframês pulse{0%,100%{opacity:1}50%{opacity:.4}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 .news-card .nc-title{font-size:.83rem;font-weight:600;color:var(--white);line-height:1.45;margin-bottom:4px}
 .news-card .nc-source{font-size:.68rem;color:var(--dim)}
 /* SCORE CARD */
@@ -382,7 +382,7 @@ textarea.ta:focus{border-color:var(--gold)}
 .score-item.ok .sn{color:var(--green)}
 .score-item.err .sn{color:var(--red)}
 .spinner{width:22px;height:22px;border:3px solid rgba(184,154,79,.25);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto}
-@keyframês spin{to{transform:rotate(360deg)}}
+@keyframes spin{to{transform:rotate(360deg)}}
 .loading{position:fixed;inset:0;background:rgba(11,34,48,.82);z-index:300;display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px}
 .loading.on{display:flex}
 .loading p{font-size:.8rem;color:var(--dim)}
@@ -997,6 +997,58 @@ window.criarConta = function(){
   salvarSessao(email);
   rotearUsuario();
 };
+
+// ══════════════════════════════════════════════════════════════════
+// HUB PRO — AUTOPROTEÇÃO DO AUTH (NAO REMOVER / NAO ALTERAR)
+// Este bloco roda automaticamente ao carregar o app.
+// Se qualquer função crítica do auth estiver quebrada,
+// exibe alerta no console E trava o app com mensagem visível.
+// ══════════════════════════════════════════════════════════════════
+(function verificarIntegridadeAuth(){
+  var erros = [];
+  // 1. Funções obrigatórias existem?
+  var fns = ['hashSenha','hashSenhaLegado','verificarESalvarSenha','getUsuarios',
+             'salvarUsuarios','salvarSessao','lerSessao','limparSessao','rotearUsuario'];
+  fns.forEach(function(fn){
+    if(typeof window[fn] !== 'function' && typeof eval('typeof ' + fn) === 'undefined'){
+      erros.push('Funcao ausente: ' + fn);
+    }
+  });
+  // 2. window.toggleSenha existe?
+  if(typeof window.toggleSenha !== 'function') erros.push('toggleSenha ausente');
+  // 3. window.fazerLogin existe?
+  if(typeof window.fazerLogin !== 'function') erros.push('fazerLogin ausente');
+  // 4. window.esqueceuSenha existe?
+  if(typeof window.esqueceuSenha !== 'function') erros.push('esqueceuSenha ausente');
+  // 5. window.criarConta existe?
+  if(typeof window.criarConta !== 'function') erros.push('criarConta ausente');
+  // 6. hashSenha produz resultado estável?
+  try {
+    var h1 = hashSenha('teste123');
+    var h2 = hashSenha('teste123');
+    if(h1 !== h2) erros.push('hashSenha instável');
+    if(!h1) erros.push('hashSenha retorna vazio');
+  } catch(e){ erros.push('hashSenha erro: ' + e.message); }
+  // 7. getUsuarios retorna objeto?
+  try {
+    var u = getUsuarios();
+    if(typeof u !== 'object') erros.push('getUsuarios nao retorna objeto');
+  } catch(e){ erros.push('getUsuarios erro: ' + e.message); }
+  // Resultado
+  if(erros.length > 0){
+    console.error('[HUB PRO AUTH] FALHA DE INTEGRIDADE:', erros);
+    // Mostrar aviso visível no app
+    setTimeout(function(){
+      var d = document.createElement('div');
+      d.style.cssText = 'position:fixed;top:0;left:0;right:0;background:#e05555;color:#fff;font-size:.8rem;font-weight:700;padding:12px 16px;z-index:9999;text-align:center;font-family:sans-serif';
+      d.textContent = 'ERRO INTERNO: ' + erros[0] + '. Contate o suporte.';
+      document.body.appendChild(d);
+    }, 500);
+  } else {
+    console.log('[HUB PRO AUTH] OK — todas as funcoes de auth integras.');
+  }
+})();
+// ══════════════════════════════════════════════════════════════════
 
 // ── LGPD ──
 window.toggleLgpd = function(){
